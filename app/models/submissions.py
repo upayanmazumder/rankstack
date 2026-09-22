@@ -1,5 +1,6 @@
 """Request/response models for the `submissions` collection."""
 
+from datetime import datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel
@@ -33,4 +34,4 @@ class SubmissionOut(BaseModel):
     answer: Any
     status: SubmissionStatus
     score: float
-    submittedAt: str
+    submittedAt: datetime

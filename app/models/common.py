@@ -24,13 +24,13 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _serialize_value(v: Any) -> Any:
+def serialize_value(v: Any) -> Any:
     if isinstance(v, ObjectId):
         return str(v)
     if isinstance(v, dict):
-        return {k: _serialize_value(x) for k, x in v.items()}
+        return {k: serialize_value(x) for k, x in v.items()}
     if isinstance(v, list):
-        return [_serialize_value(x) for x in v]
+        return [serialize_value(x) for x in v]
     return v
 
 
@@ -42,5 +42,5 @@ def serialize_doc(doc: dict[str, Any] | None) -> dict[str, Any] | None:
     out: dict[str, Any] = {}
     for k, v in doc.items():
         key = "id" if k == "_id" else k
-        out[key] = _serialize_value(v)
+        out[key] = serialize_value(v)
     return out

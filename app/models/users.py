@@ -1,5 +1,6 @@
 """Request/response models for the `users` collection."""
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
@@ -27,4 +28,4 @@ class UserOut(BaseModel):
     role: Role
     totalScore: float = 0
     teamIds: list[str] = []
-    createdAt: str
+    createdAt: datetime

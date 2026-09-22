@@ -4,6 +4,7 @@
 right shape (mcq / coding / subjective) directly from the request body.
 """
 
+from datetime import datetime
 from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, Field
@@ -75,7 +76,7 @@ class ProblemOut(BaseModel):
     difficulty: Difficulty
     points: float
     attemptCount: float = 0
-    createdAt: str
+    createdAt: datetime
     # type-specific fields, present depending on `type`
     options: list[str] | None = None
     correctAnswer: str | None = None
