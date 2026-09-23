@@ -1,0 +1,89 @@
+# Single-node replica set (rs0) -- required for the app's multi-document
+# transactions; a standalone mongod does not support them. No auth: this
+# Service is ClusterIP-only, never exposed outside the namespace, same
+# posture as the app's own docker-compose.yml. wiredTigerCacheSizeGB is
+# capped explicitly -- Mongo's default (50% of host RAM minus 1GB) would
+# overshoot this pod's own memory limit on a shared node.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rankstack-mongo-pvc
+  namespace: {{ .Values.namespace }}
+spec:
+  storageClassName: {{ .Values.mongo.storage.className }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mongo.storage.size }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rankstack-mongo
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: rankstack-mongo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rankstack-mongo
+  template:
+    metadata:
+      labels:
+        app: rankstack-mongo
+    spec:
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- include "rankstack.nodeAffinity" . | nindent 6 }}
+      containers:
+        - name: mongo
+          image: {{ .Values.mongo.image }}
+          args:
+            - --replSet
+            - rs0
+            - --bind_ip_all
+            - --wiredTigerCacheSizeGB
+            - {{ .Values.mongo.wiredTigerCacheSizeGB | quote }}
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+          resources:
+            {{- toYaml .Values.mongo.resources | nindent 12 }}
+          # mongosh-exec probes were unreliable under this shared node's CPU
+          # contention -- process spawn alone sometimes exceeded a 5s
+          # timeout. tcpSocket only confirms mongod is accepting
+          # connections, which is all the api pod's initContainer and the
+          # rs-init Job actually need.
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: rankstack-mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rankstack-mongo
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: rankstack-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017

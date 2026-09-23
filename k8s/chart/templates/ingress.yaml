@@ -1,0 +1,23 @@
+# Only the API is exposed from this cluster -- the frontend is deployed to
+# Vercel, not here. *.upayan.dev wildcard cert is served by Traefik
+# automatically, no tls: block needed (mirrors upayanmazumder/vps's
+# bitvault/ingress.yaml).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rankstack-api
+  namespace: {{ .Values.namespace }}
+  annotations:
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rankstack-api
+                port:
+                  number: 8000

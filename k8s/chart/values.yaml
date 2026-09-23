@@ -1,0 +1,76 @@
+# Default values — safe to commit, no secrets (Mongo/Redis run without auth
+# in every environment; see mongo.yaml comment in templates/). Per-cluster
+# overrides (ingress host, CORS origin, image tag) live in the values file
+# supplied by the GitOps repo's Application (see upayanmazumder/vps
+# k8s/apps/de/rankstack/values/*.yaml), not here.
+
+namespace: rankstack
+
+nodeAffinityHostname: vps
+priorityClassName: low-priority
+
+image:
+  repository: ghcr.io/upayanmazumder/rankstack/api
+  tag: edge
+  pullPolicy: Always
+
+api:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+ingress:
+  host: api-rankstack.upayan.dev
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+
+mongo:
+  image: mongo:7
+  wiredTigerCacheSizeGB: "0.25"
+  storage:
+    className: local-path
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 192Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+  rsInit:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+redis:
+  image: redis:7-alpine
+  maxmemory: 100mb
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 160Mi
+
+# envFrom the rankstack-api-env Secret, rendered from this map. No real
+# secrets today (Mongo/Redis are unauthenticated, ClusterIP-only) -- kept as
+# a Secret (not a ConfigMap) so envFrom needs no template change the day
+# real credentials are added.
+env:
+  MONGO_DB: rankstack
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  CORS_ORIGINS: "http://localhost:3000"
+  SESSION_TTL_SECONDS: "3600"
+  RATE_LIMIT_WINDOW_SECONDS: "60"
+  RATE_LIMIT_MAX_SUBMISSIONS: "10"
