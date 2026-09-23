@@ -1,0 +1,43 @@
+# Sync hook at wave 1 (mongo/redis default to wave 0, api is pinned to wave
+# 2) -- NOT PostSync. PostSync only runs once the whole app is Healthy, but
+# rankstack-api's own health depends on init_db() succeeding, which needs
+# the replica set already initiated: PostSync would deadlock against
+# itself. Sync-wave ordering only needs wave 0 (mongo) Healthy first, then
+# runs this, then applies api -- no circular wait. Idempotent rs.initiate().
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rankstack-mongo-rs-init
+  namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: Never
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- include "rankstack.nodeAffinity" . | nindent 6 }}
+      containers:
+        - name: rs-init
+          image: {{ .Values.mongo.image }}
+          command:
+            - bash
+            - -c
+            - >
+              until mongosh --host rankstack-mongo:27017 --quiet --eval 'db.adminCommand("ping")' >/dev/null 2>&1; do
+                echo waiting for mongod;
+                sleep 2;
+              done;
+              mongosh --host rankstack-mongo:27017 --quiet --eval '
+              try {
+                rs.status();
+                print("replica set already initiated");
+              } catch (e) {
+                rs.initiate({_id: "rs0", members: [{_id: 0, host: "rankstack-mongo:27017"}]});
+                print("replica set initiated");
+              }'
+          resources:
+            {{- toYaml .Values.mongo.rsInit.resources | nindent 12 }}
