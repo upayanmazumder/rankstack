@@ -5,6 +5,19 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # react-dom refuses to run against a different react version, and
+      # eslint-config-next tracks the next release line.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      next:
+        patterns:
+          - next
+          - eslint-config-next
 
   - package-ecosystem: pip
     directory: /api
