@@ -26,7 +26,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: app/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -46,7 +46,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: app/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -65,7 +65,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: app/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -85,7 +85,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: app/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
