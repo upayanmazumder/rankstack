@@ -1,6 +1,6 @@
 .PHONY: help venv install up down logs init-db seed demo api web web-install web-build clean reset
 
-PYTHON ?= python3.11
+PYTHON ?= python3.14
 VENV := .venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip

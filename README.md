@@ -9,7 +9,7 @@ Team: Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS
 
 ## Stack
 
-- **Python 3.11** + **FastAPI** + **PyMongo** (sync driver)
+- **Python 3.14** + **FastAPI** + **PyMongo** (sync driver)
 - **MongoDB 7**, running as a **single-node replica set** (`rs0`) — required for multi-document
   transactions; a standalone `mongod` does not support them
 - **Redis 7** for the live leaderboard (`ZSET`), sessions (`TTL`), and submission rate limiting (`TTL`)
@@ -51,8 +51,7 @@ Makefile                up/down/seed/demo/api/reset targets
 
 ## Setup
 
-Prerequisites: Docker + Docker Compose, Python 3.11 (`python3.11 -m venv` must work — the
-`pydantic-core`/`pyo3` wheel does not yet support 3.14; use 3.11 or 3.12).
+Prerequisites: Docker + Docker Compose, Python 3.14 (`python3.14 -m venv` must work).
 
 ```bash
 # 1. Start MongoDB (replica set) + Redis
