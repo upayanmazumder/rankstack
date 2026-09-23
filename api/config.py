@@ -11,6 +11,9 @@ class Settings(BaseSettings):
 
     redis_uri: str = "redis://localhost:6379/0"
 
+    # Comma-separated list of allowed browser origins for the frontend.
+    cors_origins: str = "http://localhost:3000"
+
     api_host: str = "0.0.0.0"
     api_port: int = 8000
 

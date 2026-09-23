@@ -35,10 +35,19 @@ scripts/
   init_db.py              Idempotently create collections/validators/indexes
   seed.py                 Wipe + reseed ~88 referentially-consistent sample records
   demo.py                 Intermediate demonstration script (see below)
-Dockerfile              Backend image, published to ghcr.io/upayanmazumder/rankstack/backend
+api/Dockerfile          Backend image, published to ghcr.io/upayanmazumder/rankstack/api
 docker-compose.yml      Mongo (replica set) + Redis
 Makefile                up/down/seed/demo/api/reset targets
 ```
+
+## Deployment
+
+- **Frontend**: Vercel, `rankstack.upayan.dev` (`NEXT_PUBLIC_API_URL` points at the API below).
+- **Backend**: `.github/workflows/api-image.yml` builds `api/Dockerfile` on every push to `main`
+  and publishes `ghcr.io/upayanmazumder/rankstack/api:edge` (floating) and `:sha-<short>`
+  (immutable). The `upayanmazumder/vps` repo's Argo CD `de-rankstack` Application
+  (`k8s/apps/de/rankstack/`) tracks `:edge` by digest and deploys to `api-rankstack.upayan.dev`,
+  with MongoDB (replica set) and Redis running in-cluster alongside it.
 
 ## Setup
 

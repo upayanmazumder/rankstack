@@ -4,6 +4,7 @@ Run with: uvicorn api.main:app --reload
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.aggregations.pipelines import router as aggregations_router
 from api.routes.contests import router as contests_router
@@ -12,12 +13,21 @@ from api.routes.sessions import router as sessions_router
 from api.routes.submissions import router as submissions_router
 from api.routes.teams import router as teams_router
 from api.routes.users import router as users_router
+from api.config import settings
 from api.db import init_db
 
 app = FastAPI(
     title="Rankstack — Contest Platform API",
     description="MongoDB + Redis backed contest platform with a live leaderboard.",
     version="0.2.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
