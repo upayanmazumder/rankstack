@@ -1,20 +1,42 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 .venv/
 venv/
 env/
-.env
-.env.local
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Node / Next
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+.pnpm-store/
+coverage/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# build output
 dist/
 build/
+
+# local data
 mongo_data/
 redis_data/
 *.log
+
+# editors / OS
 .DS_Store
 .idea/
 .vscode/
+
+# husky internals
+.husky/_/

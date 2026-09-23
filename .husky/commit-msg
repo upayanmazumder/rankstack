@@ -1,0 +1,3 @@
+# git passes the message file relative to the repo root; resolve it before cd.
+msg_file="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+cd app && pnpm exec commitlint --edit "$msg_file"

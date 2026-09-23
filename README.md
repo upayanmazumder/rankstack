@@ -19,23 +19,25 @@ Team: Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS
 ## Project layout
 
 ```
-app/
-  main.py            FastAPI app + router wiring
-  config.py           Settings (env-driven)
-  db.py                Mongo/Redis client singletons, $jsonSchema validators, indexes
-  security.py         Password hashing (PBKDF2), session tokens
-  redis_ops.py        Leaderboard / session / rate-limit Redis operations
-  services.py          Multi-document transactions (shared by API + seed script)
-  models/               Pydantic request/response schemas per collection
-  api/                    FastAPI routers: users, teams, contests, problems, submissions, sessions
+api/                    Backend (FastAPI + PyMongo)
+  main.py                 FastAPI app + router wiring
+  config.py               Settings (env-driven)
+  db.py                   Mongo/Redis clients, $jsonSchema validators, indexes
+  security.py             Password hashing (PBKDF2), session tokens
+  redis_ops.py            Leaderboard / session / rate-limit Redis operations
+  services.py             Multi-document transactions (shared by API + seed script)
+  models/                 Pydantic request/response schemas per collection
+  routes/                 Routers: users, teams, contests, problems, submissions, sessions
   aggregations/
-    pipelines.py       The 5 required aggregation pipelines + their GET endpoints
+    pipelines.py          The 5 aggregation pipelines + their GET endpoints
+app/                    Frontend (Next.js, pnpm)
 scripts/
-  init_db.py            Idempotently create collections/validators/indexes
+  init_db.py              Idempotently create collections/validators/indexes
   seed.py                 Wipe + reseed ~88 referentially-consistent sample records
-  demo.py                  Intermediate demonstration script (see below)
+  demo.py                 Intermediate demonstration script (see below)
+Dockerfile              Backend image, published to ghcr.io/upayanmazumder/rankstack/backend
 docker-compose.yml      Mongo (replica set) + Redis
-Makefile                 up/down/seed/demo/api/reset targets
+Makefile                up/down/seed/demo/api/reset targets
 ```
 
 ## Setup
@@ -104,18 +106,18 @@ All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
 
 ## Advanced NoSQL features (Review 2 rubric)
 
-- **Aggregation pipelines** (5, in `app/aggregations/pipelines.py`): contest leaderboard,
+- **Aggregation pipelines** (5, in `api/aggregations/pipelines.py`): contest leaderboard,
   avg score per problem by difficulty, submission count by status per contest, distinct problems
   solved per user, and team performance via `$lookup` from `teams` to `submissions` on `memberIds`.
 - **Indexes**: `users.email` (unique), `problems.contestId`, `submissions.{contestId, submittedBy.refId}`
-  (compound), `submissions.problemId`, `teams.memberIds`, `contests.status` — all defined in `app/db.py`.
-- **Transactions** (3, in `app/services.py`, all exercised by both the API and the seed script):
+  (compound), `submissions.problemId`, `teams.memberIds`, `contests.status` — all defined in `api/db.py`.
+- **Transactions** (3, in `api/services.py`, all exercised by both the API and the seed script):
   1. `create_submission` — insert a submission + atomically increment `problems.attemptCount`
   2. `update_submission_status` — update a submission's status/score + atomically apply the score
      delta to the submitter's cached `totalScore` on `users`/`teams`
   3. `add_team_member` / `remove_team_member` — update `teams.memberIds` + the `users.teamIds`
      back-reference atomically
-- **`$jsonSchema` validation** on every collection (`app/db.py`), including a `oneOf` schema on
+- **`$jsonSchema` validation** on every collection (`api/db.py`), including a `oneOf` schema on
   `problems` that enforces different required fields per polymorphic `type` (mcq/coding/subjective)
   — a direct NoSQL-level expression of the Review 1 polymorphic design.
 

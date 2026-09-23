@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.db import init_db  # noqa: E402
+from api.db import init_db  # noqa: E402
 
 
 def main() -> None:

@@ -21,10 +21,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from faker import Faker  # noqa: E402
 
-from app import redis_ops, services  # noqa: E402
-from app.db import get_redis_client, init_db  # noqa: E402
-from app.models.common import utcnow  # noqa: E402
-from app.security import hash_password  # noqa: E402
+from api import redis_ops, services  # noqa: E402
+from api.db import get_redis_client, init_db  # noqa: E402
+from api.models.common import utcnow  # noqa: E402
+from api.security import hash_password  # noqa: E402
 
 fake = Faker()
 Faker.seed(42)

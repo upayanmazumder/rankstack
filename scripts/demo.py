@@ -15,11 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import redis_ops, services  # noqa: E402
-from app.aggregations import pipelines as agg  # noqa: E402
-from app.db import get_db, get_redis_client  # noqa: E402
-from app.models.common import utcnow  # noqa: E402
-from app.security import hash_password  # noqa: E402
+from api import redis_ops, services  # noqa: E402
+from api.aggregations import pipelines as agg  # noqa: E402
+from api.db import get_db, get_redis_client  # noqa: E402
+from api.models.common import utcnow  # noqa: E402
+from api.security import hash_password  # noqa: E402
 
 
 def section(title: str) -> None:

@@ -1,4 +1,4 @@
-.PHONY: help venv install up down logs init-db seed demo api test clean reset
+.PHONY: help venv install up down logs init-db seed demo api web web-install web-build clean reset
 
 PYTHON ?= python3.11
 VENV := .venv
@@ -16,6 +16,9 @@ help:
 	@echo "  make seed      - wipe and reseed all 5 collections with sample data"
 	@echo "  make demo      - run the intermediate demo script"
 	@echo "  make api       - run the FastAPI dev server (http://localhost:8000/docs)"
+	@echo "  make web       - run the Next.js dev server in app/ (http://localhost:3000)"
+	@echo "  make web-install - install frontend dependencies (pnpm)"
+	@echo "  make web-build - production build of the frontend"
 	@echo "  make reset     - down + up + init-db + seed, from a clean slate"
 	@echo "  make clean     - remove the venv and docker volumes"
 
@@ -48,7 +51,16 @@ demo: install
 	$(PY) scripts/demo.py
 
 api: install
-	$(UVICORN) app.main:app --host 0.0.0.0 --port 8000 --reload
+	$(UVICORN) api.main:app --host 0.0.0.0 --port 8000 --reload
+
+web-install:
+	cd app && pnpm install
+
+web: web-install
+	cd app && pnpm dev
+
+web-build: web-install
+	cd app && pnpm build
 
 reset: down up init-db seed
 

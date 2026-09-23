@@ -1,0 +1,26 @@
+name: Create issue on dependabot pr
+
+# pull_request_target is required: the GITHUB_TOKEN on a dependabot-authored
+# pull_request event is read-only and cannot open issues.
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  create_issue:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create issue using REST API
+        run: |
+          curl --fail --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/issues \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "title": "Check for breaking changes in ${{ github.actor }} PR #${{ github.event.number }}",
+            "body": "- Check whether the updated dependencies introduce breaking changes.\n- PR: ${{ github.event.pull_request.html_url }}",
+            "labels": ["dependencies"]
+            }'
