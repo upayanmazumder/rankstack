@@ -45,7 +45,7 @@ def main() -> None:
     created = db["users"].insert_one(
         {
             "name": "Demo Reviewer",
-            "email": "demo.reviewer@rankstack.test",
+            "email": "demo.reviewer@rankstack.io",
             "passwordHash": hash_password("DemoPass123"),
             "role": "participant",
             "totalScore": 0,

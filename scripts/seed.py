@@ -59,7 +59,7 @@ def seed_users(db, n: int = 15) -> list[dict]:
     for i in range(n):
         doc = {
             "name": fake.name(),
-            "email": f"user{i + 1}@rankstack.test",
+            "email": f"user{i + 1}@rankstack.io",
             "passwordHash": hash_password(DEMO_PASSWORD),
             "role": "admin" if i < 2 else "participant",
             "totalScore": 0,
