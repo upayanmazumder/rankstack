@@ -40,3 +40,6 @@ redis_data/
 
 # husky internals
 .husky/_/
+
+# vercel
+.vercel

@@ -29,7 +29,7 @@ venv: $(VENV)/bin/python
 
 install: venv
 	$(PIP) install -q --upgrade pip
-	$(PIP) install -q -r requirements.txt
+	$(PIP) install -q -r api/requirements.txt
 
 up:
 	docker compose up -d mongo redis
