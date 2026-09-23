@@ -1,6 +1,6 @@
 # Backend image: FastAPI + PyMongo API and the seed/demo scripts.
 # Python 3.11 (pydantic-core has no wheel for 3.14 yet).
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
