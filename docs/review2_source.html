@@ -4,190 +4,63 @@
 <meta charset="UTF-8" />
 <title>Review 2 — Contest Platform with Live Leaderboard</title>
 <style>
-  @page { size: A4; margin: 18mm 16mm; }
+  @page { size: A4; margin: 16mm 15mm; }
   * { box-sizing: border-box; }
   body {
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    color: #1a1f2b;
-    font-size: 10.3pt;
-    line-height: 1.5;
+    font-family: Calibri, Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 10.5pt;
+    line-height: 1.42;
     margin: 0;
   }
-  .banner {
-    background: #0f2027;
-    background: linear-gradient(120deg, #0f2942 0%, #133a5e 100%);
-    color: #eaf2ff;
-    padding: 22px 26px;
-    border-radius: 6px;
-    margin-bottom: 18px;
-  }
-  .banner .eyebrow {
-    letter-spacing: 3px;
-    font-size: 9pt;
-    font-weight: 600;
-    color: #7fc8ff;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .banner h1 { font-size: 22pt; margin: 0 0 4px 0; font-weight: 700; }
-  .banner .sub { font-size: 10.5pt; color: #c8daf0; }
-  table.meta {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-size: 9.3pt;
-  }
-  table.meta td {
-    border: 1px solid #d7dde6;
-    padding: 6px 10px;
-    vertical-align: top;
-  }
-  table.meta td.label {
-    background: #f3f6fa;
-    font-weight: 600;
-    width: 22%;
-    color: #33475b;
-  }
-  h2.section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14.5pt;
-    color: #0f2942;
-    border-bottom: 2px solid #133a5e;
-    padding-bottom: 4px;
-    margin-top: 26px;
-    margin-bottom: 10px;
-    page-break-after: avoid;
-  }
-  h2.section .num {
-    display: inline-block;
-    background: #133a5e;
-    color: #fff;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
+  .header {
     text-align: center;
-    line-height: 26px;
-    font-size: 11pt;
-    font-weight: 700;
-    flex-shrink: 0;
+    border-bottom: 2px solid #222;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
   }
-  h3.sub {
-    font-size: 11.5pt;
-    color: #133a5e;
-    margin-top: 16px;
+  .header .code { font-size: 9.5pt; letter-spacing: 1px; color: #444; }
+  .header h1 { font-size: 16pt; margin: 4px 0 2px 0; }
+  .header .sub { font-size: 9.5pt; color: #555; }
+  table.meta { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 9.3pt; }
+  table.meta td { border: 1px solid #bbb; padding: 4px 8px; }
+  table.meta td.label { background: #eee; font-weight: 600; width: 20%; }
+  h2 {
+    font-size: 12.5pt;
+    border-bottom: 1.5px solid #333;
+    padding-bottom: 2px;
+    margin-top: 18px;
     margin-bottom: 6px;
   }
-  p { margin: 6px 0; text-align: justify; }
-  table.data {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 8px 0 14px 0;
-    font-size: 9pt;
-  }
-  table.data th {
-    background: #133a5e;
-    color: #fff;
-    padding: 6px 8px;
-    text-align: left;
-    font-weight: 600;
-  }
-  table.data td {
-    border: 1px solid #dde3ea;
-    padding: 5px 8px;
-  }
-  table.data tr:nth-child(even) td { background: #f7f9fc; }
-  code, pre {
-    font-family: "SF Mono", "Consolas", "Menlo", monospace;
-    font-size: 8pt;
-  }
+  h3 { font-size: 10.8pt; margin-top: 10px; margin-bottom: 4px; }
+  p { margin: 4px 0; }
+  ul, ol { margin: 4px 0; padding-left: 18px; }
+  li { margin-bottom: 2px; }
+  table.data { width: 100%; border-collapse: collapse; margin: 6px 0 10px 0; font-size: 9pt; }
+  table.data th { background: #333; color: #fff; padding: 4px 7px; text-align: left; }
+  table.data td { border: 1px solid #ccc; padding: 4px 7px; vertical-align: top; }
+  table.data tr:nth-child(even) td { background: #f5f5f5; }
+  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 8pt; }
   pre {
-    background: #0f1720;
-    color: #d8e6f5;
-    padding: 10px 12px;
-    border-radius: 5px;
-    overflow-x: auto;
-    line-height: 1.45;
-    margin: 6px 0 14px 0;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    border-left: 3px solid #333;
+    padding: 6px 9px;
+    margin: 5px 0 10px 0;
     white-space: pre-wrap;
     word-break: break-word;
     page-break-inside: avoid;
-    break-inside: avoid;
   }
-  pre .cmt { color: #7fb0d8; }
-  code.inline {
-    background: #eef2f7;
-    padding: 1px 5px;
-    border-radius: 3px;
-    color: #133a5e;
-  }
-  .evidence {
-    border-left: 3px solid #1c8a5e;
-    background: #f2faf6;
-    padding: 8px 12px;
-    margin: 8px 0 14px 0;
-    font-size: 9pt;
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-  .evidence .tag {
-    color: #1c8a5e;
-    font-weight: 700;
-    font-size: 8pt;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .marks-badge {
-    display: inline-block;
-    background: #1c8a5e;
-    color: #fff;
-    border-radius: 4px;
-    padding: 1px 8px;
-    font-size: 8.5pt;
-    font-weight: 700;
-  }
-  ul, ol { margin: 6px 0; padding-left: 20px; }
-  li { margin-bottom: 3px; }
-  .two-col { display: flex; gap: 16px; }
-  .two-col > div { flex: 1; }
-  .footer-note {
-    margin-top: 24px;
-    padding-top: 8px;
-    border-top: 1px solid #d7dde6;
-    font-size: 8pt;
-    color: #6b7686;
-  }
-  .schema-block { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; page-break-inside: avoid; break-inside: avoid; }
-  .schema-card {
-    flex: 1;
-    min-width: 150px;
-    border: 1px solid #d7dde6;
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  .schema-card .head {
-    background: #133a5e;
-    color: #fff;
-    font-weight: 700;
-    padding: 5px 8px;
-    font-size: 9pt;
-  }
-  .schema-card .body {
-    padding: 6px 8px;
-    font-family: monospace;
-    font-size: 7.6pt;
-    line-height: 1.5;
-    color: #33475b;
-  }
+  code.inline { background: #eee; padding: 0 4px; border-radius: 2px; }
+  .status-done { color: #1a7a3c; font-weight: 700; }
+  .note { font-size: 8.6pt; color: #555; font-style: italic; margin: 2px 0 8px 0; }
+  .footer { margin-top: 16px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #666; text-align: center; }
 </style>
 </head>
 <body>
 
-<div class="banner">
-  <div class="eyebrow">BCSE302P · Database Systems Lab · Review 2</div>
+<div class="header">
+  <div class="code">BCSE302P — Database Systems Lab — Review 2</div>
   <h1>Contest Platform with Live Leaderboard</h1>
   <div class="sub">Database Implementation &amp; Core Functionalities (MongoDB + Redis)</div>
 </div>
@@ -195,299 +68,153 @@
 <table class="meta">
   <tr>
     <td class="label">Team</td>
-    <td>Upayan Mazumder (24BDS0367) &middot; Aditya Rawat (24BCE2992) &middot; Shloak Sinha (24BDS0378)</td>
-  </tr>
-  <tr>
-    <td class="label">Document</td>
-    <td>Review 2 Report — implementation follow-on to the Review 1 design (attached separately as <code class="inline">DBMS_Review_1_Contest_Platform.pdf</code>)</td>
+    <td>Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS0378)</td>
   </tr>
   <tr>
     <td class="label">Stack</td>
-    <td>Python 3.11 + FastAPI + PyMongo &middot; MongoDB 7 (single-node replica set, for transactions) &middot; Redis 7</td>
-  </tr>
-  <tr>
-    <td class="label">Repository</td>
-    <td>Local git repository at the project workspace (<code class="inline">rankstack/</code>), 13 commits, clean working tree, no secrets committed — see §8</td>
+    <td>FastAPI + PyMongo (Python), MongoDB 7 (replica set, for transactions), Redis 7</td>
   </tr>
 </table>
 
-<h2 class="section"><span class="num">01</span>Rubric Mapping &amp; Summary</h2>
+<h2>1. Database Implementation</h2>
+
+<h3>1.1 Collections</h3>
 <table class="data">
-  <tr><th>Criterion</th><th>Marks</th><th>What was delivered</th></tr>
-  <tr>
-    <td>Database implementation<br>(collections, relationships, sample data)</td>
-    <td><span class="marks-badge">2 / 2</span></td>
-    <td>5 MongoDB collections with real ObjectId references, <code class="inline">$jsonSchema</code> validators on every collection, 88 referentially-consistent sample records loaded via a programmatic seed script.</td>
-  </tr>
-  <tr>
-    <td>CRUD operations completed</td>
-    <td><span class="marks-badge">3 / 3</span></td>
-    <td>Full create/read/update/delete for all 5 collections, exposed as a FastAPI REST surface and verified against a live running server (curl transcripts in §3).</td>
-  </tr>
-  <tr>
-    <td>Advanced NoSQL features<br>(aggregation, indexing, transactions, etc.)</td>
-    <td><span class="marks-badge">5 / 5</span></td>
-    <td>5 aggregation pipelines, 6 indexes (incl. a compound index, <code class="inline">.explain()</code>-verified), 3 real multi-document transactions on a replica set, and a polymorphic <code class="inline">oneOf</code> <code class="inline">$jsonSchema</code> validator. Redis (leaderboard/session/rate-limit) implemented as a stretch, per the Review 1 design.</td>
-  </tr>
+  <tr><th>Collection</th><th>Key fields</th></tr>
+  <tr><td>users</td><td>name, email (unique), passwordHash, role, totalScore, teamIds[]</td></tr>
+  <tr><td>teams</td><td>name, memberIds[], totalScore</td></tr>
+  <tr><td>contests</td><td>title, startTime, endTime, status, createdBy, problemIds[], participants[]</td></tr>
+  <tr><td>problems</td><td>contestId, type (mcq/coding/subjective), difficulty, points, + type-specific fields</td></tr>
+  <tr><td>submissions</td><td>contestId, problemId, submittedBy{refType,refId}, status, score</td></tr>
 </table>
 
-<h2 class="section"><span class="num">02</span>Database Implementation</h2>
+<h3>1.2 Relationships</h3>
+<ul>
+  <li>Contest &rarr; Problems (<code class="inline">problems.contestId</code>)</li>
+  <li>User/Team &rarr; Submission (<code class="inline">submissions.submittedBy</code>)</li>
+  <li>Submission &rarr; Problem (<code class="inline">submissions.problemId</code>)</li>
+  <li>Team &rarr; Users (<code class="inline">teams.memberIds</code>), with a back-reference <code class="inline">users.teamIds</code></li>
+  <li>Contest &rarr; Users/Teams (<code class="inline">contests.participants</code>, embedded ref array)</li>
+</ul>
+<p>Each collection has a <code class="inline">$jsonSchema</code> validator. <code class="inline">problems</code> uses a
+<code class="inline">oneOf</code> clause so mcq/coding/subjective documents enforce different required fields at the
+database level.</p>
 
-<h3 class="sub">2.1 Collections &amp; relationships</h3>
-<p>The five collections from the Review 1 design were implemented as-is in MongoDB, with every
-relationship expressed as an ObjectId reference (never embedded, except <code class="inline">contests.participants</code>,
-which stays a small array of refs since it is always read alongside its parent contest).</p>
-
-<div class="schema-block">
-  <div class="schema-card"><div class="head">users</div><div class="body">_id, name, email (unique idx),<br>passwordHash, role, totalScore,<br>teamIds[], createdAt</div></div>
-  <div class="schema-card"><div class="head">teams</div><div class="body">_id, name, memberIds[],<br>totalScore, createdAt</div></div>
-  <div class="schema-card"><div class="head">contests</div><div class="body">_id, title, description,<br>startTime, endTime, status,<br>createdBy, problemIds[],<br>participants[], createdAt</div></div>
-  <div class="schema-card"><div class="head">problems</div><div class="body">_id, contestId, type,<br>title, difficulty, points,<br>attemptCount, + type-specific<br>fields, createdAt</div></div>
-  <div class="schema-card"><div class="head">submissions</div><div class="body">_id, contestId, problemId,<br>submittedBy{refType,refId},<br>answer, status, score,<br>submittedAt</div></div>
-</div>
-
-<p><b>Relationships implemented:</b> User&rarr;Contest (embedded ref array), Contest&rarr;Problems
-(<code class="inline">problems.contestId</code>), User/Team&rarr;Submission (<code class="inline">submittedBy</code>), Submission&rarr;Problem
-(<code class="inline">problemId</code>), Team&rarr;Users (<code class="inline">memberIds</code>), and a User&rarr;Team back-reference
-(<code class="inline">users.teamIds</code>) added for the team-membership transaction in §4.3.</p>
-
-<h3 class="sub">2.2 Schema validation ($jsonSchema)</h3>
-<p>Every collection is created with a MongoDB <code class="inline">$jsonSchema</code> validator
-(<code class="inline">app/db.py</code>). The <code class="inline">problems</code> collection additionally uses a <code class="inline">oneOf</code> clause
-so the database itself enforces different required fields per polymorphic <code class="inline">type</code> — a direct
-NoSQL-level expression of the Review 1 polymorphic design:</p>
-<pre><span class="cmt"># app/db.py — problems validator (excerpt)</span>
-"oneOf": [
-  {"properties": {"type": {"enum": ["mcq"]}, "options": {...}, "correctAnswer": {...}},
-   "required": ["options", "correctAnswer"]},
-  {"properties": {"type": {"enum": ["coding"]}, "testCases": {...}},
-   "required": ["testCases"]},
-  {"properties": {"type": {"enum": ["subjective"]}, "evaluationRubric": {...}},
-   "required": ["evaluationRubric"]},
-]</pre>
-<div class="evidence">
-<span class="tag">Live verification</span>
-Inserting an <code class="inline">mcq</code> document missing <code class="inline">options</code>/<code class="inline">correctAnswer</code> &rarr;
-<code class="inline">pymongo.errors.WriteError</code> (rejected by MongoDB itself). Inserting the same document with
-those fields present &rarr; accepted. Confirmed against all 5 collections.
-</div>
-
-<h3 class="sub">2.3 Sample data loaded</h3>
-<p><code class="inline">scripts/seed.py</code> programmatically generates a referentially-consistent dataset (no
-hand-typed records; deterministic via a fixed <code class="inline">Faker</code>/<code class="inline">random</code> seed), comfortably
-above the 50-record minimum:</p>
+<h3>1.3 Sample data (minimum 50 required)</h3>
 <table class="data">
-  <tr><th>Collection</th><th>Count</th><th>Notes</th></tr>
-  <tr><td>users</td><td>15</td><td>2 admin, 13 participant; passwords PBKDF2-hashed</td></tr>
-  <tr><td>teams</td><td>5</td><td>3 members each, drawn from the 15 users</td></tr>
-  <tr><td>contests</td><td>5</td><td>2 ended, 1 live, 2 upcoming (status computed from real timestamps)</td></tr>
-  <tr><td>problems</td><td>15</td><td>3 per contest — 5 mcq, 5 coding, 5 subjective</td></tr>
-  <tr><td>submissions</td><td>48</td><td>only for live/ended contests (upcoming contests realistically have none yet)</td></tr>
-  <tr><td><b>Total</b></td><td><b>88</b></td><td>75% above the 50-record minimum</td></tr>
+  <tr><th>Collection</th><th>Records</th></tr>
+  <tr><td>users</td><td>15</td></tr>
+  <tr><td>teams</td><td>5</td></tr>
+  <tr><td>contests</td><td>5</td></tr>
+  <tr><td>problems</td><td>15</td></tr>
+  <tr><td>submissions</td><td>48</td></tr>
+  <tr><td><b>Total</b></td><td><b>88</b> (minimum required: 50)</td></tr>
 </table>
-<div class="evidence">
-<span class="tag">Live output — make seed</span>
-<pre>Seed complete. Record counts:
-  users: 15
-  teams: 5
-  contests: 5
-  problems: 15
-  submissions: 48
+<p class="note">Data generated by <code class="inline">scripts/seed.py</code>, not hand-typed. References checked
+after seeding — every foreign key resolves to a real document (0 broken references).</p>
+<pre>$ python scripts/seed.py
+Seed complete. Record counts:
+  users: 15   teams: 5   contests: 5   problems: 15   submissions: 48
   TOTAL: 88</pre>
-Referential integrity was checked programmatically after seeding: every <code class="inline">submissions.contestId</code>/
-<code class="inline">problemId</code>/<code class="inline">submittedBy.refId</code>, every <code class="inline">problems.contestId</code>, every
-<code class="inline">teams.memberIds</code> entry, and every <code class="inline">contests.problemIds</code>/<code class="inline">participants</code> entry
-resolves to a real document in the target collection &mdash; <b>0 violations</b> found.
-</div>
 
-<h2 class="section"><span class="num">03</span>CRUD Operations</h2>
-<p>All five collections expose a full REST CRUD surface via FastAPI (<code class="inline">app/api/</code>), running
-against the live MongoDB/Redis stack (not mocked). Swagger UI is auto-served at
-<code class="inline">/docs</code> for interactive testing.</p>
+<h2>2. CRUD Operations</h2>
 <table class="data">
-  <tr><th>Collection</th><th>Routes</th></tr>
-  <tr><td>users</td><td><code class="inline">POST /users</code>, <code class="inline">GET /users</code>, <code class="inline">GET /users/{id}</code>, <code class="inline">PATCH /users/{id}</code>, <code class="inline">DELETE /users/{id}</code></td></tr>
-  <tr><td>teams</td><td><code class="inline">POST /teams</code>, <code class="inline">GET /teams</code>, <code class="inline">GET /teams/{id}</code>, <code class="inline">PATCH /teams/{id}</code>, <code class="inline">POST /teams/{id}/members</code>, <code class="inline">DELETE /teams/{id}/members/{userId}</code>, <code class="inline">DELETE /teams/{id}</code></td></tr>
-  <tr><td>contests</td><td><code class="inline">POST /contests</code>, <code class="inline">GET /contests</code>, <code class="inline">GET /contests/{id}</code>, <code class="inline">PATCH /contests/{id}</code>, <code class="inline">PATCH /contests/{id}/status</code>, <code class="inline">POST /contests/{id}/participants</code>, <code class="inline">GET /contests/{id}/leaderboard</code>, <code class="inline">DELETE /contests/{id}</code></td></tr>
-  <tr><td>problems</td><td><code class="inline">POST /problems</code> (polymorphic), <code class="inline">GET /problems?contestId=</code>, <code class="inline">GET /problems/{id}</code>, <code class="inline">PATCH /problems/{id}</code>, <code class="inline">DELETE /problems/{id}</code></td></tr>
-  <tr><td>submissions</td><td><code class="inline">POST /submissions</code>, <code class="inline">GET /submissions?contestId=&amp;userId=&amp;status=</code>, <code class="inline">GET /submissions/{id}</code>, <code class="inline">PATCH /submissions/{id}/status</code>, <code class="inline">DELETE /submissions/{id}</code></td></tr>
+  <tr><th>Collection</th><th>Create</th><th>Read</th><th>Update</th><th>Delete</th></tr>
+  <tr><td>users</td><td>POST /users</td><td>GET /users, /users/{id}</td><td>PATCH /users/{id}</td><td>DELETE /users/{id}</td></tr>
+  <tr><td>teams</td><td>POST /teams</td><td>GET /teams, /teams/{id}</td><td>PATCH /teams/{id}, add/remove member</td><td>DELETE /teams/{id}</td></tr>
+  <tr><td>contests</td><td>POST /contests</td><td>GET /contests, /contests/{id}, /leaderboard</td><td>PATCH /contests/{id}, /status</td><td>DELETE /contests/{id}</td></tr>
+  <tr><td>problems</td><td>POST /problems</td><td>GET /problems?contestId=, /problems/{id}</td><td>PATCH /problems/{id}</td><td>DELETE /problems/{id}</td></tr>
+  <tr><td>submissions</td><td>POST /submissions</td><td>GET /submissions?..., /submissions/{id}</td><td>PATCH /submissions/{id}/status</td><td>DELETE /submissions/{id}</td></tr>
 </table>
 
-<div class="evidence">
-<span class="tag">Live evidence — full CRUD round-trip against a running uvicorn server (curl)</span>
-<pre><span class="cmt">$ curl -X POST http://localhost:8000/users -d '{"name":"Doc Evidence User","email":"doc.evidence2@rankstack.io","password":"secret123"}'</span>
-{"id":"6ab3f9a580961206777c15a1","name":"Doc Evidence User","email":"doc.evidence2@rankstack.io","role":"participant","totalScore":0.0,"teamIds":[],"createdAt":"2026-09-23T16:09:09.451309Z"}
+<p><b>Evidence — tested against a running server (curl):</b></p>
+<pre>$ curl -X POST /users -d '{"name":"Doc Evidence User","email":"doc.evidence2@rankstack.io","password":"secret123"}'
+{"id":"6ab3f9a5...","name":"Doc Evidence User", ...}          # CREATE
 
-<span class="cmt">$ curl http://localhost:8000/users/6ab3f9a580961206777c15a1                       # READ</span>
-{"id":"6ab3f9a580961206777c15a1", ... "name":"Doc Evidence User", ...}
+$ curl /users/6ab3f9a5...
+{"id":"6ab3f9a5...","name":"Doc Evidence User", ...}          # READ
 
-<span class="cmt">$ curl -X PATCH .../users/6ab3f9a5... -d '{"name":"Doc Evidence User (Updated)"}'   # UPDATE</span>
-{"id":"6ab3f9a580961206777c15a1", "name":"Doc Evidence User (Updated)", ...}
+$ curl -X PATCH /users/6ab3f9a5... -d '{"name":"Doc Evidence User (Updated)"}'
+{"id":"6ab3f9a5...","name":"Doc Evidence User (Updated)", ...} # UPDATE
 
-<span class="cmt">$ curl -X DELETE .../users/6ab3f9a5...                                             # DELETE</span>
-status: 204
-<span class="cmt">$ curl .../users/6ab3f9a5...                                                       # confirm gone</span>
-status: 404</pre>
-</div>
+$ curl -X DELETE /users/6ab3f9a5...   -> 204
+$ curl /users/6ab3f9a5...             -> 404 (confirmed deleted)</pre>
 
-<h2 class="section"><span class="num">04</span>Advanced NoSQL Features</h2>
+<h2>3. Advanced NoSQL Features</h2>
 
-<h3 class="sub">4.1 Aggregation pipelines (5)</h3>
-<p>Implemented in <code class="inline">app/aggregations/pipelines.py</code>, each exposed as both a plain Python
-callable and a <code class="inline">GET /aggregations/...</code> endpoint. Live output against the seeded 88-record dataset:</p>
-
-<p><b>1. Leaderboard for a contest</b> — group submissions by submitter, sum score, sort desc.</p>
-<pre>[{'totalScore': 40, 'submissionCount': 2, 'refId': '...cd', 'refType': 'user'},
- {'totalScore': 40, 'submissionCount': 2, 'refId': '...d1', 'refType': 'user'},
- {'totalScore': 30, 'submissionCount': 2, 'refId': '...ce', 'refType': 'user'}, ...]</pre>
-
-<p><b>2. Average score per problem, grouped by difficulty</b> — two-stage: per-problem avg, then
-grouped by <code class="inline">$lookup</code>-ed difficulty.</p>
-<pre>[{'difficulty': 'easy',   'avgScorePerProblem': 3.81,  'problemCount': 3},
- {'difficulty': 'hard',   'avgScorePerProblem': 18.17, 'problemCount': 3},
- {'difficulty': 'medium', 'avgScorePerProblem': 11.94, 'problemCount': 3}]</pre>
-
-<p><b>3. Submission count by status, per contest.</b></p>
-<pre>[{'contestId': '...e1', 'title': 'Expanded static flexibility Contest',
-  'statusCounts': [{'status': 'incorrect','count': 4}, {'status': 'correct','count': 8},
-                    {'status': 'partial','count': 4}]}, ...]</pre>
-
-<p><b>4. Distinct problems solved (status = correct) per user, across all contests.</b></p>
-<pre>[{'userId': '...ce', 'distinctProblemsSolved': 4, 'name': 'Angie Henderson'},
- {'userId': '...d0', 'distinctProblemsSolved': 3, 'name': 'Cristian Santos'}, ...]</pre>
-
-<p><b>5. Team performance</b> — <code class="inline">$lookup</code> from <code class="inline">teams</code> to <code class="inline">submissions</code> via
-<code class="inline">memberIds</code>, aggregating total score per team.</p>
-<pre><span class="cmt"># app/aggregations/pipelines.py — team_performance (excerpt)</span>
+<h3>3.1 Aggregation pipelines (5)</h3>
+<table class="data">
+  <tr><th>#</th><th>Pipeline</th><th>Result (sample)</th></tr>
+  <tr><td>1</td><td>Leaderboard per contest — group by submitter, sum score, sort desc</td>
+      <td><code class="inline">{totalScore: 40, refId: ..., refType: 'user'}</code></td></tr>
+  <tr><td>2</td><td>Avg score per problem, grouped by difficulty</td>
+      <td><code class="inline">{difficulty: 'hard', avgScorePerProblem: 18.17}</code></td></tr>
+  <tr><td>3</td><td>Submission count by status, per contest</td>
+      <td><code class="inline">{status: 'correct', count: 8}</code></td></tr>
+  <tr><td>4</td><td>Distinct problems solved (correct) per user</td>
+      <td><code class="inline">{name: 'Angie Henderson', distinctProblemsSolved: 4}</code></td></tr>
+  <tr><td>5</td><td>Team performance — <code class="inline">$lookup</code> teams &rarr; submissions via memberIds</td>
+      <td><code class="inline">{name: 'Team Lavender Trial', totalScore: 195.0}</code></td></tr>
+</table>
+<pre># pipelines[4] — team performance ($lookup excerpt)
 {"$lookup": {"from": "submissions", "let": {"memberIds": "$memberIds"},
   "pipeline": [{"$match": {"$expr": {"$and": [
       {"$eq": ["$submittedBy.refType", "user"]},
       {"$in": ["$submittedBy.refId", "$$memberIds"]}]}}}],
   "as": "memberSubmissions"}}</pre>
-<pre>[{'name': 'Team Lavender Trial',     'totalScore': 195.0, 'submissionCount': 12, 'memberCount': 3},
- {'name': 'Team Darkgreen Husband',  'totalScore': 165.0, 'submissionCount': 18, 'memberCount': 3},
- {'name': 'Team Lightseagreen Long', 'totalScore': 60.0,  'submissionCount': 6,  'memberCount': 3}, ...]</pre>
 
-<h3 class="sub">4.2 Indexing</h3>
+<h3>3.2 Indexing</h3>
 <table class="data">
-  <tr><th>Collection</th><th>Index</th><th>Keys</th><th>Purpose</th></tr>
-  <tr><td>users</td><td>uniq_email</td><td>{email: 1} <i>unique</i></td><td>enforce unique registration, fast login lookup</td></tr>
-  <tr><td>problems</td><td>by_contest</td><td>{contestId: 1}</td><td>"all problems in a contest"</td></tr>
-  <tr><td>submissions</td><td>by_contest_and_submitter</td><td>{contestId: 1, submittedBy.refId: 1} <i>compound</i></td><td>leaderboard/submission-history queries</td></tr>
-  <tr><td>submissions</td><td>by_problem</td><td>{problemId: 1}</td><td>per-problem submission lookups</td></tr>
-  <tr><td>teams</td><td>by_member</td><td>{memberIds: 1}</td><td>"which teams is this user on"</td></tr>
-  <tr><td>contests</td><td>by_status</td><td>{status: 1}</td><td>filter by upcoming/live/ended</td></tr>
+  <tr><th>Collection</th><th>Index</th><th>Keys</th></tr>
+  <tr><td>users</td><td>uniq_email</td><td>{email: 1} unique</td></tr>
+  <tr><td>problems</td><td>by_contest</td><td>{contestId: 1}</td></tr>
+  <tr><td>submissions</td><td>by_contest_and_submitter (compound)</td><td>{contestId: 1, submittedBy.refId: 1}</td></tr>
+  <tr><td>submissions</td><td>by_problem</td><td>{problemId: 1}</td></tr>
+  <tr><td>teams</td><td>by_member</td><td>{memberIds: 1}</td></tr>
+  <tr><td>contests</td><td>by_status</td><td>{status: 1}</td></tr>
 </table>
-<div class="evidence">
-<span class="tag">Live evidence — .explain() proves the index is used, not a collection scan</span>
-<pre><span class="cmt">$ db.problems.find({contestId: ObjectId("...")}).explain()</span>
-Winning plan stage: FETCH -&gt; IXSCAN
-Index used: by_contest
-Documents returned: 3
+<pre>$ db.problems.find({contestId: ObjectId("...")}).explain()
+Winning plan: FETCH -> IXSCAN, Index used: by_contest   (not a collection scan)</pre>
 
-<span class="cmt">$ db.submissions.find({contestId: ..., "submittedBy.refId": ...}).explain()</span>
-Index used: by_contest_and_submitter</pre>
-</div>
-
-<h3 class="sub">4.3 Transactions (3, on a single-node replica set)</h3>
-<p>MongoDB transactions require a replica set — a standalone <code class="inline">mongod</code> does not support
-<code class="inline">start_transaction()</code>. <code class="inline">docker-compose.yml</code> runs <code class="inline">mongod --replSet rs0</code> with a
-one-shot <code class="inline">rs.initiate()</code> container. All three transactions live in <code class="inline">app/services.py</code>
-and are used by both the API and the seed script (so denormalized counters stay consistent with
-the raw submission data everywhere):</p>
-<ol>
-<li><b>create_submission</b> — insert a submission + atomically increment <code class="inline">problems.attemptCount</code>.</li>
-<li><b>update_submission_status</b> — update a submission's status/score + atomically apply the score
-delta to the submitter's cached <code class="inline">totalScore</code> on <code class="inline">users</code>/<code class="inline">teams</code>.</li>
-<li><b>add_team_member</b> / <b>remove_team_member</b> — update <code class="inline">teams.memberIds</code> +
-<code class="inline">users.teamIds</code> back-reference atomically.</li>
-</ol>
-<pre><span class="cmt"># app/services.py — transaction #1 (excerpt)</span>
-with client.start_session() as session:
+<h3>3.3 Transactions (multi-document, on a replica set)</h3>
+<ul>
+  <li>Create submission + increment <code class="inline">problems.attemptCount</code> atomically</li>
+  <li>Update submission status/score + update submitter's <code class="inline">totalScore</code> atomically</li>
+  <li>Add/remove team member + update <code class="inline">users.teamIds</code> back-reference atomically</li>
+</ul>
+<pre>with client.start_session() as session:
     with session.start_transaction():
-        result = db["submissions"].insert_one(doc, session=session)
+        db["submissions"].insert_one(doc, session=session)
         db["problems"].update_one({"_id": problem_id},
                                    {"$inc": {"attemptCount": 1}}, session=session)</pre>
-<div class="evidence">
-<span class="tag">Live evidence — before/after counters, via scripts/demo.py</span>
-<pre>problem.attemptCount before=7 after=8   (submission inserted atomically)
-user.totalScore       before=90 after=100 (status+score updated atomically)</pre>
-</div>
+<pre>Evidence: problem.attemptCount before=7 after=8   |   user.totalScore before=90 after=100</pre>
 
-<h2 class="section"><span class="num">05</span>Redis Integration</h2>
-<p>Implemented now rather than deferred to Review 3, per the Review 1 design. Runs as a Docker
-service alongside MongoDB; three key patterns, all wired into the live API:</p>
+<h3>3.4 Redis (leaderboard / sessions / rate limiting)</h3>
 <table class="data">
-  <tr><th>Key pattern</th><th>Type</th><th>Used for</th></tr>
-  <tr><td><code class="inline">leaderboard:&lt;contestId&gt;</code></td><td>Sorted Set</td><td>O(log N) live rank reads, kept in sync with every score-changing transaction</td></tr>
-  <tr><td><code class="inline">session:&lt;sessionId&gt;</code></td><td>String + TTL</td><td>login sessions, expire on inactivity</td></tr>
-  <tr><td><code class="inline">rate_limit:&lt;userId&gt;</code></td><td>String counter + TTL</td><td>submission throttling per time window</td></tr>
+  <tr><th>Key</th><th>Type</th><th>Used for</th></tr>
+  <tr><td>leaderboard:&lt;contestId&gt;</td><td>Sorted Set</td><td>live rank, updated on every score change</td></tr>
+  <tr><td>session:&lt;sessionId&gt;</td><td>String + TTL</td><td>login sessions</td></tr>
+  <tr><td>rate_limit:&lt;userId&gt;</td><td>Counter + TTL</td><td>max 10 submissions / 60s</td></tr>
 </table>
-<div class="evidence">
-<span class="tag">Live evidence — rate limiter (max 10 submissions / 60s) against the running API</span>
-<pre><span class="cmt">$ for i in 1..12: curl -X POST http://localhost:8000/submissions ...</span>
-201 201 201 201 201 201 201 201 201 201 429 429</pre>
-</div>
+<pre>$ 12 rapid POST /submissions from one user -> 201 x10, then 429 x2 (rate limit working)</pre>
 
-<h2 class="section"><span class="num">06</span>Intermediate Demonstration</h2>
-<p><code class="inline">scripts/demo.py</code> (<code class="inline">make demo</code>) is a self-cleaning script a faculty member can
-run live end-to-end. It connects to the real database and prints, in order: a CRUD round-trip, an
-indexed query with <code class="inline">.explain()</code> proof, a multi-document transaction with before/after
-counters, all 5 aggregation results, and the Redis leaderboard/session/rate-limit state — verified
-twice end-to-end from a completely clean slate (<code class="inline">docker compose down -v && make up &&
-make init-db && make seed && make demo</code>), and again against a live <code class="inline">uvicorn</code> server via
-curl for the CRUD/Redis evidence captured in this document.</p>
+<h2>4. Current Implementation Status</h2>
+<table class="data">
+  <tr><th>Criterion</th><th>Marks</th><th>Status</th></tr>
+  <tr><td>Database implementation (collections, relationships, sample data)</td><td>2</td><td class="status-done">Done</td></tr>
+  <tr><td>CRUD operations completed</td><td>3</td><td class="status-done">Done</td></tr>
+  <tr><td>Advanced NoSQL features (aggregation, indexing, transactions)</td><td>5</td><td class="status-done">Done</td></tr>
+</table>
 
-<h2 class="section"><span class="num">07</span>Source Code Repository</h2>
-<h3 class="sub">7.1 Layout</h3>
-<pre>app/
-  main.py                 FastAPI app + router wiring
-  config.py                Settings (env-driven)
-  db.py                     Mongo/Redis clients, $jsonSchema validators, indexes
-  security.py              Password hashing (PBKDF2), session tokens
-  redis_ops.py             Leaderboard / session / rate-limit Redis operations
-  services.py               Multi-document transactions (shared by API + seed)
-  models/                    Pydantic request/response schemas per collection
-  api/                         FastAPI routers: users, teams, contests, problems, submissions, sessions
-  aggregations/pipelines.py    The 5 aggregation pipelines + their endpoints
-scripts/
-  init_db.py                 create collections/validators/indexes
-  seed.py                      wipe + reseed ~88 sample records
-  demo.py                       intermediate demonstration script
-docker-compose.yml            MongoDB (replica set) + Redis
-Makefile                       up / down / init-db / seed / demo / api / reset
-README.md, .env.example, .gitignore, requirements.txt</pre>
+<h2>5. Repository</h2>
+<p>Git repository at the project workspace (<code class="inline">rankstack/</code>), 15 commits.</p>
+<pre>app/            FastAPI app, models, db config, aggregations, redis, transactions
+scripts/        init_db.py, seed.py, demo.py
+docker-compose.yml, Makefile, README.md
 
-<h3 class="sub">7.2 Setup (also in README.md)</h3>
-<pre>make up        <span class="cmt"># start MongoDB (replica set) + Redis via docker compose</span>
-make install   <span class="cmt"># create venv, install dependencies (needs python3.11)</span>
-make init-db   <span class="cmt"># create collections, $jsonSchema validators, indexes</span>
-make seed      <span class="cmt"># load ~88 referentially-consistent sample records</span>
-make demo      <span class="cmt"># run the intermediate demonstration</span>
-make api       <span class="cmt"># serve the REST API at http://localhost:8000/docs</span></pre>
+Run: make up -> make init-db -> make seed -> make demo / make api</pre>
 
-<h3 class="sub">7.3 Commit history</h3>
-<p>13 commits, one logical change each (infra &rarr; db/schema &rarr; models &rarr; security/redis &rarr;
-transactions &rarr; seed &rarr; api &rarr; demo &rarr; makefile &rarr; docs &rarr; a live-testing bugfix), no
-secrets committed (<code class="inline">.env</code> / venv gitignored, only <code class="inline">.env.example</code> tracked):</p>
-<pre>0c815e7 fix: use non-reserved email TLD (rankstack.io) so POST /users accepts seeded/demo addresses
-d073377 chore: remove unused empty tests package and dead pytest Makefile target
-4c11c55 chore: add httpx dev dependency for TestClient-based smoke tests
-475ea77 docs: README with setup, run instructions, rubric mapping
-75f58f1 chore: Makefile for up/down/seed/demo/api workflow
-1ea9fc1 demo: intermediate walkthrough script (CRUD, indexed query, transaction, aggregations, redis)
-2ab9f8a api: FastAPI app + CRUD routers for all 5 collections, sessions, aggregation endpoints
-635f751 seed: generate 88 referentially-consistent sample records across all collections
-e4071d3 services: multi-document transactions (submission+counter, score+totalScore, team member back-ref)
-92c29f7 core: password hashing, redis leaderboard/session/rate-limit ops, init_db script
-23149a8 models: pydantic request/response schemas incl. polymorphic problems
-1a21af7 db: mongo/redis clients, $jsonSchema validators, indexes
-dae96d2 infra: docker-compose for mongo single-node replica set + redis, base deps</pre>
-
-<div class="footer-note">
-Rankstack — Contest Platform with Live Leaderboard &middot; BCSE302P Database Systems Lab &middot; Review 2
-&middot; Upayan Mazumder, Aditya Rawat, Shloak Sinha
-</div>
+<div class="footer">Rankstack — BCSE302P Database Systems Lab — Review 2</div>
 
 </body>
 </html>
