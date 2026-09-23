@@ -44,7 +44,7 @@ jobs:
       # by digest (never `latest` -- see vps repo k8s/GUIDE.md convention).
       - name: Tags and labels
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
