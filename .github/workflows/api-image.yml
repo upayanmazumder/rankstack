@@ -1,4 +1,4 @@
-name: Backend Image
+name: API Image
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
       - 'api/requirements.txt'
       - 'api/Dockerfile'
       - 'api/Dockerfile.dockerignore'
-      - '.github/workflows/backend-image.yml'
+      - '.github/workflows/api-image.yml'
   workflow_dispatch:
 
 concurrency:
