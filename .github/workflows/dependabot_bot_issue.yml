@@ -1,14 +1,15 @@
-name: Create issue on dependabot pr
+name: Track dependabot PRs with an issue
 
 # pull_request_target is required: the GITHUB_TOKEN on a dependabot-authored
-# pull_request event is read-only and cannot open issues.
+# pull_request event is read-only and cannot touch issues.
 on:
   pull_request_target:
-    types: [opened]
+    types: [opened, closed]
 
 jobs:
   create_issue:
-    if: github.actor == 'dependabot[bot]'
+    # The PR author settles this, not the actor: whoever merges the PR is the actor on close.
+    if: github.event.action == 'opened' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -20,7 +21,52 @@ jobs:
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
           --data '{
-            "title": "Check for breaking changes in ${{ github.actor }} PR #${{ github.event.number }}",
+            "title": "Check for breaking changes in ${{ github.event.pull_request.user.login }} PR #${{ github.event.number }}",
             "body": "- Check whether the updated dependencies introduce breaking changes.\n- PR: ${{ github.event.pull_request.html_url }}",
             "labels": ["dependencies"]
             }'
+
+  close_issue:
+    if: github.event.action == 'closed' && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      # The tracking issue exists to remind a human to look at the PR, so it goes away with the PR.
+      - name: Close the tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+        run: |
+          if [ "$PR_MERGED" = "true" ]; then
+            reason=completed
+            outcome="merged"
+          else
+            reason=not_planned
+            outcome="closed without merging"
+          fi
+
+          numbers=$(curl --fail --silent --show-error --get \
+            --url https://api.github.com/search/issues \
+            --data-urlencode "q=repo:$REPO in:title \"${{ github.event.pull_request.user.login }} PR #$PR_NUMBER\"" \
+            --header "authorization: Bearer $GH_TOKEN" \
+            | jq -r '.items[] | select(.state == "open") | .number')
+
+          for number in $numbers; do
+            curl --fail --silent --show-error \
+              --request POST \
+              --url "https://api.github.com/repos/$REPO/issues/$number/comments" \
+              --header "authorization: Bearer $GH_TOKEN" \
+              --header 'content-type: application/json' \
+              --data "{\"body\": \"$PR_URL was $outcome, so there is nothing left to check for this PR.\"}"
+
+            curl --fail --silent --show-error \
+              --request PATCH \
+              --url "https://api.github.com/repos/$REPO/issues/$number" \
+              --header "authorization: Bearer $GH_TOKEN" \
+              --header 'content-type: application/json' \
+              --data "{\"state\": \"closed\", \"state_reason\": \"$reason\"}"
+          done
