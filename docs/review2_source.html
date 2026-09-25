@@ -4,63 +4,63 @@
 <meta charset="UTF-8" />
 <title>Review 2 - Contest Platform with Live Leaderboard</title>
 <style>
-  @page { size: A4; margin: 16mm 15mm; }
+  @page { size: A4; margin: 18mm 16mm; }
   * { box-sizing: border-box; }
   body {
     font-family: Calibri, Arial, sans-serif;
     color: #1a1a1a;
-    font-size: 10.5pt;
-    line-height: 1.42;
+    font-size: 11pt;
+    line-height: 1.5;
     margin: 0;
   }
   .header {
     text-align: center;
-    border-bottom: 2px solid #222;
+    border-bottom: 1.5px solid #333;
     padding-bottom: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
-  .header .code { font-size: 9.5pt; letter-spacing: 1px; color: #444; }
+  .header .code { font-size: 9.5pt; letter-spacing: 0.5px; color: #444; }
   .header h1 { font-size: 16pt; margin: 4px 0 2px 0; }
   .header .sub { font-size: 9.5pt; color: #555; }
-  table.meta { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 9.3pt; }
-  table.meta td { border: 1px solid #bbb; padding: 4px 8px; }
-  table.meta td.label { background: #eee; font-weight: 600; width: 20%; }
+  table.meta { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 9.8pt; }
+  table.meta td { border: 1px solid #999; padding: 4px 8px; }
+  table.meta td.label { background: #eee; font-weight: 600; width: 22%; }
   h2 {
-    font-size: 12.5pt;
-    border-bottom: 1.5px solid #333;
-    padding-bottom: 2px;
-    margin-top: 16px;
+    font-size: 13pt;
+    margin-top: 18px;
     margin-bottom: 6px;
   }
-  h3 { font-size: 10.3pt; margin-top: 8px; margin-bottom: 3px; }
-  p { margin: 4px 0; }
-  ul, ol { margin: 3px 0; padding-left: 18px; }
-  li { margin-bottom: 2px; }
-  table.data { width: 100%; border-collapse: collapse; margin: 5px 0 9px 0; font-size: 9pt; }
-  table.data th { background: #333; color: #fff; padding: 4px 7px; text-align: left; }
-  table.data td { border: 1px solid #ccc; padding: 4px 7px; vertical-align: top; }
-  table.data tr:nth-child(even) td { background: #f5f5f5; }
-  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 8pt; }
+  h3 { font-size: 10.8pt; margin-top: 10px; margin-bottom: 4px; }
+  p { margin: 6px 0; text-align: justify; }
+  ul, ol { margin: 4px 0; padding-left: 20px; }
+  li { margin-bottom: 3px; text-align: justify; }
+  table.data { width: 100%; border-collapse: collapse; margin: 6px 0 10px 0; font-size: 9.3pt; }
+  table.data th { background: #e8e8e8; color: #000; padding: 4px 7px; text-align: left; border: 1px solid #999; font-weight: 600; }
+  table.data td { border: 1px solid #999; padding: 4px 7px; vertical-align: top; }
+  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 8.3pt; }
   pre {
-    background: #f4f4f4;
+    background: #f6f6f6;
     border: 1px solid #ccc;
-    border-left: 3px solid #333;
-    padding: 5px 8px;
-    margin: 4px 0 9px 0;
+    padding: 6px 9px;
+    margin: 5px 0 10px 0;
     white-space: pre-wrap;
     word-break: break-word;
     page-break-inside: avoid;
   }
-  code.inline { background: #eee; padding: 0 4px; border-radius: 2px; }
-  .status-done { color: #1a7a3c; font-weight: 700; }
-  .note { font-size: 8.6pt; color: #555; font-style: italic; margin: 2px 0 8px 0; }
-  .footer { margin-top: 14px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #666; text-align: center; }
+  code.inline { background: #eee; padding: 0 3px; }
+  .diagram {
+    text-align: center;
+    margin: 8px 0 10px 0;
+  }
+  .diagram pre { display: inline-block; text-align: left; background: #fff; border: none; font-size: 8.6pt; }
+  .note { font-size: 9pt; color: #444; margin: 3px 0 8px 0; }
+  .footer { margin-top: 16px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #666; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="code">BCSE302P | Database Systems Lab | Review 2</div>
+  <div class="code">BCSE302P &ndash; Database Systems Lab &ndash; Review 2</div>
   <h1>Contest Platform with Live Leaderboard</h1>
   <div class="sub">Database Implementation &amp; Core Functionalities (MongoDB + Redis)</div>
 </div>
@@ -71,8 +71,12 @@
     <td>Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS0378)</td>
   </tr>
   <tr>
-    <td class="label">Stack</td>
-    <td>MongoDB 7 (single-node replica set <code class="inline">rs0</code>) + Redis 7, FastAPI backend</td>
+    <td class="label">Course</td>
+    <td>BCSE302P &ndash; Database Systems Lab</td>
+  </tr>
+  <tr>
+    <td class="label">Component</td>
+    <td>Review 2 &ndash; Database Implementation &amp; Core Functionalities</td>
   </tr>
   <tr>
     <td class="label">Repository</td>
@@ -80,31 +84,48 @@
   </tr>
 </table>
 
-<h2>1. Database implementation</h2>
+<h2>1. Database Implementation</h2>
 
-<table class="data">
-  <tr><th>Collection</th><th>Key fields</th></tr>
-  <tr><td>users</td><td>name, email, passwordHash, role, totalScore</td></tr>
-  <tr><td>teams</td><td>name, memberIds[], totalScore</td></tr>
-  <tr><td>contests</td><td>title, startTime, endTime, status, problemIds[], participants[]</td></tr>
-  <tr><td>problems</td><td>contestId, type (mcq/coding/subjective), difficulty, points, attemptCount</td></tr>
-  <tr><td>submissions</td><td>contestId, problemId, submittedBy, status, score</td></tr>
-</table>
+<p>We used MongoDB as the primary database for this project. The data used in a contest platform, such
+as problems that have different fields depending on whether they are MCQ, coding or subjective
+questions, fits more naturally into a document model than into fixed relational tables. Redis is used
+alongside MongoDB for data that changes frequently or does not need to be stored permanently, such as
+leaderboard scores and login sessions.</p>
 
-<p>Every collection is created with a <code class="inline">$jsonSchema</code> validator, so MongoDB rejects a
-bad document at insert time instead of leaving the check to the API. <code class="inline">scripts/init_db.py</code>
-creates the collections, validators and indexes, and can be re-run safely.</p>
-
-<p>Relationships:</p>
+<p>The project uses five collections: users, teams, contests, problems and submissions.</p>
 <ul>
-  <li>Contest &rarr; Problems</li>
-  <li>Contest &rarr; Participants (users or teams)</li>
-  <li>User/Team &rarr; Submissions</li>
-  <li>Team &rarr; Users</li>
-  <li>Submission &rarr; Problem</li>
+  <li>A user document stores the name, email, hashed password, role and total score.</li>
+  <li>A team document stores the team name, the list of member user ids, and the team's total score.</li>
+  <li>A contest document stores the title, start and end time, current status, and the list of problem
+  ids and participants.</li>
+  <li>A problem document stores which contest it belongs to, its type (mcq, coding or subjective),
+  difficulty, points, and how many times it has been attempted.</li>
+  <li>A submission document stores the contest, the problem, who submitted it, its status and score.</li>
 </ul>
 
-<p>Sample data loaded by <code class="inline">scripts/seed.py</code>:</p>
+<p>A contest can have multiple problems and multiple participants, and a participant can be either a
+user or a team. Every submission is linked to the problem it was made for and to the participant who
+made it. A team also keeps a list of its member users, so a user can belong to a team and submit either
+individually or as part of that team.</p>
+
+<div class="diagram">
+<pre>   contests -----> problems
+   contests -----> participants (users / teams)
+   participants -----> submissions <----- problems
+   teams -----> users (team members)</pre>
+</div>
+
+<p>Every collection has a validation rule attached to it using MongoDB's <code class="inline">$jsonSchema</code>,
+so the required fields and their types are checked when a document is inserted or updated, instead of
+relying only on checks inside the API code. For example, the validator on the problems collection
+requires the <code class="inline">type</code> field to be one of mcq, coding or subjective. These
+validators, along with the indexes described in Section 3, are created by
+<code class="inline">scripts/init_db.py</code>, which can be run again without creating duplicate
+collections.</p>
+
+<p><code class="inline">scripts/seed.py</code> was used to load sample data into all five collections.
+Review 2 asks for at least 50 sample records, and our seed script currently inserts 88:</p>
+
 <table class="data">
   <tr><th>Collection</th><th>Records</th></tr>
   <tr><td>users</td><td>15</td></tr>
@@ -112,23 +133,18 @@ creates the collections, validators and indexes, and can be re-run safely.</p>
   <tr><td>contests</td><td>5</td></tr>
   <tr><td>problems</td><td>15</td></tr>
   <tr><td>submissions</td><td>48</td></tr>
-  <tr><td><b>Total</b></td><td><b>88</b></td></tr>
+  <tr><td>Total</td><td>88</td></tr>
 </table>
-<p class="note">The rubric asks for 50+ records. The seed gives 88, and the references between them are
-consistent (every submission points at a real problem, contest and participant).</p>
 
-<h2>2. CRUD operations</h2>
+<p>The records are related correctly to each other &ndash; every submission in the seed data points to
+a problem, a contest and a participant that actually exist, so the aggregation results shown later in
+this document are computed from consistent data.</p>
 
-<p>33 REST endpoints across the five collections plus sessions, all reachable from Swagger UI at
-<code class="inline">/docs</code>.</p>
+<h2>2. CRUD Operations</h2>
 
-<table class="data">
-  <tr><th>Operation</th><th>Implemented for</th></tr>
-  <tr><td>Create</td><td>Users, teams, contests, problems, submissions</td></tr>
-  <tr><td>Read</td><td>All 5 collections (single record and filtered list)</td></tr>
-  <tr><td>Update</td><td>Users, teams, contests, problems, submissions</td></tr>
-  <tr><td>Delete</td><td>Users, teams, contests, problems, submissions</td></tr>
-</table>
+<p>For demonstrating CRUD operations, we used the users collection. Creating a user sends a POST
+request with the name, email and password, and the API returns the created user along with a
+generated id. The same id is then used to read, update and delete that user.</p>
 
 <pre>POST /users {"name":"Doc User","email":"doc@rankstack.io","password":"secret123"}
 -> 201 {"id":"6ab3f9a5...","name":"Doc User","role":"participant","totalScore":0}
@@ -137,81 +153,134 @@ GET    /users/6ab3f9a5...   -> 200 {"id":"6ab3f9a5...","name":"Doc User", ...}
 PATCH  /users/6ab3f9a5...   -> 200 {"name":"Doc User (edited)", ...}
 DELETE /users/6ab3f9a5...   -> 204</pre>
 
-<h2>3. Advanced NoSQL features</h2>
+<p>The other four collections (teams, contests, problems and submissions) support the same four
+operations in the same way. In total, the API has 33 REST endpoints across these five collections and
+the session routes, but they all follow the create-read-update-delete pattern shown above.</p>
 
-<h3>3.1 Aggregation pipelines</h3>
+<h2>3. Advanced NoSQL Features</h2>
+
+<h3>3.1 Aggregation Pipelines</h3>
+
+<p>MongoDB's aggregation framework was used for calculations that a plain <code class="inline">find()</code>
+query cannot produce directly, since these need totals or comparisons across multiple documents.</p>
+
+<ul>
+  <li>The <b>leaderboard</b> pipeline groups submissions by participant, adds up their scores and ranks
+  them, so the standings for a contest can be returned directly.</li>
+  <li>The <b>average score</b> pipeline groups problems by difficulty and works out the average score
+  of submissions made to problems in that group.</li>
+  <li>The <b>submission status</b> pipeline counts submissions in each contest by their status
+  (pending, correct, incorrect, partial).</li>
+  <li>The <b>distinct problems solved</b> pipeline works out how many different problems each user has
+  solved correctly, since the same user may submit to a problem more than once.</li>
+  <li>The <b>team performance</b> pipeline uses <code class="inline">$lookup</code> to bring together a
+  team's members and their submissions, so a team's total score, submission count and member count come
+  back as one document.</li>
+</ul>
+
 <table class="data">
-  <tr><th>Pipeline</th><th>What it answers</th><th>Endpoint</th></tr>
-  <tr><td>Contest leaderboard</td><td>total score and rank per contestant</td><td>/aggregations/leaderboard/{id}</td></tr>
-  <tr><td>Problem statistics</td><td>average score per difficulty level</td><td>/aggregations/avg-score-by-difficulty</td></tr>
-  <tr><td>Submission statistics</td><td>submissions by status, per contest</td><td>/aggregations/submission-status-by-contest</td></tr>
-  <tr><td>Problems solved per user</td><td>distinct correct problems across contests</td><td>/aggregations/problems-solved-per-user</td></tr>
-  <tr><td>Team performance</td><td><code class="inline">$lookup</code> from teams to their members' submissions</td><td>/aggregations/team-performance</td></tr>
+  <tr><th>Pipeline</th><th>Purpose</th><th>Endpoint</th></tr>
+  <tr><td>Leaderboard</td><td>total score and rank per participant, for one contest</td><td>/aggregations/leaderboard/{id}</td></tr>
+  <tr><td>Average score by difficulty</td><td>mean score of submissions, grouped by problem difficulty</td><td>/aggregations/avg-score-by-difficulty</td></tr>
+  <tr><td>Submission status by contest</td><td>submission count per status, per contest</td><td>/aggregations/submission-status-by-contest</td></tr>
+  <tr><td>Distinct problems solved</td><td>number of unique problems solved by each user</td><td>/aggregations/problems-solved-per-user</td></tr>
+  <tr><td>Team performance</td><td>combined score and submission count for a team's members</td><td>/aggregations/team-performance</td></tr>
 </table>
-<pre>Sample output: {"name": "Team Lavender Trial", "totalScore": 195.0, "submissionCount": 12, "memberCount": 3}</pre>
 
 <h3>3.2 Indexing</h3>
-<table class="data">
-  <tr><th>Index</th><th>Collection and keys</th></tr>
-  <tr><td>uniq_email</td><td>users (email), unique</td></tr>
-  <tr><td>by_contest</td><td>problems (contestId)</td></tr>
-  <tr><td>by_contest_and_submitter</td><td>submissions (contestId, submittedBy.refId), compound</td></tr>
-  <tr><td>by_problem</td><td>submissions (problemId)</td></tr>
-  <tr><td>by_member</td><td>teams (memberIds), multikey</td></tr>
-  <tr><td>by_status</td><td>contests (status)</td></tr>
-</table>
-<p class="note">The demo script runs <code class="inline">explain()</code> on two of these queries and prints the
-winning plan, which comes back as IXSCAN with the index name, so the query is not scanning the whole collection.</p>
+
+<p>Indexes were added on fields that are queried often, or that need to stay unique, so MongoDB does
+not have to scan every document in a collection to answer a query.</p>
+
+<ul>
+  <li>A <b>unique index on users.email</b> stops two accounts from registering with the same email
+  address and speeds up login lookups.</li>
+  <li>An <b>index on problems.contestId</b> is used whenever a contest's problem list is fetched.</li>
+  <li>A <b>compound index on submissions (contestId, submittedBy.refId)</b> is used to fetch one
+  participant's submissions within a specific contest, which comes up whenever a user's own submission
+  history is shown.</li>
+  <li>An <b>index on submissions.problemId</b> supports the distinct-problems-solved aggregation and
+  other problem-level statistics.</li>
+  <li>An <b>index on teams.memberIds</b> is used to look up which team a user belongs to.</li>
+  <li>An <b>index on contests.status</b> is used to filter contests that are live or upcoming.</li>
+</ul>
+
+<p class="note">We checked two of these queries with <code class="inline">explain()</code> while
+testing, and the winning plan came back as IXSCAN with the expected index name instead of a full
+collection scan.</p>
 
 <h3>3.3 Transactions</h3>
-<p>Four operations in <code class="inline">api/services.py</code> run inside a session transaction, which is why
-Mongo runs as a replica set:</p>
-<ul>
-  <li><code class="inline">create_submission</code>: insert the submission and increment <code class="inline">problem.attemptCount</code></li>
-  <li><code class="inline">update_submission_status</code>: set status and score, then add the score to the user or team total</li>
-  <li><code class="inline">add_team_member</code> and <code class="inline">remove_team_member</code>: update the team and the user's back-reference together</li>
-</ul>
+
+<p>When a submission is created, both the submission document and the attempt count on the
+corresponding problem need to be updated. If only one of these writes went through, for example because
+of a crash between the two operations, the data would become inconsistent. To avoid this, the two
+writes are placed inside a single transaction using a MongoDB session, so either both of them happen or
+neither does.</p>
+
+<p>The same idea is used in three other places. Updating a submission's status also updates the score
+of the submitter (a user or a team) in the same transaction. Adding or removing a member from a team
+updates both the team's member list and a reference stored on the user's own document, and this is also
+done together as one transaction.</p>
+
+<p>MongoDB only supports multi-document transactions when it is running as a replica set. This is why
+the project runs MongoDB as a single-node replica set (<code class="inline">rs0</code>) even during
+local development, instead of as a standalone instance.</p>
 
 <h3>3.4 Redis</h3>
+
+<p>We used Redis for data that changes often or does not need to be kept permanently, alongside
+MongoDB.</p>
+
 <ul>
-  <li>Live leaderboard per contest in a sorted set (<code class="inline">ZINCRBY</code> on score change, <code class="inline">ZREVRANGE</code> to read the top N)</li>
-  <li>Login sessions as keys with a TTL of 3600s</li>
-  <li>Submission rate limiting: a counter per user in a 60s window, capped at 10</li>
+  <li><b>Leaderboard</b> &ndash; each contest has a Redis sorted set. A participant's score is updated
+  with <code class="inline">ZINCRBY</code> whenever their submission score changes, and the top
+  participants are read back with <code class="inline">ZREVRANGE</code>.</li>
+  <li><b>Sessions</b> &ndash; after logging in, a session key is stored in Redis with a TTL of one hour
+  (3600 seconds), so old sessions expire on their own without a separate cleanup job.</li>
+  <li><b>Rate limiting</b> &ndash; a counter is kept per user for a 60 second window. Once a user
+  crosses 10 submissions in that window, further submissions are blocked until the window resets.</li>
 </ul>
 
-<h2>4. Intermediate demonstration</h2>
-<p><code class="inline">make demo</code> runs <code class="inline">scripts/demo.py</code> against the seeded
-database and prints each step:</p>
+<h2>4. Intermediate Demonstration</h2>
+
+<p>During the intermediate review, the project can be demonstrated in the following order:</p>
 <ol>
-  <li>Connection check on Mongo and Redis</li>
-  <li>CRUD on a user: create, read, update, delete</li>
-  <li>Indexed query on <code class="inline">problems.contestId</code> with the winning plan and index name</li>
-  <li>Compound-indexed query on submissions by contest and submitter</li>
-  <li>Transaction: submission inserted while <code class="inline">attemptCount</code> and the user total move with it</li>
-  <li>All five aggregation pipelines with their results</li>
-  <li>Redis leaderboard, session TTL and rate-limit counter</li>
+  <li>Check the MongoDB and Redis connection</li>
+  <li>Demonstrate CRUD operations on a user</li>
+  <li>Show an indexed query and its <code class="inline">explain()</code> output</li>
+  <li>Demonstrate the compound index on submissions</li>
+  <li>Demonstrate a transaction by creating a submission</li>
+  <li>Run all five aggregation pipelines</li>
+  <li>Show the Redis leaderboard, session TTL and rate limiting</li>
 </ol>
-<p class="note">The demo cleans up what it creates, so it can be run repeatedly during the review.</p>
+
+<p>This flow is scripted in <code class="inline">scripts/demo.py</code>, which runs against the
+already-seeded database and prints the result of each step as it happens. The submission it creates for
+the transaction step is removed again at the end, so the script can be run more than once during the
+review without leaving extra data behind.</p>
 
 <h2>5. Checklist</h2>
+
 <table class="data">
-  <tr><th>Criterion</th><th>Marks</th><th>Where</th><th>Status</th></tr>
-  <tr><td>Database implementation</td><td>2</td><td>Section 1, <code class="inline">scripts/init_db.py</code></td><td class="status-done">Done</td></tr>
-  <tr><td>CRUD operations</td><td>3</td><td>Section 2, <code class="inline">api/routes/</code></td><td class="status-done">Done</td></tr>
-  <tr><td>Advanced NoSQL features</td><td>5</td><td>Section 3, <code class="inline">api/aggregations/</code>, <code class="inline">api/services.py</code></td><td class="status-done">Done</td></tr>
-  <tr><td>50+ sample records</td><td>&ndash;</td><td>88 records from <code class="inline">scripts/seed.py</code></td><td class="status-done">Done</td></tr>
-  <tr><td>Intermediate demonstration</td><td>&ndash;</td><td><code class="inline">scripts/demo.py</code></td><td class="status-done">Done</td></tr>
-  <tr><td>Source code repository</td><td>&ndash;</td><td>github.com/upayanmazumder/rankstack</td><td class="status-done">Done</td></tr>
+  <tr><th>Criterion</th><th>Marks</th><th>Where to look</th><th>Status</th></tr>
+  <tr><td>Database implementation</td><td>2</td><td>Section 1, <code class="inline">scripts/init_db.py</code></td><td>Completed</td></tr>
+  <tr><td>CRUD operations</td><td>3</td><td>Section 2, <code class="inline">api/routes/</code></td><td>Completed</td></tr>
+  <tr><td>Advanced NoSQL features</td><td>5</td><td>Section 3, <code class="inline">api/aggregations/</code>, <code class="inline">api/services.py</code></td><td>Completed</td></tr>
+  <tr><td>50+ sample records</td><td>&ndash;</td><td>88 records, <code class="inline">scripts/seed.py</code></td><td>Completed</td></tr>
+  <tr><td>Intermediate demonstration</td><td>&ndash;</td><td><code class="inline">scripts/demo.py</code></td><td>Completed</td></tr>
+  <tr><td>Source code repository</td><td>&ndash;</td><td>github.com/upayanmazumder/rankstack</td><td>Completed</td></tr>
 </table>
 
-<h2>6. Running it</h2>
+<h2>6. Running the Project</h2>
+
+<p>The following commands set up and run the project locally:</p>
 <pre>make up        # MongoDB replica set + Redis in Docker
 make init-db   # collections, $jsonSchema validators, indexes
 make seed      # 88 sample records
-make demo      # the walkthrough in section 4
+make demo      # the walkthrough described in Section 4
 make api       # FastAPI on http://localhost:8000/docs</pre>
 
-<div class="footer">Rankstack | BCSE302P Database Systems Lab | Review 2</div>
+<div class="footer">Rankstack &ndash; BCSE302P Database Systems Lab &ndash; Review 2</div>
 
 </body>
 </html>
