@@ -32,12 +32,20 @@ spec:
                 sleep 2;
               done;
               mongosh --host rankstack-mongo:27017 --quiet --eval '
-              try {
-                rs.status();
-                print("replica set already initiated");
-              } catch (e) {
+              var status = null;
+              try { status = rs.status(); } catch (e) { status = null; }
+              if (status === null) {
                 rs.initiate({_id: "rs0", members: [{_id: 0, host: "rankstack-mongo:27017"}]});
                 print("replica set initiated");
+              } else if (status.myState !== 1 && status.myState !== 2) {
+                print("replica set exists but broken (myState=" + status.myState + ", not PRIMARY/SECONDARY) -- forcing reconfig");
+                var cfg = rs.conf();
+                cfg.members = [{_id: 0, host: "rankstack-mongo:27017"}];
+                cfg.version = (cfg.version || 1) + 1;
+                rs.reconfig(cfg, {force: true});
+                print("replica set reconfigured");
+              } else {
+                print("replica set already healthy, myState=" + status.myState);
               }'
           resources:
             {{- toYaml .Values.mongo.rsInit.resources | nindent 12 }}
