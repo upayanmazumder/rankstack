@@ -2,3 +2,13 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ .Values.namespace }}
+  # S11 (vps cluster hardening): this chart owns the namespace, so the Pod
+  # Security Admission labels belong here rather than in the GitOps repo --
+  # declaring the Namespace a second time there would give two owners of the
+  # same object. Baseline is enforced: every workload in this chart (api,
+  # mongo, redis) passes it as of 2026-09-28 -- no hostPath, no hostPort, no
+  # privileged containers, no added capabilities beyond the Baseline set, and
+  # no host fields on probes. Restricted stays warn-only.
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
