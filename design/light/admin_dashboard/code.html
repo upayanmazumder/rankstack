@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><title>Rankstack Admin - Precision Control Plane</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error":"#ba1a1a","secondary":"#904d00","on-surface":"#0b1c30","on-error-container":"#93000a","on-error":"#ffffff","background":"#f8f9ff","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#100069","secondary-container":"#fe932c","on-secondary":"#ffffff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed":"#002114","on-secondary-container":"#663500","on-primary-container":"#c1beff","surface-container":"#e5eeff","inverse-primary":"#c3c0ff","outline":"#777586","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed":"#ffdcc3","surface-container-low":"#eff4ff","primary-fixed":"#e3dfff","on-secondary-fixed-variant":"#6e3900","on-secondary-fixed":"#2f1500","on-primary-fixed-variant":"#372abf","on-tertiary":"#ffffff","tertiary":"#00442d","tertiary-container":"#005e40","outline-variant":"#c7c4d7","tertiary-fixed-dim":"#68dba9","on-background":"#0b1c30","surface-bright":"#f8f9ff","on-tertiary-fixed-variant":"#005137","surface-tint":"#5148d7","on-surface-variant":"#464554","surface-dim":"#cbdbf5","on-primary":"#ffffff","surface-container-high":"#dce9ff","error-container":"#ffdad6","surface-variant":"#d3e4fe","on-tertiary-container":"#66daa8","primary-container":"#4338ca","primary-fixed-dim":"#c3c0ff","inverse-surface":"#213145","surface-container-highest":"#d3e4fe","primary":"#2a14b4","tertiary-fixed":"#85f8c4"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xl":"2.5rem","space-lg":"1.5rem","margin":"2rem","margin-mobile":"1rem","space-xs":"0.25rem","gutter-mobile":"0.75rem"},fontFamily:{"label-md":["Hanken Grotesk"],"display-hero-mobile":["Montserrat"],"mono-data":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"body-lg":["Hanken Grotesk"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"mono-rank":["JetBrains Mono"],"mono-sm":["JetBrains Mono"],"headline-lg":["Montserrat"],"headline-sm":["Montserrat"],"label-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"headline-lg-mobile":["Montserrat"]},fontSize:{"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><div class="flex items-center gap-3"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-mono-sm font-mono-sm border border-secondary/30 uppercase font-semibold">Admin</span></div><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="leaderboard" href="#">Leaderboard</a><a aria-current="page" class="px-3 py-1.5 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="admin-dashboard" href="#">Dashboard</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><a class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" data-path="auth-login" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></a></div></div></div></header><aside class="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-surface-container-lowest border-r border-outline-variant p-4 flex flex-col justify-between z-40"><div class="flex flex-col gap-6"><div class="px-3 py-2 bg-surface-container-low rounded-lg"><span class="block font-label-md text-label-md uppercase text-on-surface-variant font-bold tracking-wider">Cluster Status</span><div class="flex items-center gap-2 mt-1"><span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span><span class="font-mono-sm text-mono-sm text-on-surface font-semibold">Primary Sandbox #42</span></div></div><div class="flex flex-col gap-1"><span class="px-3 font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-semibold mb-1">Management</span><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary font-semibold"><a aria-current="page" class="px-3 py-2 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="admin-dashboard" href="#">Overview</a><a class="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests Hub</a><a class="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="problem-and-submission" href="#">Problem Bank</a><a class="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Audit Queue</a><a class="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="teams" href="#">Roster & Teams</a></nav></div></div><div class="pt-4 border-t border-outline-variant flex flex-col gap-2"><a class="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg" data-path="landing-page" href="#">Exit Console</a></div></aside><main class="w-full pt-16 pl-64 bg-surface min-h-[calc(100vh-4rem)]"><div class="flex flex-col w-full">
+<div class="p-8 max-w-[1520px] mx-auto w-full flex flex-col gap-8">
+<!-- Header Section with Telemetry Ticker -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-2">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-semibold tracking-wide uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Elevated Control Plane
+          </span>
+<span class="text-outline-variant font-mono-sm text-mono-sm">/</span>
+<span class="text-on-surface-variant font-mono-sm text-mono-sm font-medium">Session #ADM-9842</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Admin Evaluation Console</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Manage live contests, inspect platform telemetry, and grade subjective architecture submissions across active runtime sandboxes.
+        </p>
+</div>
+<!-- Quick Session Controls -->
+<div class="flex items-center gap-3 self-start lg:self-auto">
+<div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary">sync_alt</span>
+<span class="font-mono-data text-mono-data text-on-surface">Queue latency: <span class="font-bold text-tertiary">14ms</span></span>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-lg text-label-lg transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+          Ruleset V4.2
+        </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-lg text-label-lg transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]">download_done</span>
+          Export Audit Log
+        </button>
+</div>
+</div>
+<!-- Top Row: Four High-Contrast Telemetry Metric Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+<!-- Metric 1: Total Users -->
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest p-5 shadow-sm transition-all hover:shadow-md flex flex-col justify-between group">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Total Platform Users</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-hero text-headline-lg text-on-surface font-extrabold tracking-tight">48,290</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[22px]">group</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 bg-surface-container-low -mx-5 -mb-5 px-5 py-2.5">
+<div class="flex items-center gap-1.5 text-tertiary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+            +12.4% <span class="text-on-surface-variant font-normal">this week</span>
+</div>
+<span class="font-mono-sm text-mono-sm text-outline">Synced 2m ago</span>
+</div>
+</div>
+<!-- Metric 2: Active Contests -->
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest p-5 shadow-sm transition-all hover:shadow-md flex flex-col justify-between group">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Active Competitions</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-hero text-headline-lg text-on-surface font-extrabold tracking-tight">3 Live</span>
+<span class="text-on-surface-variant font-mono-data text-mono-data">/ 12 Upcoming</span>
+</div>
+</div>
+<div class="relative w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-[22px]">timer</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 bg-surface-container-low -mx-5 -mb-5 px-5 py-2.5">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface font-medium">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+            Global AMC #42 Active
+          </div>
+<span class="font-mono-sm text-mono-sm text-secondary font-bold">T-02:18:40</span>
+</div>
+</div>
+<!-- Metric 3: Pending Reviews (Highlighted Amber) -->
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest p-5 shadow-sm transition-all hover:shadow-md flex flex-col justify-between group">
+<div class="absolute top-0 left-0 h-1 w-full bg-secondary-container"></div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Pending Reviews</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-bold uppercase">Needs Grading</span>
+</div>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-hero text-headline-lg text-secondary font-extrabold tracking-tight">34</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Submissions</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-secondary-fixed/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]">assignment_late</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 bg-surface-container-low -mx-5 -mb-5 px-5 py-2.5">
+<span class="font-label-md text-label-md text-on-surface-variant">Priority 1 SLA: <span class="text-error font-semibold">< 30m</span></span>
+<span class="font-mono-sm text-mono-sm font-bold text-on-surface">Queue: 4 Crit</span>
+</div>
+</div>
+<!-- Metric 4: Total Teams -->
+<div class="relative overflow-hidden rounded-lg bg-surface-container-lowest p-5 shadow-sm transition-all hover:shadow-md flex flex-col justify-between group">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant font-bold">Total Teams & Squads</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-hero text-headline-lg text-on-surface font-extrabold tracking-tight">1,420</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Active</span>
+</div>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">diversity_2</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 bg-surface-container-low -mx-5 -mb-5 px-5 py-2.5">
+<div class="flex items-center gap-1.5 text-tertiary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+            +8 new today
+          </div>
+<span class="font-mono-sm text-mono-sm text-outline">Avg Squad: 3.4</span>
+</div>
+</div>
+</div>
+<!-- Section A: Manual Subjective Review Queue Header & Split Workspace -->
+<div class="flex flex-col gap-4">
+<!-- Section Titlebar & Breadcrumbs -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-surface-container-low p-4 rounded-lg shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">rate_review</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Manual Subjective Review Queue</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-mono-sm text-mono-sm font-semibold">AMC #42</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Evaluating candidate architecture blueprint for distributed Byzantine Consensus (Problem C)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Queue: <span class="font-bold text-on-surface">14 of 34</span></span>
+<div class="flex items-center bg-surface-container-lowest rounded-lg p-0.5 shadow-sm">
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Previous Submission">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Next Submission">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Split Review Interface -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- Left Side: Candidate Submission & Problem Context (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col gap-4">
+<!-- Candidate Metadata Ribbon -->
+<div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-lg bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Close-up portrait of Elena V, an elite female software engineer with a determined expression, lit with subtle cool studio lighting and tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBty6mb1chcEk1otJrwoZlDYLqgPubcelb2692i3eECMzACUfbfGRIu34HaaSMScP8kca0D3X63la-e8WYbPqyMJHEAMwMYYW9o79yq9UOLMZfZEpf0zKBci3mLhMAJaDo5Nz7sXXV9xJv4qbteOdmKQfUiCCXR9p3ToNT_exqwsQ4oLxuMhzgfO5yJ2qj7KVb8B3kWtZz_tDpNQ6oqwd-amic4gwTi-KkhZIMZKSc6"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Elena_V</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-semibold">Grandmaster</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Autonomous Systems Lab • Rank #4 Overall</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface-container font-mono-data text-mono-data text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+                14m ago
+              </div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-mono-data text-mono-data font-semibold">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                Verified Unit Tests (18/18)
+              </div>
+</div>
+</div>
+<!-- Problem Statement Brief -->
+<div class="p-4 rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md uppercase font-bold text-on-surface-variant tracking-wider flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">task_alt</span>
+                Problem Prompt Excerpt
+              </span>
+<span class="font-mono-sm text-mono-sm text-primary font-medium">Max 750 Points</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface italic font-serif bg-surface-container-lowest/60 p-3 rounded-md">
+              “Describe a fault-tolerant state-machine replication protocol resilient to 33% Byzantine nodes with optimal latency under network partitions. Specify quorum intersections, cryptographic view-change bounds, and fail-over invariants.”
+            </p>
+</div>
+<!-- Candidate Submitted Answer text box/viewer -->
+<div class="rounded-lg bg-surface-container-lowest shadow-sm flex flex-col overflow-hidden">
+<!-- Terminal/Editor Style Header -->
+<div class="flex items-center justify-between px-4 py-2.5 bg-surface-container-high">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-error/70"></span>
+<span class="w-3 h-3 rounded-full bg-secondary/70"></span>
+<span class="w-3 h-3 rounded-full bg-tertiary-container/70"></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant ml-2 font-semibold">submission_elena_v_rev2.md</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface-variant hover:text-on-surface font-mono-sm text-mono-sm transition-colors flex items-center gap-1" title="Copy raw source">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                  Raw
+                </button>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-mono-sm text-mono-sm">Markdown Preview</span>
+</div>
+</div>
+<!-- Content Area -->
+<div class="p-6 flex flex-col gap-6 text-on-surface overflow-y-auto max-h-[640px] font-body-md text-body-md leading-relaxed">
+<!-- Markdown Content -->
+<div class="flex flex-col gap-2">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">1. Protocol Specification: Asynchronous Byzantine Paxos-Hybrid</h3>
+<p class="text-on-surface-variant">
+                  We formulate a two-phase commit state-machine protocol extending PBFT with optimistic pipeline pipelining under partial synchrony assumptions. 
+                  Given a system of <span class="font-mono-data text-mono-data bg-surface-container px-1 py-0.5 rounded font-bold text-primary">n ≥ 3f + 1</span> nodes where at most <span class="font-mono-data text-mono-data bg-surface-container px-1 py-0.5 rounded font-bold">f</span> can exhibit arbitrary Byzantine failures:
+                </p>
+</div>
+<!-- Mathematical Quorum Diagram / Callout -->
+<div class="p-4 rounded-lg bg-surface-container-low flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-mono-data text-mono-data font-bold text-on-surface">Mathematical Quorum Intersection</span>
+<span class="font-mono-sm text-mono-sm text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded font-semibold">Bound Proved</span>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded font-mono-data text-mono-data text-on-surface flex flex-col gap-1">
+<div>Q_prepare ∩ Q_commit ≥ f + 1</div>
+<div class="text-on-surface-variant text-mono-sm">Since |Q| = 2f + 1: (2f + 1) + (2f + 1) - (3f + 1) = f + 1 non-faulty nodes in intersection.</div>
+</div>
+<!-- Quorum SVG Visualizer -->
+<div class="w-full bg-surface-container-lowest rounded p-3 flex items-center justify-center">
+<svg class="w-full max-w-md h-24" fill="none" viewbox="0 0 420 100" xmlns="http://www.w3.org/2000/svg">
+<rect class="fill-primary/10 stroke-primary" height="60" rx="8" stroke-dasharray="3 3" stroke-width="1.5" width="160" x="20" y="20"></rect>
+<rect class="fill-secondary/10 stroke-secondary" height="60" rx="8" stroke-dasharray="3 3" stroke-width="1.5" width="160" x="140" y="20"></rect>
+<rect class="fill-tertiary/10 stroke-tertiary" height="60" rx="8" stroke-width="1.5" width="140" x="260" y="20"></rect>
+<text class="fill-primary font-mono-sm text-[12px] font-bold" x="50" y="55">Quorum A (2f+1)</text>
+<text class="fill-secondary font-mono-sm text-[12px] font-bold" x="175" y="55">≥ f + 1</text>
+<text class="fill-tertiary font-mono-sm text-[12px] font-bold" x="290" y="55">Commit Validated</text>
+</svg>
+</div>
+</div>
+<!-- View Change Logic -->
+<div class="flex flex-col gap-2">
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">2. View-Change Latency Minimization</h4>
+<p class="text-on-surface-variant">
+                  Standard PBFT introduces <span class="font-mono-data text-mono-data">O(n³)</span> communication complexity during leader fail-over. Elena_V introduces a threshold cryptographic signature collector that compresses View-Change witness certificates down to linear <span class="font-mono-data text-mono-data">O(n)</span>:
+                </p>
+<div class="bg-surface-container-highest p-4 rounded-lg font-mono-data text-mono-data text-on-surface text-body-sm leading-relaxed overflow-x-auto">
+<span class="text-primary font-bold">func</span> <span class="text-secondary font-bold">OnViewTimeout</span>(v_current uint64, log []Entry) {<br/>
+                    sig := BLS_Sign(SK_i, Hash(v_current + 1, "VIEW_CHANGE"))<br/>
+                    broadcast(&ViewChangeMsg{NewView: v_current + 1, Proof: sig})<br/>
+                    await ThresholdAggregation(2*f + 1, timer.WithFactor(1.5))<br/>
+                  }
+                </div>
+</div>
+<!-- Inline Architectural Photo Verification Reference -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low">
+<img class="w-20 h-16 rounded object-cover shadow-sm flex-shrink-0" data-alt="Technical telemetry monitor displaying distributed cluster nodes communicating with network graph overlays and real-time execution speeds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFE9SS7fBmuo2ktOZngjTpBLFUvvPbqWdpJCRilViwEJcjpbY0uDNiCwQ_Y7ITiPWpT9O9TgA-KKteqCnNxQimL1xxLH3D2iu8TjFYpj1pzts11B9pj1jVBWIeFXKKkkYh_6VOLPo0_5RqQvP3l3uLspr9o_q1QZCDVjQRSz0R3q4-C-cjojQrqvOXsixaf85cMCoOWuFLCKwEe27ncomY9_dXSmiN-h4O7-ZRkJVC"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Automated Replay Sandbox Telemetry</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Simulated 100-node cluster benchmark achieved 48,000 tx/sec with 18.2ms p99 latency during 32 injected node faults.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Grading & Status Selector Panel (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-5 sticky top-20">
+<div class="rounded-lg bg-surface-container-lowest p-6 shadow-sm flex flex-col gap-6">
+<!-- Panel Header -->
+<div class="flex items-center justify-between pb-3 bg-surface-container-low -mx-6 -mt-6 p-6 rounded-t-lg">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">fact_check</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Evaluation & Scorecard</span>
+</div>
+<span class="font-mono-sm text-mono-sm text-outline uppercase font-semibold">Rubric V-1.8</span>
+</div>
+<!-- Status Selector Pill Buttons -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Evaluation Verdict</label>
+<div class="grid grid-cols-3 gap-2 p-1 rounded-lg bg-surface-container-low">
+<button class="py-2.5 px-3 rounded-md bg-tertiary text-on-tertiary font-label-md text-label-md font-bold shadow-sm transition-all flex flex-col items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Accepted</span>
+<span class="font-mono-sm text-mono-sm font-normal text-on-tertiary-container">Full Credit</span>
+</button>
+<button class="py-2.5 px-3 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-all flex flex-col items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">flaky</span>
+<span>Partial</span>
+<span class="font-mono-sm text-mono-sm text-outline font-normal">Adjust Pts</span>
+</button>
+<button class="py-2.5 px-3 rounded-md bg-surface-container-lowest text-on-surface hover:bg-surface-container font-label-md text-label-md font-semibold transition-all flex flex-col items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[18px] text-error">cancel</span>
+<span>Rejected</span>
+<span class="font-mono-sm text-mono-sm text-outline font-normal">0 Pts</span>
+</button>
+</div>
+</div>
+<!-- Score Input Box -->
+<div class="flex flex-col gap-2 p-4 rounded-lg bg-surface-container-low">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-bold">Awarded Score</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">Weighted Architecture Benchmark</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative flex-1">
+<input class="w-full h-12 px-4 rounded-md bg-surface-container-lowest font-mono-rank text-mono-rank text-primary font-bold focus:outline-none focus:ring-2 focus:ring-primary shadow-inner text-right pr-4" type="text" value="680"/>
+</div>
+<div class="font-mono-data text-mono-data text-on-surface-variant font-bold">
+                  / 750 <span class="font-normal text-mono-sm">Max PTS</span>
+</div>
+</div>
+</div>
+<!-- Rubric Checkboxes -->
+<div class="flex flex-col gap-3">
+<span class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider">Evaluation Criteria Rubric</span>
+<div class="flex flex-col gap-2">
+<!-- Checkbox 1 -->
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low/60 hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Safety proofs under asynchronous network</span>
+<span class="font-mono-sm text-mono-sm font-bold text-tertiary">250 / 250</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Validated quorum intersection bounds <span class="font-mono-sm">n ≥ 3f + 1</span></span>
+</div>
+</label>
+<!-- Checkbox 2 -->
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low/60 hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Liveness guarantee verification</span>
+<span class="font-mono-sm text-mono-sm font-bold text-tertiary">250 / 250</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">BLS signature aggregation withstands split-brain</span>
+</div>
+</label>
+<!-- Checkbox 3 (Partial Deducted) -->
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low/60 hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" type="checkbox"/>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Latency benchmark analysis</span>
+<span class="font-mono-sm text-mono-sm font-bold text-secondary">180 / 250</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">O(n) message complexity substantiated, minor timeout penalty</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Admin Feedback / Notes Textarea -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Admin Feedback / Examiner Notes</label>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Candidate sees this</span>
+</div>
+<textarea class="w-full p-3 rounded-md bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary resize-none" placeholder="Provide actionable feedback on architecture optimality or fail-over bounds..." rows="3">Exceptional quorum proof formulation. Pipelined commit phase functions flawlessly. Deducted 70 points due to unaddressed edge cases during synchronous gossip gossip-window recovery.</textarea>
+</div>
+<!-- Actions Bar -->
+<div class="flex items-center gap-3 pt-2">
+<button class="w-1/3 py-2.5 px-3 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-lg text-label-lg transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">skip_next</span>
+                Skip
+              </button>
+<button class="w-2/3 py-2.5 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-lg text-label-lg font-bold shadow-md transition-all flex items-center justify-center gap-2 group" type="button">
+<span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">publish</span>
+                Save & Publish Grade
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section B: Recent Flagged Incidents & Audit Table -->
+<div class="flex flex-col gap-4 mt-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">security</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold">Recent Flagged Incidents & Plagiarism Queue</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Automated AST similarity engines detected 4 potential integrity breaches requiring human disqualification approval.</p>
+</div>
+</div>
+<!-- Filter Controls -->
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+            All Incidents (4)
+          </button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md shadow-sm transition-colors">
+            High Confidence (>90%)
+          </button>
+</div>
+</div>
+<!-- Audit Incident Table -->
+<div class="rounded-lg bg-surface-container-lowest shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
+<th class="py-3 px-4">Competitor</th>
+<th class="py-3 px-4">Problem</th>
+<th class="py-3 px-4 text-center">Similarity Match</th>
+<th class="py-3 px-4">Flagged Reason & Origin</th>
+<th class="py-3 px-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent font-body-md text-body-md">
+<!-- Incident Row 1: High Severity -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm" data-alt="Avatar portrait of a male competitor with glasses and dark hoodie looking directly into camera with competitive intensity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb5OMSczx7Zpl_1A5XlCJh7sZFfj0i3DVMMciymSHpFOVsAL6JpEVUbQx3H6sULtbZY_MwVmK7YEMQ522fWTz0oLvgqdREsS_WWn55UO4WbV4vLLXzVwjYT7R3jH1WBYLhSEiBRe9VFy4jvZPEwnt1clsA1Yej2HyiRIs9bqHQBLrnzj6_pOJ69DmRlCYkzBgasJmxR8wqg-TmpzphusksMPzS6EVv265hqU3_uafe"/>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Kovacs_99</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">IP: 185.220.101.4</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold">Problem B: HyperLogLog Matrix</span>
+</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-mono-data text-mono-data font-bold">
+                    94.2% match
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Identical Abstract Syntax Tree (AST)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Cluster matched with user <strong class="text-on-surface">@byte_sorcerer</strong> (Sub: #99014)</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+                      Diff
+                    </button>
+<button class="px-3 py-1.5 rounded bg-error text-on-error hover:bg-on-error-container font-label-md text-label-md font-semibold transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+                      Disqualify
+                    </button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Dismiss Flag">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Incident Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center font-bold font-mono-rank">
+                      TR
+                    </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Team_RogueOne</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">IP: 92.40.12.189</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold">Problem C: Byzantine Latency</span>
+</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-data text-mono-data font-bold">
+                    87.6% match
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">LLM Generation Signature High</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Unsanitized prompt instructions retained in markdown code block</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+                      Diff
+                    </button>
+<button class="px-3 py-1.5 rounded bg-error text-on-error hover:bg-on-error-container font-label-md text-label-md font-semibold transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+                      Disqualify
+                    </button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Dismiss Flag">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Incident Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm" data-alt="Avatar portrait of a young coder smiling slightly against a minimalist backdrop in high definition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS5A5dlLmEpGgHn0ZgX_hzZYHxW15TGZHUbdRKZY5WFh2g69n0RrRr1vJ5tw4wd620BrBn9XgmKOaN-laJGZT_0jySMER7PS_HlKPfkxMk072uGVC0JRMn2Wz7OoQzjqBVPxxsZWHttD-ZhK7gsPO8kR3v226dYYo-BYmSrtuj66EjHdButl4kCaYC-I01QWpF_6AuvYKcsE1KcTBsmGUKCQrJh7A4fK4f6_GLFpIg"/>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Dave_Null</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">IP: 142.250.190.46</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold">Problem A: Red-Black Splay Tree</span>
+</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-mono-data text-mono-data font-bold">
+                    68.1% match
+                  </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Public GitHub Repo Exact Mirror</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Matches 2021 MIT OpenCourseWare algorithm assignment baseline</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-3 py-1.5 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+                      Diff
+                    </button>
+<button class="px-3 py-1.5 rounded bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                      Warn
+                    </button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Dismiss Flag">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Telemetry Summary -->
+<div class="flex flex-col sm:flex-row items-center justify-between p-4 bg-surface-container-low">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Showing 3 of 4 active incident queues • Real-time sandbox isolation active</span>
+<div class="flex items-center gap-2 mt-2 sm:mt-0">
+<span class="font-label-md text-label-md text-on-surface font-medium">Auto-quarantine:</span>
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-mono-sm text-mono-sm font-bold">ENABLED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></body></html>

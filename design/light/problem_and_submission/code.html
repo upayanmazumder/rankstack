@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Rankstack - Precision Competitive Benchmark</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error":"#ba1a1a","secondary":"#904d00","on-surface":"#0b1c30","on-error-container":"#93000a","on-error":"#ffffff","background":"#f8f9ff","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#100069","secondary-container":"#fe932c","on-secondary":"#ffffff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed":"#002114","on-secondary-container":"#663500","on-primary-container":"#c1beff","surface-container":"#e5eeff","inverse-primary":"#c3c0ff","outline":"#777586","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed":"#ffdcc3","surface-container-low":"#eff4ff","primary-fixed":"#e3dfff","on-secondary-fixed-variant":"#6e3900","on-secondary-fixed":"#2f1500","on-primary-fixed-variant":"#372abf","on-tertiary":"#ffffff","tertiary":"#00442d","tertiary-container":"#005e40","outline-variant":"#c7c4d7","tertiary-fixed-dim":"#68dba9","on-background":"#0b1c30","surface-bright":"#f8f9ff","on-tertiary-fixed-variant":"#005137","surface-tint":"#5148d7","on-surface-variant":"#464554","surface-dim":"#cbdbf5","on-primary":"#ffffff","surface-container-high":"#dce9ff","error-container":"#ffdad6","surface-variant":"#d3e4fe","on-tertiary-container":"#66daa8","primary-container":"#4338ca","primary-fixed-dim":"#c3c0ff","inverse-surface":"#213145","surface-container-highest":"#d3e4fe","primary":"#2a14b4","tertiary-fixed":"#85f8c4"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xl":"2.5rem","space-lg":"1.5rem","margin":"2rem","margin-mobile":"1rem","space-xs":"0.25rem","gutter-mobile":"0.75rem"},fontFamily:{"label-md":["Hanken Grotesk"],"display-hero-mobile":["Montserrat"],"mono-data":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"body-lg":["Hanken Grotesk"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"mono-rank":["JetBrains Mono"],"mono-sm":["JetBrains Mono"],"headline-lg":["Montserrat"],"headline-sm":["Montserrat"],"label-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"headline-lg-mobile":["Montserrat"]},fontSize:{"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests</a><a aria-current="page" class="px-3 py-1.5 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="problem-and-submission" href="#">Problems</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="leaderboard" href="#">Leaderboard</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="teams" href="#">Teams</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Submissions</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><a class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" data-path="auth-login" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></a></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full h-[calc(100vh-4rem)] overflow-hidden bg-surface">
+<!-- Top Action & Telemetry Bar -->
+<div class="w-full flex-shrink-0 bg-surface-container-lowest px-6 py-2.5 flex items-center justify-between shadow-sm z-20">
+<!-- Breadcrumb & Status -->
+<div class="flex items-center gap-3 min-w-0">
+<nav class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant truncate">
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">emoji_events</span>
+<span>Contests</span>
+</a>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<a class="hover:text-primary transition-colors font-medium" href="#">AMC #42</a>
+<span class="material-symbols-outlined text-[14px] text-outline">chevron_right</span>
+<span class="font-semibold text-on-surface truncate">Problem A: Minimum Cost Network Topology</span>
+</nav>
+<span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container font-mono-sm text-mono-sm text-primary font-semibold">
+        ID: 42-A
+      </span>
+</div>
+<!-- Live Telemetry & Global CTA -->
+<div class="flex items-center gap-3 flex-shrink-0">
+<!-- Countdown Pill -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">timer</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold">Remaining:</span>
+<span class="font-mono-rank text-mono-rank text-secondary tracking-tight" id="contest-timer">01:42:19</span>
+</div>
+<!-- Quick Actions -->
+<button class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-all font-label-lg text-label-lg font-semibold active:scale-95 shadow-sm" id="quick-run-btn">
+<span class="material-symbols-outlined text-[18px] text-tertiary">play_arrow</span>
+<span>Run Tests</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary transition-all font-label-lg text-label-lg font-semibold shadow-md active:scale-95" id="quick-submit-btn">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Submit Solution</span>
+</button>
+</div>
+</div>
+<!-- Main Split Workspace -->
+<div class="flex-1 flex flex-col lg:flex-row w-full min-h-0 overflow-hidden">
+<!-- LEFT PANEL: Problem Description (Scrollable) -->
+<div class="w-full lg:w-1/2 flex flex-col h-full bg-surface-container-lowest overflow-hidden shadow-sm z-10">
+<!-- Problem Navigation / Type Bar -->
+<div class="px-6 py-2.5 bg-surface-container-low flex items-center justify-between flex-shrink-0">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md font-bold tracking-wide">
+            MEDIUM
+          </span>
+<span class="px-2.5 py-1 rounded bg-surface-container-highest text-primary font-mono-rank text-mono-rank font-bold">
+            500 PTS
+          </span>
+</div>
+<!-- Format Mode Switcher -->
+<div class="flex items-center bg-surface-container p-0.5 rounded-lg">
+<button class="px-2.5 py-1 rounded-md bg-surface-container-lowest font-label-md text-label-md text-primary font-bold shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">code</span>
+            Coding
+          </button>
+<button class="px-2.5 py-1 rounded-md text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+            MCQ Preview
+          </button>
+<button class="px-2.5 py-1 rounded-md text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+            Subjective
+          </button>
+</div>
+</div>
+<!-- Scrollable Problem Body -->
+<div class="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+<!-- Header Info -->
+<div>
+<div class="flex items-baseline justify-between flex-wrap gap-2">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+              A. Minimum Cost Network Topology
+            </h1>
+</div>
+<div class="flex items-center gap-4 mt-3 font-mono-data text-mono-data text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+<span>Time Limit: <strong class="text-on-surface">2.0s</strong></span>
+</div>
+<span class="text-outline">/</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">memory</span>
+<span>Memory Limit: <strong class="text-on-surface">256 MB</strong></span>
+</div>
+<span class="text-outline">/</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+<span>I/O: <strong class="text-on-surface">Standard Stream</strong></span>
+</div>
+</div>
+</div>
+<!-- Problem Narrative -->
+<div class="space-y-4 font-body-lg text-body-lg text-on-surface leading-relaxed">
+<p>
+            You are commissioned to architect a resilient high-throughput optical transit backbone connecting 
+            <span class="font-mono-data text-mono-data font-semibold text-primary">N</span> primary server clusters, indexed from 
+            <span class="font-mono-data text-mono-data">1</span> to <span class="font-mono-data text-mono-data">N</span>. 
+            There are <span class="font-mono-data text-mono-data font-semibold text-primary">M</span> bidirectional fiber conduits candidate routes available. 
+            Each conduit <span class="font-mono-data text-mono-data">i</span> directly joins node <span class="font-mono-data text-mono-data">u<sub>i</sub></span> 
+            and node <span class="font-mono-data text-mono-data">v<sub>i</sub></span> with optical deployment latency weight <span class="font-mono-data text-mono-data">w<sub>i</sub></span>.
+          </p>
+<p>
+            To prevent single-cluster packet congestion, a critical structural limitation is enforced: 
+            the central ingress cluster (Node <span class="font-mono-data text-mono-data font-bold text-secondary">1</span>) must hold a tree degree 
+            <strong>strictly less than or equal to <span class="font-mono-data text-mono-data text-secondary">K</span></strong> in the chosen connected backbone topology. 
+            All other nodes can maintain arbitrary degree connectivity as long as the entire cluster forms a connected spanning tree.
+          </p>
+<p>
+            Determine the minimum aggregate conduit deployment weight required to form a valid connected spanning tree satisfying this degree constraint. If it is impossible to construct a spanning tree meeting the criteria, output <span class="font-mono-data text-mono-data bg-error-container text-on-error-container px-1.5 py-0.5 rounded">-1</span>.
+          </p>
+</div>
+<!-- Constraints Card -->
+<div class="rounded-xl bg-surface-container-low p-5 shadow-sm space-y-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide">Input Constraints</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+<div class="p-2.5 rounded-lg bg-surface-container-lowest shadow-sm flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Nodes (N)</span>
+<span class="font-mono-data text-mono-data font-bold text-on-surface mt-1">2 ≤ N ≤ 10⁵</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container-lowest shadow-sm flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Conduits (M)</span>
+<span class="font-mono-data text-mono-data font-bold text-on-surface mt-1">1 ≤ M ≤ 2×10⁵</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container-lowest shadow-sm flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Latency / Weight</span>
+<span class="font-mono-data text-mono-data font-bold text-on-surface mt-1">1 ≤ wᵢ ≤ 10⁹</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant pt-1">
+            Constraints guarantee the candidate graph is simple, undirected, and may contain disconnected partitions initially.
+          </p>
+</div>
+<!-- Interactive Sample Cases Tabs -->
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Sample Test Cases</span>
+<div class="flex items-center gap-1 bg-surface-container p-1 rounded-lg" id="sample-tabs">
+<button class="sample-tab-btn px-3 py-1 rounded bg-surface-container-lowest text-primary font-label-md text-label-md font-bold shadow-sm transition-all" data-sample="1">
+                Sample 1
+              </button>
+<button class="sample-tab-btn px-3 py-1 rounded text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-all" data-sample="2">
+                Sample 2
+              </button>
+</div>
+</div>
+<!-- Sample 1 Content -->
+<div class="space-y-3" id="sample-1-view">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<!-- Sample Input -->
+<div class="rounded-xl bg-surface-container-low p-4 relative group shadow-sm">
+<div class="flex items-center justify-between pb-2 mb-2 bg-surface-container-high/40 px-2 py-1 rounded">
+<span class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Standard Input</span>
+<button class="flex items-center gap-1 font-mono-sm text-mono-sm text-primary hover:text-primary-container transition-colors" onclick="copySnippet('sample1-in')">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="font-mono-data text-mono-data text-on-surface overflow-x-auto p-1 leading-relaxed" id="sample1-in">4 5 2
+1 2 3
+1 3 5
+1 4 7
+2 3 2
+3 4 1</pre>
+</div>
+<!-- Sample Output -->
+<div class="rounded-xl bg-surface-container-low p-4 relative shadow-sm">
+<div class="flex items-center justify-between pb-2 mb-2 bg-surface-container-high/40 px-2 py-1 rounded">
+<span class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Standard Output</span>
+<button class="flex items-center gap-1 font-mono-sm text-mono-sm text-primary hover:text-primary-container transition-colors" onclick="copySnippet('sample1-out')">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="font-mono-data text-mono-data text-tertiary font-bold overflow-x-auto p-1 leading-relaxed" id="sample1-out">6</pre>
+</div>
+</div>
+<!-- Explanation Box -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5">lightbulb</span>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-1">
+<strong class="text-on-surface font-semibold">Sample 1 Walkthrough:</strong>
+<p>Node 1 degree limit is <span class="font-mono-data text-mono-data">K = 2</span>. The optimal Spanning Tree picks edges (3,4) with cost 1, (2,3) with cost 2, and edge (1,2) with cost 3. Node 1 has degree 1, which strictly adheres to ≤ 2. Aggregate latency = 1 + 2 + 3 = 6.</p>
+</div>
+</div>
+</div>
+<!-- Sample 2 Content (Hidden by default) -->
+<div class="space-y-3 hidden" id="sample-2-view">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="rounded-xl bg-surface-container-low p-4 relative shadow-sm">
+<div class="flex items-center justify-between pb-2 mb-2 bg-surface-container-high/40 px-2 py-1 rounded">
+<span class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Standard Input</span>
+<button class="flex items-center gap-1 font-mono-sm text-mono-sm text-primary hover:text-primary-container transition-colors" onclick="copySnippet('sample2-in')">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="font-mono-data text-mono-data text-on-surface overflow-x-auto p-1 leading-relaxed" id="sample2-in">3 2 1
+1 2 10
+1 3 20</pre>
+</div>
+<div class="rounded-xl bg-surface-container-low p-4 relative shadow-sm">
+<div class="flex items-center justify-between pb-2 mb-2 bg-surface-container-high/40 px-2 py-1 rounded">
+<span class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Standard Output</span>
+<button class="flex items-center gap-1 font-mono-sm text-mono-sm text-primary hover:text-primary-container transition-colors" onclick="copySnippet('sample2-out')">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<pre class="font-mono-data text-mono-data text-error font-bold overflow-x-auto p-1 leading-relaxed" id="sample2-out">-1</pre>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5">lightbulb</span>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-1">
+<strong class="text-on-surface font-semibold">Sample 2 Walkthrough:</strong>
+<p>Node 1 is an essential cut vertex required to connect Node 2 and Node 3. Any connected tree requires Node 1 degree to be 2. Since <span class="font-mono-data text-mono-data">K = 1</span>, no valid spanning tree exists; output is -1.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-6"></div>
+</div>
+</div>
+<!-- RIGHT PANEL: IDE / Code Editor & Diagnostics -->
+<div class="w-full lg:w-1/2 flex flex-col h-full bg-surface-container-lowest overflow-hidden">
+<!-- Editor Top Controls Bar -->
+<div class="px-5 py-2.5 bg-surface-container-low flex items-center justify-between flex-wrap gap-2 flex-shrink-0">
+<!-- Language Select & Tools -->
+<div class="flex items-center gap-2">
+<div class="relative">
+<select class="appearance-none bg-surface-container-lowest pl-3 pr-8 py-1.5 rounded-lg font-mono-data text-mono-data font-semibold text-on-surface shadow-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer" id="lang-select">
+<option value="py">Python 3.11</option>
+<option value="cpp">C++ 20 (GCC 13)</option>
+<option value="rs">Rust 1.75</option>
+<option value="go">Go 1.21</option>
+</select>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant absolute right-2 top-2 pointer-events-none">expand_more</span>
+</div>
+<div class="hidden sm:flex items-center gap-1 bg-surface-container p-0.5 rounded-lg">
+<button class="px-2 py-1 rounded text-on-surface-variant hover:text-on-surface font-mono-sm text-mono-sm font-bold transition-colors" title="Editor Font Scale">
+              13px
+            </button>
+<button class="px-2 py-1 rounded text-on-surface-variant hover:text-on-surface font-mono-sm text-mono-sm font-semibold transition-colors" title="Toggle Vim Keybindings">
+              VIM: OFF
+            </button>
+</div>
+</div>
+<!-- Right Side Utility Controls -->
+<div class="flex items-center gap-1.5">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" id="reset-code-btn" title="Reset Code to Template">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Full Screen IDE">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Editor Settings">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</button>
+</div>
+</div>
+<!-- Editor Code Canvas (High Contrast Dark Slate Editor) -->
+<div class="flex-1 flex min-h-0 bg-inverse-surface text-inverse-on-surface overflow-hidden relative font-mono-data text-mono-data">
+<!-- Line Numbers Column -->
+<div class="w-12 py-4 select-none bg-inverse-surface/80 text-outline text-right pr-3 font-mono-sm text-mono-sm space-y-1">
+<div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+<div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
+<div>11</div><div>12</div><div>13</div><div>14</div><div>15</div>
+<div>16</div><div>17</div><div>18</div><div>19</div><div>20</div>
+<div>21</div><div>22</div><div>23</div><div>24</div>
+</div>
+<!-- Code Content Area -->
+<div class="flex-1 py-4 px-4 overflow-y-auto overflow-x-auto space-y-1 leading-relaxed selection:bg-primary-container selection:text-on-primary">
+<div class="text-tertiary-fixed-dim italic"># Algorithmic Masters Cup #42 - Problem A</div>
+<div class="text-tertiary-fixed-dim italic"># Implementation: Degree-Constrained Spanning Tree via Kruskal & Dual MST</div>
+<div><span class="text-secondary-fixed-dim font-bold">import</span> sys</div>
+<div><span class="text-secondary-fixed-dim font-bold">from</span> heapq <span class="text-secondary-fixed-dim font-bold">import</span> heappush, heappop</div>
+<div><br/></div>
+<div><span class="text-secondary-fixed-dim font-bold">class</span> <span class="text-primary-fixed-dim font-bold">UnionFind</span>:</div>
+<div class="pl-4"><span class="text-secondary-fixed-dim font-bold">def</span> <span class="text-secondary-container font-semibold">__init__</span>(<span class="text-inverse-on-surface">self</span>, n):</div>
+<div class="pl-8"><span class="text-inverse-on-surface">self</span>.parent = list(range(n + 1))</div>
+<div class="pl-8"><span class="text-inverse-on-surface">self</span>.rank = [0] * (n + 1)</div>
+<div><br/></div>
+<div class="pl-4"><span class="text-secondary-fixed-dim font-bold">def</span> <span class="text-secondary-container font-semibold">find</span>(<span class="text-inverse-on-surface">self</span>, u):</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">if</span> <span class="text-inverse-on-surface">self</span>.parent[u] != u:</div>
+<div class="pl-12"><span class="text-inverse-on-surface">self</span>.parent[u] = <span class="text-inverse-on-surface">self</span>.find(<span class="text-inverse-on-surface">self</span>.parent[u])</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">return</span> <span class="text-inverse-on-surface">self</span>.parent[u]</div>
+<div><br/></div>
+<div class="pl-4"><span class="text-secondary-fixed-dim font-bold">def</span> <span class="text-secondary-container font-semibold">union</span>(<span class="text-inverse-on-surface">self</span>, u, v):</div>
+<div class="pl-8">root_u, root_v = <span class="text-inverse-on-surface">self</span>.find(u), <span class="text-inverse-on-surface">self</span>.find(v)</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">if</span> root_u == root_v: <span class="text-secondary-fixed-dim font-bold">return</span> False</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">if</span> <span class="text-inverse-on-surface">self</span>.rank[root_u] < <span class="text-inverse-on-surface">self</span>.rank[root_v]:</div>
+<div class="pl-12">root_u, root_v = root_v, root_u</div>
+<div class="pl-8"><span class="text-inverse-on-surface">self</span>.parent[root_v] = root_u</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">if</span> <span class="text-inverse-on-surface">self</span>.rank[root_u] == <span class="text-inverse-on-surface">self</span>.rank[root_v]:</div>
+<div class="pl-12"><span class="text-inverse-on-surface">self</span>.rank[root_u] += 1</div>
+<div class="pl-8"><span class="text-secondary-fixed-dim font-bold">return</span> True</div>
+<div><br/></div>
+<!-- Cursor active simulation line -->
+<div class="bg-primary/20 -mx-4 px-4 py-0.5 rounded flex items-center">
+<span class="text-secondary-fixed-dim font-bold">def</span> <span class="text-secondary-container font-semibold">solve_network</span>(): <span class="inline-block w-2 h-4 bg-tertiary-fixed-dim animate-pulse ml-0.5"></span>
+</div>
+<div class="pl-4">input_data = sys.stdin.read().split()</div>
+</div>
+</div>
+<!-- Test Cases & Output Diagnostic Console Drawer -->
+<div class="h-64 flex flex-col bg-surface-container-lowest flex-shrink-0 shadow-inner" id="console-drawer">
+<!-- Console Drawer Header Tabs -->
+<div class="px-4 py-2 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2" id="testcase-tabs">
+<button class="tc-tab flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-container-lowest font-label-md text-label-md font-bold text-on-surface shadow-sm" data-tc="1">
+<span class="material-symbols-outlined text-tertiary text-[16px]">check_circle</span>
+<span>Testcase 1</span>
+</button>
+<button class="tc-tab flex items-center gap-1.5 px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-semibold transition-colors" data-tc="2">
+<span class="material-symbols-outlined text-tertiary text-[16px]">check_circle</span>
+<span>Testcase 2</span>
+</button>
+<button class="tc-tab flex items-center gap-1.5 px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-semibold transition-colors" data-tc="custom">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Custom Input</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 text-tertiary font-mono-sm text-mono-sm font-bold bg-tertiary-fixed/30 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+              Runtime: 12ms
+            </span>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface" id="toggle-console-btn">
+<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- Console Dynamic Content -->
+<div class="flex-1 p-4 overflow-y-auto bg-surface space-y-3 font-mono-data text-mono-data">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="tc-panel-1">
+<!-- Expected -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
+<span>Expected Output</span>
+<span class="text-tertiary font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">done_all</span> Matches
+                </span>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-lowest text-on-surface font-mono-data shadow-sm">
+                6
+              </div>
+</div>
+<!-- Produced Output -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
+<span>Your Output</span>
+<span class="text-on-surface-variant font-mono-sm text-mono-sm">Peak: 14.2 MB</span>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-lowest text-tertiary font-bold font-mono-data shadow-sm flex items-center justify-between">
+<span>6</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden" id="tc-panel-2">
+<div class="space-y-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Expected Output</span>
+<div class="p-3 rounded-lg bg-surface-container-lowest text-on-surface font-mono-data shadow-sm">
+                -1
+              </div>
+</div>
+<div class="space-y-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Your Output</span>
+<div class="p-3 rounded-lg bg-surface-container-lowest text-tertiary font-bold font-mono-data shadow-sm flex items-center justify-between">
+<span>-1</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+</div>
+</div>
+</div>
+<div class="space-y-2 hidden" id="tc-panel-custom">
+<span class="font-label-md text-label-md text-on-surface-variant">Enter custom stdin:</span>
+<textarea class="w-full h-20 bg-surface-container-lowest rounded-lg p-2.5 font-mono-data text-mono-data text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Paste custom graph matrix or edge list..."></textarea>
+</div>
+</div>
+</div>
+<!-- Anchored Bottom Action & History Bar -->
+<div class="px-5 py-3 bg-surface-container-lowest flex items-center justify-between flex-shrink-0 shadow-md z-10">
+<!-- Collapsible Past Submissions Trigger -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface font-label-md text-label-md font-semibold" id="toggle-history-btn">
+<span class="material-symbols-outlined text-primary text-[18px]">history</span>
+<span>Past Submissions (3)</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" id="history-arrow">expand_less</span>
+</button>
+<!-- Primary Execution CTAs -->
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-lg text-label-lg font-semibold transition-all active:scale-95 shadow-sm" id="run-code-action">
+<span class="material-symbols-outlined text-tertiary text-[20px]">play_arrow</span>
+<span>Run Code</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold transition-all shadow-md active:scale-95" id="submit-code-action">
+<span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+<span>Submit Solution</span>
+</button>
+</div>
+</div>
+<!-- Collapsible History Drawer Pane -->
+<div class="hidden bg-surface-container-lowest p-4 space-y-2 flex-shrink-0 max-h-48 overflow-y-auto" id="history-drawer">
+<div class="flex items-center justify-between text-label-md font-label-md text-on-surface-variant pb-1">
+<span>Submission ID</span>
+<span>Verdict & Failure Point</span>
+<span>Time</span>
+<span>Memory</span>
+<span>Score</span>
+</div>
+<!-- Row 1: WA -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors font-mono-sm text-mono-sm">
+<span class="font-bold text-on-surface">#10492</span>
+<span class="flex items-center gap-1.5 text-error font-semibold">
+<span class="material-symbols-outlined text-[15px]">cancel</span>
+            Wrong Answer (Test 14)
+          </span>
+<span class="text-on-surface-variant">18:14:02</span>
+<span class="text-on-surface-variant">28.4 MB</span>
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-bold">140 / 500</span>
+</div>
+<!-- Row 2: TLE -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors font-mono-sm text-mono-sm">
+<span class="font-bold text-on-surface">#10512</span>
+<span class="flex items-center gap-1.5 text-secondary font-semibold">
+<span class="material-symbols-outlined text-[15px]">hourglass_empty</span>
+            Time Limit Exceeded (>2.0s)
+          </span>
+<span class="text-on-surface-variant">18:22:45</span>
+<span class="text-on-surface-variant">142.1 MB</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface font-bold">220 / 500</span>
+</div>
+<!-- Row 3: Accepted sample test -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors font-mono-sm text-mono-sm">
+<span class="font-bold text-on-surface">#10528</span>
+<span class="flex items-center gap-1.5 text-tertiary font-semibold">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+            Pretests Accepted (8/8)
+          </span>
+<span class="text-on-surface-variant">18:31:10</span>
+<span class="text-on-surface-variant">18.6 MB</span>
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-bold">Ready</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Client-side Interactive Behaviors -->
+<script>
+  // Countdown Timer Simulation
+  (function() {
+    let totalSeconds = 1 * 3600 + 42 * 60 + 19;
+    const timerEl = document.getElementById('contest-timer');
+    if (timerEl) {
+      setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+          const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+          const secs = (totalSeconds % 60).toString().padStart(2, '0');
+          timerEl.textContent = `${hrs}:${mins}:${secs}`;
+        }
+      }, 1000);
+    }
+  })();
+
+  // Sample Cases Tabs Switcher
+  const sampleBtns = document.querySelectorAll('.sample-tab-btn');
+  const sample1View = document.getElementById('sample-1-view');
+  const sample2View = document.getElementById('sample-2-view');
+
+  sampleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      sampleBtns.forEach(b => {
+        b.className = 'sample-tab-btn px-3 py-1 rounded text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-all';
+      });
+      btn.className = 'sample-tab-btn px-3 py-1 rounded bg-surface-container-lowest text-primary font-label-md text-label-md font-bold shadow-sm transition-all';
+
+      const s = btn.getAttribute('data-sample');
+      if (s === '1') {
+        sample1View.classList.remove('hidden');
+        sample2View.classList.add('hidden');
+      } else {
+        sample1View.classList.add('hidden');
+        sample2View.classList.remove('hidden');
+      }
+    });
+  });
+
+  // Testcase Tabs Switcher
+  const tcBtns = document.querySelectorAll('.tc-tab');
+  const tc1 = document.getElementById('tc-panel-1');
+  const tc2 = document.getElementById('tc-panel-2');
+  const tcCustom = document.getElementById('tc-panel-custom');
+
+  tcBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tcBtns.forEach(b => {
+        b.className = 'tc-tab flex items-center gap-1.5 px-3 py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-semibold transition-colors';
+      });
+      btn.className = 'tc-tab flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-container-lowest font-label-md text-label-md font-bold text-on-surface shadow-sm';
+
+      const tc = btn.getAttribute('data-tc');
+      tc1.classList.add('hidden');
+      tc2.classList.add('hidden');
+      tcCustom.classList.add('hidden');
+
+      if (tc === '1') tc1.classList.remove('hidden');
+      if (tc === '2') tc2.classList.remove('hidden');
+      if (tc === 'custom') tcCustom.classList.remove('hidden');
+    });
+  });
+
+  // Toggle History Submissions Drawer
+  const toggleHistoryBtn = document.getElementById('toggle-history-btn');
+  const historyDrawer = document.getElementById('history-drawer');
+  const historyArrow = document.getElementById('history-arrow');
+
+  if (toggleHistoryBtn && historyDrawer) {
+    toggleHistoryBtn.addEventListener('click', () => {
+      const isHidden = historyDrawer.classList.contains('hidden');
+      if (isHidden) {
+        historyDrawer.classList.remove('hidden');
+        historyArrow.textContent = 'expand_more';
+      } else {
+        historyDrawer.classList.add('hidden');
+        historyArrow.textContent = 'expand_less';
+      }
+    });
+  }
+
+  // Toggle Console Drawer
+  const toggleConsoleBtn = document.getElementById('toggle-console-btn');
+  const consoleDrawer = document.getElementById('console-drawer');
+  if (toggleConsoleBtn && consoleDrawer) {
+    let collapsed = false;
+    toggleConsoleBtn.addEventListener('click', () => {
+      collapsed = !collapsed;
+      if (collapsed) {
+        consoleDrawer.style.height = '42px';
+        toggleConsoleBtn.querySelector('.material-symbols-outlined').textContent = 'keyboard_arrow_up';
+      } else {
+        consoleDrawer.style.height = '16rem';
+        toggleConsoleBtn.querySelector('.material-symbols-outlined').textContent = 'keyboard_arrow_down';
+      }
+    });
+  }
+
+  // Copy Snippet Utility
+  function copySnippet(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-center gap-3 bg-surface-container-lowest shadow-lg px-4 py-3 rounded-lg text-primary font-body-sm text-body-sm transition-all animate-bounce';
+        toast.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span> Copied to clipboard!`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      }
+    });
+  }
+
+  // Run Code simulation feedback
+  const runCodeAction = document.getElementById('run-code-action');
+  const quickRunBtn = document.getElementById('quick-run-btn');
+  const submitCodeAction = document.getElementById('submit-code-action');
+  const quickSubmitBtn = document.getElementById('quick-submit-btn');
+
+  function triggerRunSimulation() {
+    const originalText = runCodeAction.innerHTML;
+    runCodeAction.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span><span>Evaluating...</span>`;
+    setTimeout(() => {
+      runCodeAction.innerHTML = originalText;
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-center gap-3 bg-surface-container-lowest shadow-lg px-4 py-3 rounded-lg text-tertiary font-body-sm text-body-sm';
+        toast.innerHTML = `<span class="material-symbols-outlined text-[18px]">task_alt</span> All local testcases passed in 12ms!`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+    }, 800);
+  }
+
+  if (runCodeAction) runCodeAction.addEventListener('click', triggerRunSimulation);
+  if (quickRunBtn) quickRunBtn.addEventListener('click', triggerRunSimulation);
+
+  function triggerSubmitSimulation() {
+    const originalText = submitCodeAction.innerHTML;
+    submitCodeAction.innerHTML = `<span class="material-symbols-outlined text-[20px] animate-spin">hourglass_top</span><span>Submitting...</span>`;
+    setTimeout(() => {
+      submitCodeAction.innerHTML = originalText;
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-center gap-3 bg-primary text-on-primary shadow-xl px-4 py-3 rounded-lg font-body-sm text-body-sm font-semibold';
+        toast.innerHTML = `<span class="material-symbols-outlined text-[18px]">cloud_done</span> Solution Accepted on 48 testcases! +500 PTS`;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+    }, 1200);
+  }
+
+  if (submitCodeAction) submitCodeAction.addEventListener('click', triggerSubmitSimulation);
+  if (quickSubmitBtn) quickSubmitBtn.addEventListener('click', triggerSubmitSimulation);
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant py-8 px-8"><div class="w-full flex flex-col md:flex-row justify-between items-start gap-8"><div class="flex flex-col gap-2 max-w-sm"><div class="flex items-center gap-2"><img alt="Rankstack" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rankstack</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Precision Competitive Benchmark & Skill Evaluation</p><p class="font-mono-sm text-mono-sm text-on-surface-variant mt-2">© 2025 Rankstack Inc. All rights reserved.</p></div><div class="grid grid-cols-3 gap-12"><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Product</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contest-catalog" href="#">Contests</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboards</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="problem-and-submission" href="#">Practice Sandbox</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Workspace</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="teams" href="#">Teams</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="submission-history" href="#">Submissions</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="admin-dashboard" href="#">Admin Console</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Security</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="auth-login" href="#">Account Access</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Integrity Code</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"><div class="pointer-events-auto flex items-center gap-3 bg-surface-container-lowest border border-outline-variant shadow-lg px-4 py-3 rounded-lg"><span class="material-symbols-outlined text-secondary text-[20px]">info</span><span class="font-body-sm text-body-sm text-on-surface">System live: Evaluation cluster running at 99.98% efficiency</span></div></div></body></html>

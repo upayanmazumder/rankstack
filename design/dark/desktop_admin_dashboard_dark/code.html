@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600;700&amp;family=Montserrat:wght@600;700&amp;family=Red+Hat+Display:wght@400;600;700&amp;family=Red+Hat+Mono:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"surface-container-low":"#141b2b","secondary-container":"#ee9800","on-secondary-fixed-variant":"#653e00","tertiary-fixed":"#e2dfff","on-primary-fixed-variant":"#2f2ebe","on-error":"#690005","surface-container-lowest":"#070e1d","on-surface":"#dce2f7","surface-container-high":"#232a3a","error-container":"#93000a","primary-container":"#8083ff","on-tertiary":"#1d00a5","surface-dim":"#0c1322","inverse-surface":"#dce2f7","on-secondary-container":"#5b3800","secondary-fixed":"#ffddb8","surface-container-highest":"#2e3545","surface-tint":"#c0c1ff","on-primary":"#1000a9","on-tertiary-container":"#180092","tertiary-fixed-dim":"#c3c0ff","on-background":"#dce2f7","on-surface-variant":"#c7c4d7","surface-bright":"#323949","tertiary":"#c3c0ff","inverse-on-surface":"#293040","inverse-primary":"#494bd6","surface":"#0c1322","primary":"#c0c1ff","on-error-container":"#ffdad6","surface-variant":"#2e3545","secondary-fixed-dim":"#ffb95f","on-primary-fixed":"#07006c","on-primary-container":"#0d0096","primary-fixed-dim":"#c0c1ff","primary-fixed":"#e1e0ff","on-secondary-fixed":"#2a1700","secondary":"#ffb95f","outline-variant":"#464554","tertiary-container":"#8582ff","surface-container":"#191f2f","on-tertiary-fixed":"#0f0069","on-secondary":"#472a00","background":"#0c1322","error":"#ffb4ab","outline":"#908fa0","on-tertiary-fixed-variant":"#3323cc"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"1rem","gutter":"1rem","margin-lg":"2.5rem","space-lg":"1.5rem","space-xs":"0.25rem","gutter-lg":"1.5rem","margin":"1rem","margin-md":"1.5rem","space-sm":"0.5rem","space-xl":"2rem"},"fontFamily":{"body-lg":["Red Hat Display"],"body-md":["Red Hat Display"],"headline-lg-mobile":["Montserrat Alternates"],"title-lg":["Montserrat"],"body-sm":["Red Hat Display"],"title-md":["Montserrat"],"mono-code":["Red Hat Mono"],"display-lg":["Montserrat Alternates"],"headline-lg":["Montserrat Alternates"],"display-lg-mobile":["Montserrat Alternates"],"mono-metric-md":["Red Hat Mono"],"label-md":["Red Hat Display"],"title-sm":["Montserrat"],"mono-metric-lg":["Red Hat Mono"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"title-lg":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"title-md":["16px",{"lineHeight":"24px","fontWeight":"600"}],"mono-code":["13px",{"lineHeight":"20px","fontWeight":"400"}],"display-lg":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.01em","fontWeight":"600"}],"display-lg-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-metric-md":["14px",{"lineHeight":"20px","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","fontWeight":"600"}],"mono-metric-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-outline-variant/20"><img alt="Rankstack app icon 512x512 with sleek dark theme, stacked ascending geometric podium bars representing algorithmic mastery and rankings, glowing indigo and warm amber accents on dark slate background.. Brand logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WCfOrI40pAJ0JDpYqJpVEPBw9aahVZ6DZnWrRWbbd5BwkeYKIe6w6PFSsdp4Kwh1a3r9uGbQP1cqYUaeDCGmMJ9DHNvIwY9v8vK9YmynbxqjRZROPZ02eG5t8RpufrkZgTypX0_H-2WhJ10XjI6RuGVJQJrEGxq4ud5e-vAu-aZIIfmdyGweEHID_-oIodxorPDBTQRWQwxCQiMHC48iuK1IhuIKFGzLcWYENXIbDhag"/><span class="font-title-md text-title-md font-bold tracking-tight text-on-surface">Rank<span class="text-primary">Admin</span></span></div><div class="px-space-md py-space-sm"><span class="font-label-md text-label-md text-outline uppercase tracking-wider">Control Center</span></div><nav class="flex flex-col gap-space-xs px-space-sm" data-active-classes="bg-surface-container-high text-primary font-bold"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2 rounded transition-colors bg-surface-container-high text-primary font-bold" data-path="admin-overview" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="manage-contests" href="#"><span class="material-symbols-outlined text-[20px]">code</span><span>Manage Contests</span></a><a class="flex items-center gap-space-sm px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="question-bank" href="#"><span class="material-symbols-outlined text-[20px]">quiz</span><span>Question Bank</span></a><a class="flex items-center gap-space-sm px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="judge-analytics" href="#"><span class="material-symbols-outlined text-[20px]">insights</span><span>Judge Telemetry</span></a><a class="flex items-center gap-space-sm px-space-md py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="anti-cheat-audit" href="#"><span class="material-symbols-outlined text-[20px]">shield</span><span>Anti-Cheat Audit</span></a></nav></div><div class="p-space-md border-t border-outline-variant/20 flex flex-col gap-space-sm"><a class="flex items-center gap-space-xs text-on-surface-variant hover:text-on-surface text-body-sm font-body-sm transition-colors" data-path="contests" href="#"><span class="material-symbols-outlined text-[16px]">arrow_back</span><span>Back to Platform</span></a><div class="flex items-center gap-space-sm pt-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">admin_panel_settings</span></div><div class="flex flex-col"><span class="font-title-sm text-title-sm text-on-surface leading-tight">Root SysAdmin</span><span class="font-mono-code text-[11px] text-secondary">cluster-01.us-east</span></div></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/20 z-40 flex items-center justify-between px-gutter-lg"><div class="flex items-center gap-space-sm"><div class="flex items-center gap-space-xs px-space-sm py-0.5 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-mono-code text-[12px]"><span class="w-2 h-2 rounded-full bg-secondary"></span><span>CLUSTER STATUS: NORMAL</span></div></div><div class="flex items-center gap-space-md"><button class="p-space-xs text-on-surface-variant hover:text-on-surface rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><button class="p-space-xs text-on-surface-variant hover:text-on-surface rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 bg-surface w-full p-gutter-lg min-h-screen"><div class="flex flex-col w-full">
+<!-- TOP CONSOLE CONTROL BANNER -->
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-md mb-space-xl">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded bg-secondary-container/20 text-secondary font-mono-code text-[11px] tracking-wider uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          Elevated Control Plane / Session #ADM-9842
+        </span>
+<span class="text-outline font-mono-code text-body-sm">|</span>
+<span class="text-on-surface-variant font-mono-code text-body-sm">Node: us-east-aurora-7</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Admin Evaluation Console</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+        Manage live contests, inspect platform telemetry, and grade subjective architecture submissions across active runtime sandboxes.
+      </p>
+</div>
+<!-- Quick Stats & Actions -->
+<div class="flex items-center flex-wrap gap-space-sm">
+<div class="flex items-center gap-space-md px-space-md py-space-sm bg-surface-container-low rounded-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-outline">Queue Latency</span>
+<span class="font-mono-metric-md text-mono-metric-md text-secondary">14ms</span>
+</div>
+<div class="w-px h-6 bg-surface-bright"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-outline">Active Ruleset</span>
+<span class="font-mono-metric-md text-mono-metric-md text-primary">v4.2-strict</span>
+</div>
+</div>
+<button class="flex items-center gap-space-xs px-space-md py-space-sm bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg font-title-sm text-title-sm shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">download</span>
+<span>Export Audit Log</span>
+</button>
+</div>
+</div>
+<!-- METRIC CARDS ROW (4 CARDS) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-xl">
+<!-- Card 1 -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Total Platform Users</span>
+<h3 class="font-mono-metric-lg text-mono-metric-lg text-on-surface mt-1">48,290</h3>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 mt-space-md">
+<span class="inline-flex items-center text-secondary font-mono-code text-body-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>+12.4%
+        </span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">vs prior rolling week</span>
+</div>
+<!-- Decorative Micro Sparkline -->
+<div class="absolute bottom-0 right-0 w-28 h-8 opacity-20 pointer-events-none">
+<svg class="w-full h-full stroke-current text-primary fill-none stroke-[2]" viewbox="0 0 100 25">
+<polyline points="0,20 15,18 30,12 45,15 60,8 75,10 90,3 100,2"></polyline>
+</svg>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Active Competitions</span>
+<h3 class="font-mono-metric-lg text-mono-metric-lg text-secondary mt-1">3 Live <span class="font-body-md text-body-md text-outline font-normal">/ 12 Upcoming</span></h3>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">trophy</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 mt-space-md">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-surface-container-highest font-mono-code text-[11px] text-on-surface">
+          Global AMC #42
+        </span>
+<span class="text-secondary font-mono-code text-body-sm font-semibold">T-02:18:40</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Pending Reviews</span>
+<h3 class="font-mono-metric-lg text-mono-metric-lg text-on-surface mt-1">34 <span class="font-body-md text-body-md text-outline font-normal">Submissions</span></h3>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[20px]">rate_review</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-space-md">
+<span class="text-on-surface-variant font-body-sm text-body-sm">Priority 1 SLA: <span class="text-secondary font-mono-code">&lt;30m</span></span>
+<span class="px-space-xs py-0.5 bg-error-container/40 text-error rounded font-mono-code text-[11px] font-bold">4 Crit</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Teams &amp; Squads</span>
+<h3 class="font-mono-metric-lg text-mono-metric-lg text-on-surface mt-1">1,420 <span class="font-body-md text-body-md text-outline font-normal">Active</span></h3>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[20px]">diversity_2</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 mt-space-md">
+<span class="inline-flex items-center text-primary font-mono-code text-body-sm font-semibold">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>+8 squads
+        </span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">registered today</span>
+</div>
+</div>
+</div>
+<!-- SPLIT SUBJECTIVE REVIEW MODULE -->
+<section class="flex flex-col bg-surface-container-low rounded-xl shadow-md overflow-hidden mb-space-xl">
+<!-- Review Module Header -->
+<div class="p-space-lg bg-surface-container flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+</div>
+<div>
+<div class="flex items-center gap-space-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface">Manual Subjective Review Queue</h2>
+<span class="px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary font-mono-code text-[12px] font-semibold">
+              AMC #42
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Archived Task: Distributed Consensus &amp; Partition Resilience Spec</span>
+</div>
+</div>
+<!-- Navigation & Candidate Meta -->
+<div class="flex items-center gap-space-md">
+<span class="font-mono-code text-body-sm text-on-surface-variant">Queue: <strong class="text-on-surface">14</strong> of 34</span>
+<div class="flex items-center gap-1 bg-surface-container-lowest p-1 rounded-lg">
+<button class="w-8 h-8 rounded bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Candidate Detailed Ribbon -->
+<div class="px-space-lg py-space-md bg-surface-container-lowest flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Portrait photo of a young female software engineer wearing spectacles, ambient neon blue and magenta reflections, sharp cinematic studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJPwbzVF5L28_wjXAG6V8d_fZVSDmfhskpiNT9sCXCcozyLmIIxxQOBK10PpW28UQn4d7i1Q7axX7f2fdU5yoruqeDzsnFI8EFV1m_xCjCKkKY5lrjYG0g4ZXCeCjywFLz5S8z1LY2kz7i-VMtFJWPCwEqyHb4NTlMHBMLpIvI0T60xpQ7PtKHiGjanMQfm1xnNZIPHFVNx1sUrOuD5Z5c9zFHQZ4xA59oLPQIOQ5m"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-title-md text-title-md text-on-surface">Elena_V</span>
+<span class="px-1.5 py-0.5 rounded bg-secondary-container/20 text-secondary font-mono-code text-[11px] font-bold tracking-wide">
+              GRANDMASTER
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Autonomous Systems Lab • Rank #4 Overall</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-mono-code text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+<span>Submitted 14m ago</span>
+</div>
+<div class="flex items-center gap-1 px-space-sm py-1 bg-surface-container rounded font-mono-code text-[12px] text-secondary">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Verified Unit Tests (18/18)</span>
+</div>
+</div>
+</div>
+<!-- Problem Prompt Excerpt Bar -->
+<div class="px-space-lg py-space-sm bg-surface-container-high/60 flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">info</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+<strong class="text-on-surface">Prompt:</strong> Describe a fault-tolerant state-machine replication protocol resilient to 33% Byzantine nodes with optimal latency under network partitions. Specify quorum intersections and OnViewTimeout state transitions.
+      </p>
+</div>
+<!-- 2-COL WORKBENCH (SPEC vs SCORING PANEL) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 min-h-[580px]">
+<!-- LEFT SIDE: Submitted Markdown Architectural Specification (7 cols) -->
+<div class="xl:col-span-7 p-space-lg flex flex-col gap-space-lg bg-surface-container-low/40">
+<!-- Rendered Architectural Document -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-md text-label-md text-outline uppercase tracking-wider">Architectural Whitepaper &amp; Proof</span>
+<span class="font-mono-code text-[11px] text-primary">LaTeX / Markdown v2.4</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-space-sm">
+<h4 class="font-title-md text-title-md text-on-surface">1. Quorum Consistency Invariant</h4>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              To withstand Byzantine faults in an unauthenticated asynchronous network with $N = 3f + 1$ total nodes, two quorums of size $2f + 1$ must share at least one non-faulty honest validator node:
+            </p>
+<!-- Mathematical Formula Box -->
+<div class="p-space-md bg-surface-container rounded text-center my-1">
+<span class="font-mono-metric-md text-mono-metric-md text-primary tracking-wide">
+                |Q_{prepare} ∩ Q_{commit}| ≥ (2f + 1) + (2f + 1) - (3f + 1) = f + 1
+              </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Since at most $f$ participants are adversarial, the intersection strictly contains at least 1 honest node that validates consistent monotonic view progression before endorsing payload blocks.
+            </p>
+</div>
+<!-- Quorum Intersection Geometric Telemetry Diagram -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-space-xs">
+<span class="font-label-md text-label-md text-outline uppercase">Consensus Overlap Topology Diagram</span>
+<div class="h-32 w-full flex items-center justify-center relative overflow-hidden bg-surface-container/40 rounded">
+<svg class="w-full max-w-sm h-full" viewbox="0 0 400 110">
+<!-- Group 1 -->
+<circle class="text-primary" cx="160" cy="55" fill="currentColor" r="45" stroke="currentColor" stroke-width="1.5"></circle>
+<!-- Group 2 -->
+<circle class="text-secondary" cx="240" cy="55" fill="currentColor" r="45" stroke="currentColor" stroke-width="1.5"></circle>
+<!-- Intersection highlight -->
+<path class="text-primary-container/40" d="M 200,16.5 A 45,45 0 0,0 200,93.5 A 45,45 0 0,0 200,16.5" fill="currentColor"></path>
+<!-- Labels -->
+<text fill="#c7c4d7" font-family="Red Hat Mono" font-size="11" text-anchor="middle" x="130" y="58">Quorum A (2f+1)</text>
+<text fill="#c7c4d7" font-family="Red Hat Mono" font-size="11" text-anchor="middle" x="270" y="58">Quorum B (2f+1)</text>
+<text fill="#ffb95f" font-family="Red Hat Mono" font-size="10" font-weight="bold" text-anchor="middle" x="200" y="58">≥ f+1</text>
+</svg>
+</div>
+</div>
+<!-- Golang Code Snippet Implementation -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-outline uppercase">State Machine Core Routine</span>
+<span class="font-mono-code text-[11px] text-on-surface-variant">engine_pacemaker.go</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-lg font-mono-code text-mono-code text-on-surface overflow-x-auto leading-relaxed">
+<pre><span class="text-primary">func</span> (s *StateEngine) <span class="text-secondary">OnViewTimeout</span>(ctx context.Context, v ViewID) <span class="text-primary">error</span> {
+    s.mu.Lock()
+    <span class="text-outline">defer</span> s.mu.Unlock()
+
+    <span class="text-outline">// Ensure monotonically advancing view progression</span>
+    <span class="text-primary">if</span> v &lt;= s.currentView {
+        <span class="text-primary">return</span> ErrStaleViewTransition
+    }
+    
+    evidence := s.signTimeoutCertificate(v, s.highestPreparedQC)
+    <span class="text-primary">return</span> s.p2p.BroadcastNewView(ctx, evidence)
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT SIDE: Evaluation & Scorecard Panel (5 cols) -->
+<div class="xl:col-span-5 p-space-lg bg-surface-container-lowest/60 flex flex-col justify-between gap-space-lg">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<h3 class="font-title-md text-title-md text-on-surface">Grading &amp; Assessment Rubric</h3>
+<span class="px-space-xs py-0.5 rounded bg-surface-container-highest text-primary font-mono-code text-[11px]">Strict Mode</span>
+</div>
+<!-- Quick Verdict Selector -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-md text-label-md text-outline uppercase">Verdict Decision</label>
+<div class="grid grid-cols-3 gap-space-xs">
+<button class="py-space-sm px-2 rounded-lg bg-surface-container-highest hover:bg-surface-bright text-on-surface flex flex-col items-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">check_circle</span>
+<span class="font-title-sm text-[12px]">Accepted</span>
+</button>
+<button class="py-space-sm px-2 rounded-lg bg-surface-container-highest ring-1 ring-secondary/50 text-on-surface flex flex-col items-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
+<span class="font-title-sm text-[12px] font-bold text-secondary">Partial</span>
+</button>
+<button class="py-space-sm px-2 rounded-lg bg-surface-container-highest hover:bg-surface-bright text-on-surface flex flex-col items-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-error">cancel</span>
+<span class="font-title-sm text-[12px]">Reject</span>
+</button>
+</div>
+</div>
+<!-- Awarded Score Field -->
+<div class="flex items-center justify-between p-space-md bg-surface-container rounded-lg">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">Assigned Final Score</span>
+<span class="font-body-sm text-body-sm text-outline">Weight coefficient 1.25x</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<input class="w-20 px-space-sm py-1.5 bg-surface-container-lowest text-on-surface font-mono-metric-md text-right rounded focus:outline-none focus:ring-1 focus:ring-primary" type="text" value="680"/>
+<span class="font-mono-code text-body-md text-on-surface-variant">/ 750 PTS</span>
+</div>
+</div>
+<!-- Detailed Rubric Sliders / Toggles -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-label-md text-label-md text-outline uppercase">Component Breakdown</span>
+<!-- Criterion 1 -->
+<div class="p-space-sm bg-surface-container rounded flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary">task_alt</span>
+<span class="font-body-sm text-body-sm text-on-surface">Safety proofs under asynchronous network</span>
+</div>
+<span class="font-mono-code text-[13px] text-on-surface font-semibold">250 <span class="text-outline">/ 250</span></span>
+</div>
+<!-- Criterion 2 -->
+<div class="p-space-sm bg-surface-container rounded flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary">task_alt</span>
+<span class="font-body-sm text-body-sm text-on-surface">Liveness guarantee &amp; view change</span>
+</div>
+<span class="font-mono-code text-[13px] text-on-surface font-semibold">250 <span class="text-outline">/ 250</span></span>
+</div>
+<!-- Criterion 3 -->
+<div class="p-space-sm bg-surface-container rounded flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary">pending</span>
+<span class="font-body-sm text-body-sm text-on-surface">Latency benchmark analysis under partitioned load</span>
+</div>
+<span class="font-mono-code text-[13px] text-secondary font-semibold">180 <span class="text-outline">/ 250</span></span>
+</div>
+</div>
+<!-- Admin Feedback Notes -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-outline uppercase" for="admin-feedback">Examiner Telemetry &amp; Feedback Notes</label>
+<span class="text-outline font-mono-code text-[11px]">Private to Competitor</span>
+</div>
+<textarea class="w-full p-space-sm bg-surface-container-lowest text-on-surface font-body-sm rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-primary" id="admin-feedback" placeholder="State reasons for score deductions or laudable architectural paradigms..." rows="3">Proof of safety monotonic bounds verified. -70 pts deducted on Section 3 due to omission of pipeline amortized roundtrip calculations during transient netsplit recovery.</textarea>
+</div>
+</div>
+<!-- Action Row -->
+<div class="flex items-center justify-between pt-space-md">
+<button class="px-space-md py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm rounded-lg transition-colors" type="button">
+            Skip to Next
+          </button>
+<button class="px-space-lg py-2.5 bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm rounded-lg shadow-sm flex items-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">publish</span>
+<span>Save &amp; Publish Grade</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- BOTTOM PLAGIARISM & INTEGRITY QUEUE TABLE -->
+<section class="bg-surface-container-low rounded-xl shadow-md p-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded bg-error/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Plagiarism &amp; Code Integrity Triage</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Live AST heuristic similarity detections in active submissions</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container font-mono-code text-[12px] text-on-surface">
+<span class="w-2 h-2 rounded-full bg-error"></span> 3 Unresolved Flags
+        </span>
+</div>
+</div>
+<!-- Table -->
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-outline font-label-md text-label-md uppercase">
+<th class="py-space-sm px-space-md rounded-l">Incident / Competitor</th>
+<th class="py-space-sm px-space-md">Problem Module</th>
+<th class="py-space-sm px-space-md">AST Similarity Score</th>
+<th class="py-space-sm px-space-md">Detection Reason</th>
+<th class="py-space-sm px-space-md text-right rounded-r">Review Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container/20">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="Portrait photo of a young man with headphones, focused coder in dark room with green terminal glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP_-27g2gU8YipcSxa7diCfq6JqYb1pIVwndaa92Kvk9rE-YULgo22Tipde78tg1AKD9doNozvOSzzkGtm1c9BS_2z2ooUQ5EL2tHgxCPnUJUQ0wELOOi87oxuhwJTakxnNli6q4EVOClcYNm4eCNYfWd9-zxWEj7I7BdNnzuTqHWwZcSGysqonHPe_j2tUPEqCTG8zQVcIV2j5BvTAFkx5sKjJbs90blWiKpwC4o8"/>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">x_vortex_dev</span>
+<span class="font-mono-code text-[11px] text-outline">vs. anonymous_sub_99</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md font-body-sm text-body-sm text-on-surface">
+              P-402: Radix Tree In-Memory Cache
+            </td>
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-mono-code text-[13px] text-error font-bold">94.2%</span>
+<div class="w-20 bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-error h-full rounded-full" style="width: 94.2%;"></div>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="px-2 py-0.5 rounded bg-error-container/20 text-error font-mono-code text-[11px]">
+                Identical AST graph &amp; Variable Rehash
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-primary transition-colors" type="button">Diff AST</button>
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-secondary transition-colors" type="button">Warn</button>
+<button class="px-2.5 py-1 rounded bg-error/20 hover:bg-error/30 font-mono-code text-[11px] text-error transition-colors" type="button">DQ</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="Portrait photo of an Asian woman in dark tech wear, calm expression, ambient purple city lights background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5-2EkCCLm-ymzRlUDgkYEXvCCErL3eV1BUTY5V_qWpyp9slntJtLeEyUVop5eo3zwBSuJY_OxoDjkEdrFdYjbasrscCLqwm8piNQRacyKhIgV-zmDbjC0-5MsBwow-r9rGdU4S9EBuLI-ijFCxXtCsuLWr7WK4bCPT7aYVdU_mUawLZ10v9i3G5IAcvq34eYO8eldChEHOSZGj4XxRY9mGsGMTjwWmtzguNhm0QQ6"/>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">marcus_k</span>
+<span class="font-mono-code text-[11px] text-outline">vs. public_gist_0432</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md font-body-sm text-body-sm text-on-surface">
+              P-118: SIMD Vectorized Dot Product
+            </td>
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-mono-code text-[13px] text-secondary font-bold">87.6%</span>
+<div class="w-20 bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 87.6%;"></div>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="px-2 py-0.5 rounded bg-secondary-container/20 text-secondary font-mono-code text-[11px]">
+                External Repository Fingerprint
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-primary transition-colors" type="button">Diff AST</button>
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-secondary transition-colors" type="button">Warn</button>
+<button class="px-2.5 py-1 rounded bg-error/20 hover:bg-error/30 font-mono-code text-[11px] text-error transition-colors" type="button">DQ</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="Cyberpunk style avatar showing holographic wireframe human face with illuminated orange nodes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwE52qL3NKKU6rBcZKQRU6aieLaG-aCwfoKObBH--TeL-D5OyTOSWJgJmu6DsGII1zL8bXWZL-JY5VL3lq0C6veY5qtjdR6ZC3uWTSNnxaU3M7yyvLVclBWFFVzRjwmK6YUCsvp-UiMmaLqqYqn62tfzPIrYFSFqDdry8FP131NaOhGKwtqHpEiwFpNDGoRDPSn77b9KQUGF7rsEfefNEwmAjm7L9MWJOBW1Q6jSMU"/>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">omega_sub_7</span>
+<span class="font-mono-code text-[11px] text-outline">vs. team_solaris_alpha</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md font-body-sm text-body-sm text-on-surface">
+              P-209: Zero-Knowledge Range Proof
+            </td>
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-mono-code text-[13px] text-primary font-bold">68.1%</span>
+<div class="w-20 bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 68.1%;"></div>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-mono-code text-[11px]">
+                Concurrent IP Session Collision
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex items-center justify-end gap-space-xs">
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-primary transition-colors" type="button">Diff AST</button>
+<button class="px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-highest font-mono-code text-[11px] text-secondary transition-colors" type="button">Warn</button>
+<button class="px-2.5 py-1 rounded bg-error/20 hover:bg-error/30 font-mono-code text-[11px] text-error transition-colors" type="button">DQ</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div></main></div></body></html>

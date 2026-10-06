@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600;700&amp;family=Montserrat:wght@600&amp;family=Red+Hat+Display:wght@400;600&amp;family=Red+Hat+Mono:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#0c1322;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-container": "#0d0096", "outline-variant": "#464554", "surface": "#0c1322", "on-secondary-fixed": "#2a1700", "inverse-surface": "#dce2f7", "surface-container-highest": "#2e3545", "inverse-primary": "#494bd6", "on-surface-variant": "#c7c4d7", "on-background": "#dce2f7", "surface-container-lowest": "#070e1d", "tertiary-fixed": "#e2dfff", "secondary-fixed-dim": "#ffb95f", "on-secondary": "#472a00", "primary-container": "#8083ff", "on-error": "#690005", "on-surface": "#dce2f7", "tertiary-container": "#8582ff", "secondary-fixed": "#ffddb8", "surface-variant": "#2e3545", "surface-container-high": "#232a3a", "on-error-container": "#ffdad6", "primary": "#c0c1ff", "surface-tint": "#c0c1ff", "primary-fixed-dim": "#c0c1ff", "on-tertiary-container": "#180092", "error": "#ffb4ab", "primary-fixed": "#e1e0ff", "on-secondary-container": "#5b3800", "on-primary": "#1000a9", "tertiary": "#c3c0ff", "surface-bright": "#323949", "surface-container-low": "#141b2b", "inverse-on-surface": "#293040", "on-tertiary-fixed-variant": "#3323cc", "surface-dim": "#0c1322", "on-primary-fixed-variant": "#2f2ebe", "outline": "#908fa0", "on-tertiary-fixed": "#0f0069", "secondary": "#ffb95f", "on-secondary-fixed-variant": "#653e00", "tertiary-fixed-dim": "#c3c0ff", "on-tertiary": "#1d00a5", "surface-container": "#191f2f", "error-container": "#93000a", "on-primary-fixed": "#07006c", "secondary-container": "#ee9800", "background": "#0c1322" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "margin-md": "1.5rem", "gutter-lg": "1.5rem", "gutter": "1rem", "space-xl": "2rem", "space-md": "1rem", "margin": "1rem", "space-sm": "0.5rem", "margin-lg": "2.5rem", "space-lg": "1.5rem", "space-xs": "0.25rem" }, "fontFamily": { "body-md": ["Red Hat Display"], "display-lg": ["Montserrat Alternates"], "mono-code": ["Red Hat Mono"], "label-md": ["Red Hat Display"], "body-sm": ["Red Hat Display"], "title-md": ["Montserrat"], "headline-lg": ["Montserrat Alternates"], "display-lg-mobile": ["Montserrat Alternates"], "mono-metric-md": ["Red Hat Mono"], "body-lg": ["Red Hat Display"], "mono-metric-lg": ["Red Hat Mono"], "headline-lg-mobile": ["Montserrat Alternates"], "title-lg": ["Montserrat"], "title-sm": ["Montserrat"] }, "fontSize": { "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "mono-code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "mono-metric-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "mono-metric-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg-mobile": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "title-sm": ["14px", { "lineHeight": "20px", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface-container-low/85 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.4)] pt-safe"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Rankstack app icon 512x512 with sleek dark theme, stacked ascending geometric podium bars representing algorithmic mastery and rankings, glowing indigo and warm amber accents on dark slate background.. Brand logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WCfOrI40pAJ0JDpYqJpVEPBw9aahVZ6DZnWrRWbbd5BwkeYKIe6w6PFSsdp4Kwh1a3r9uGbQP1cqYUaeDCGmMJ9DHNvIwY9v8vK9YmynbxqjRZROPZ02eG5t8RpufrkZgTypX0_H-2WhJ10XjI6RuGVJQJrEGxq4ud5e-vAu-aZIIfmdyGweEHID_-oIodxorPDBTQRWQwxCQiMHC48iuK1IhuIKFGzLcWYENXIbDhag"/><div class="flex items-center gap-space-xs"><span class="font-headline-lg-mobile text-headline-lg-mobile tracking-tight text-on-surface">Rankstack</span><span class="relative flex h-2 w-2 ml-space-xs"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span></span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></button><button aria-label="Open navigation menu" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="document.getElementById('mobile-drawer').classList.remove('translate-x-full'); document.getElementById('mobile-drawer-backdrop').classList.remove('opacity-0', 'pointer-events-none');"><span class="material-symbols-outlined text-[24px]">menu</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><div class="fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" id="mobile-drawer-backdrop" onclick="document.getElementById('mobile-drawer').classList.add('translate-x-full'); document.getElementById('mobile-drawer-backdrop').classList.add('opacity-0', 'pointer-events-none');"></div><aside class="fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[85vw] bg-surface-container-high shadow-[0_0_40px_rgba(0,0,0,0.8)] transform translate-x-full transition-transform duration-300 ease-out flex flex-col pt-safe pb-safe" id="mobile-drawer"><div class="h-16 px-gutter flex items-center justify-between"><span class="font-title-md text-title-md text-on-surface flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[20px]">tune</span> Terminal Matrix</span><button aria-label="Close navigation menu" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" onclick="document.getElementById('mobile-drawer').classList.add('translate-x-full'); document.getElementById('mobile-drawer-backdrop').classList.add('opacity-0', 'pointer-events-none');"><span class="material-symbols-outlined text-[22px]">close</span></button></div><div class="px-gutter py-space-sm flex-1 overflow-y-auto flex flex-col gap-space-xs"><div class="p-space-sm rounded-xl bg-surface-container flex items-center gap-space-sm mb-space-sm"><div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[20px]">terminal</span></div><div><div class="font-title-sm text-title-sm text-on-surface">Arena Node #04</div><div class="font-mono-code text-mono-code text-secondary">24ms latency • Sync active</div></div></div><a class="flex items-center gap-space-sm h-11 px-space-sm rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">code</span><span class="font-body-md text-body-md">Algorithm Arena</span></a><a class="flex items-center gap-space-sm h-11 px-space-sm rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">hub</span><span class="font-body-md text-body-md">Battle Rooms</span></a><a class="flex items-center gap-space-sm h-11 px-space-sm rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">military_tech</span><span class="font-body-md text-body-md">Division Badges</span></a><a class="flex items-center gap-space-sm h-11 px-space-sm rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="font-body-md text-body-md">Editor Settings</span></a><a class="flex items-center gap-space-sm h-11 px-space-sm rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">help_outline</span><span class="font-body-md text-body-md">Documentation</span></a></div><div class="p-gutter"><div class="p-space-sm rounded-xl bg-surface-container-lowest flex items-center justify-between"><span class="font-mono-code text-mono-code text-on-surface-variant">SYS.REV: 3.4.1</span><span class="font-mono-code text-mono-code text-secondary">OPERATIONAL</span></div></div></aside><main class="flex flex-col relative w-full pt-16 pb-20 bg-surface min-h-screen"><div class="flex flex-col w-full text-on-surface">
+<div class="px-gutter pt-space-md pb-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile tracking-tight text-on-surface">Season 14 Arena</h1>
+<div class="flex items-center gap-1.5 px-space-xs py-0.5 rounded-full bg-surface-container-highest shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+</span>
+<span class="font-label-md text-label-md text-emerald-300 uppercase tracking-widest text-[10px]">LIVE</span>
+</div>
+</div>
+<button aria-label="Refresh telemetry" class="w-9 h-9 rounded-xl bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+</button>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-mono-code text-mono-code flex items-center gap-1 text-[11px]">
+<span class="material-symbols-outlined text-secondary text-[14px]">bolt</span>
+        Telemetry updates in real-time
+      </span>
+<span class="font-mono-code text-mono-code text-[11px] text-secondary">Round 5 / 8</span>
+</div>
+</div>
+<div class="px-gutter pb-space-md flex gap-space-xs overflow-x-auto no-scrollbar">
+<button class="flex items-center gap-space-xs px-3 h-9 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">workspace_premium</span>
+<span class="font-title-sm text-title-sm">Div 1 (&gt;2100)</span>
+<span class="material-symbols-outlined text-outline text-[16px]">expand_more</span>
+</button>
+<button class="flex items-center gap-space-xs px-3 h-9 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors shrink-0">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="font-label-md text-label-md">Global Sprint #42</span>
+<span class="material-symbols-outlined text-outline text-[16px]">tune</span>
+</button>
+<button class="flex items-center gap-1 px-3 h-9 rounded-xl bg-surface-container-lowest text-secondary shrink-0 font-mono-code text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+      14m 28s remaining
+    </button>
+</div>
+<div class="px-gutter pb-space-lg">
+<div class="relative bg-surface-container-low rounded-xl p-space-sm pt-space-md shadow-md overflow-hidden">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-1/2 -left-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="relative grid grid-cols-3 gap-space-xs items-end pt-2">
+<div class="flex flex-col items-center">
+<div class="relative mb-space-xs">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest p-0.5 shadow-sm">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait avatar of a female competitive algorithm programmer Elena_V with cool tone rim lighting against dark slate studio setting, wearing sleek technical headphones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfAk5S9WE_s9LBXj8VUwg88ITcYr1igpKSMCF3eZVLbnDZNuGRuLBMRzhnZn887EGtdu3ftMQhLCBa9ZfelyTTrcLyaSif9M8sIi2riF5-mPdbYw9miRmbsMDvL_P_DdvjdaC7Tnsa36qbUAFlc37X9fC5SI-61bCNPkVcvxxXU2Bp2A1yhtWDdYRBba3QRhTh-TWtgMhO0y4Uj_aQ03Jpv35oDMeUdVT2unUasA-4"/>
+</div>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center font-mono-metric-md text-[11px] font-bold shadow-md">2</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface truncate max-w-[90px] text-center">Elena_V</span>
+<span class="font-label-md text-label-md text-on-surface-variant text-[10px] mt-0.5">Master</span>
+<div class="w-full mt-space-sm bg-surface-container-high rounded-t-xl pt-space-sm pb-space-xs px-1 flex flex-col items-center shadow-inner">
+<span class="font-mono-metric-md text-mono-metric-md text-on-surface font-bold text-[13px]">3,650</span>
+<span class="font-mono-code text-[10px] text-on-surface-variant mt-0.5">6/6 • 42m</span>
+<div class="h-10 w-full flex items-end justify-center pb-1">
+<span class="w-6 h-6 rounded-md bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">military_tech</span>
+</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center z-10 -mt-4">
+<div class="flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-secondary text-[24px] animate-bounce">crown</span>
+</div>
+<div class="relative mb-space-xs">
+<div class="w-18 h-18 w-[72px] h-[72px] rounded-full bg-secondary-container p-1 shadow-[0_0_24px_rgba(238,152,0,0.35)]">
+<img class="w-full h-full rounded-full object-cover" data-alt="Cybernetic styled avatar icon of 0xKaelen elite developer with glowing amber visor and sleek obsidian tech hood, studio lighting, hyper detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnrR1O80LUkQ-oecU_D4BP0NLC1tEFt6-Ii85PPGpApQyZXVtVh-eiEa4nj4A7Q21D7o3VJd03-hm0mbUvV6mdTvbdFd6mx5mhuTgVWCr7yQTf9YQWzpjwylDR0lkCqgGfVVOoyZbtEvQIhoO6M-1tOOohWgs6R89a8SiV5CjstVgEf44MxofCdyoEh_bSBiPvtl47pUcOD4VU8sdjvbcwzU9DK5H5QOug2U82FMHY"/>
+</div>
+<span class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.2 rounded-full bg-secondary text-on-secondary font-mono-metric-md text-[11px] font-bold shadow-md flex items-center gap-0.5">
+              #1
+            </span>
+</div>
+<span class="font-title-md text-title-md text-secondary truncate max-w-[105px] text-center font-bold">0xKaelen</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-secondary-container/30 text-secondary font-label-md text-[10px] mt-0.5">Grandmaster</span>
+<div class="w-full mt-space-sm bg-surface-container-highest rounded-t-xl pt-space-sm pb-space-xs px-1 flex flex-col items-center shadow-lg">
+<span class="font-mono-metric-lg text-mono-metric-lg text-secondary tracking-tight">3,840</span>
+<span class="font-mono-code text-mono-code text-on-surface text-[11px] font-semibold">6/6 Solved</span>
+<span class="font-mono-code text-[10px] text-secondary-fixed-dim">31m 14s penalty</span>
+<div class="h-16 w-full flex items-end justify-center pb-2 pt-1">
+<div class="px-2 py-1 rounded bg-secondary/15 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-[14px]">local_fire_department</span>
+<span class="font-mono-code text-[11px] text-secondary font-bold">Streak 9</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center">
+<div class="relative mb-space-xs">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest p-0.5 shadow-sm">
+<img class="w-full h-full rounded-full object-cover" data-alt="Stylized portrait avatar of competitor DevRyu with warm crimson rim lighting, high-contrast digital look on dark backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQHbHJodMcvmKjmFAYumGqGczW6m8VSjPM_lrxx1sK60mX8DAgGgoAyysUGGSJPfiBDC_CJ7bQcT0X4n3QXhRCQQuPy-7QL-zubAgrg3R84WSFp-PT8o8pvd1CTsguESzhgdfcGezBviugSEwxQmaxbzhR9_GFCCqyQ1-dpWAcY4hSzM74WwIVHjx3pl4E1_eamgOPHx2Lx0-vlCrAQRb6nAH0mKUhgEkKi_C7CbBI"/>
+</div>
+<span class="absolute -bottom-1 -left-1 w-5 h-5 rounded-full bg-surface-container-highest text-amber-600 flex items-center justify-center font-mono-metric-md text-[11px] font-bold shadow-md">3</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface truncate max-w-[90px] text-center">DevRyu</span>
+<span class="font-label-md text-label-md text-on-surface-variant text-[10px] mt-0.5">Master</span>
+<div class="w-full mt-space-sm bg-surface-container-high rounded-t-xl pt-space-sm pb-space-xs px-1 flex flex-col items-center shadow-inner">
+<span class="font-mono-metric-md text-mono-metric-md text-on-surface font-bold text-[13px]">3,420</span>
+<span class="font-mono-code text-[10px] text-on-surface-variant mt-0.5">5/6 • 49m</span>
+<div class="h-8 w-full flex items-end justify-center pb-1">
+<span class="w-6 h-6 rounded-md bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-amber-500">award_star</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-gutter pb-space-md">
+<div class="bg-gradient-to-r from-primary-container/20 via-surface-container to-surface-container-high rounded-xl p-space-sm shadow-[0_0_20px_rgba(128,131,255,0.18)] flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+<span class="font-mono-metric-md text-on-primary font-bold">AR</span>
+</div>
+<span class="absolute -top-1 -right-1 px-1 rounded bg-primary-container text-on-primary-container font-mono-code text-[9px] font-bold">YOU</span>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-mono-metric-md text-primary font-bold">#07</span>
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">Alex Rivera</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-primary-fixed">Candidate Master</span>
+<span>•</span>
+<span class="text-emerald-400 font-semibold flex items-center">
+<span class="material-symbols-outlined text-[13px]">trending_up</span> +5
+            </span>
+</div>
+</div>
+</div>
+<div class="text-right shrink-0 pl-space-xs">
+<div class="font-mono-metric-lg text-title-lg text-primary font-bold">2,950</div>
+<div class="font-mono-code text-[11px] text-on-surface-variant">5/6 • 58m</div>
+</div>
+</div>
+</div>
+<div class="px-gutter flex flex-col gap-space-xs pb-space-xl">
+<div class="flex items-center justify-between px-space-xs text-on-surface-variant font-label-md text-label-md tracking-wider uppercase text-[10px] pb-1">
+<div class="flex items-center gap-space-md">
+<span>Rank &amp; Coder</span>
+</div>
+<div class="flex items-center gap-space-lg text-right">
+<span>Solved</span>
+<span>Score</span>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#04</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Avatar portrait of algorithmic coder CipherMonk with neon blue spectacles in high tech dark room." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwW0JGWN9zUUa4Xv-7tSM2Pw_rfCTrV_nB4BOb6pNNasBPp9cQoh5sUtrYK2qlNiAfwezguh0A190tNnOdJzamDzEy6mKfsjUebIYOAovUxMMkOJ1u28nX9WpA1AHGjre8qZWOLmkFnrm0NqU06mXWIIEO0MJXEhCS1ol94G9T-62emKKEU7VyeJ-jn2qZfsNFARUxtf_i8ExFZ0Xm74ZMtG3Ue14nqMlrvibIpvAd"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">CipherMonk</span>
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-secondary-fixed-dim">Master</span>
+<span>•</span>
+<span class="text-on-surface-variant">52m 10s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">5/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">3,280</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#05</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Competitor profile avatar of NullPointer wearing minimalist dark tech hoodie with subtle purple reflection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvxvPI_C7JlwRB9uSsE1upzF_StaPaBiF1CyP74mcQUypECLjPrz35_DYDyz1wz8m6UTj-TmPvi4cZsO4p0hdOvNjyQwt2MgrAHLbvLsAg9iy20YlZ27M8X0kayskmTCKoTKnmV-E-NB_xOBdSn6Dat0PODa6RysSdZjReT81A1vD4d-x8JFuNI2oPcNhsZX-4pNF5POM-jsJrpiteFYqeWNONSIgeG1TtTzb--D0C"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">NullPointer</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-secondary-fixed-dim">Master</span>
+<span>•</span>
+<span class="text-on-surface-variant">54m 32s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">5/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">3,190</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#06</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait avatar of competitive programmer S_Turing with amber glasses and focused expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa9gT2TegerLlLtW0-AzFtUDaerr_A3B_xDxQLZC2YmbjX3y71xR6XTNvMKJf47IuHkGRWj-2nC2DvwicE2wUk_OhUoV98wDqTNUk8Lp4rOeffQro_6A557iRUEQfXMHZxCbrEs5zmseJh1p0IZJX3hQQARL2Dt4qAFbh0qG5DcT6E-1jenlrDGGXU8CpwxDjQPQSPWSma0sP8Ld1GZcnB7wU2ghbmW6Uxz0oEPF77"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">S_Turing</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-primary">Cand. Master</span>
+<span>•</span>
+<span class="text-on-surface-variant">56m 04s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">5/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">3,040</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between opacity-80">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#08</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Avatar portrait of coder byte_witch with cybernetic graphic pins and dark indigo ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCggap4G2KF6_0ITuVsj-ho-5Aujgoq9Ql6BP1cdxYaaq3eUPnXLYIG5Ff43SObkpMUoo880gqvyfhCu9TLLAwDp2FrbwEsDABUCMcWDYju8q_VoBA_DYMbOW0Jmknrx_Wg_K8m0Wrj8e4C8pkJGBq_QdMsmXB5ZlLtZlbtP2ze7nk_cqFFfNwB_F7stlCs-ILhunmEIiKRgTav8uyFhz2TnMJWnZ2ofLI7WaIqtiWR"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">byte_witch</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-primary">Cand. Master</span>
+<span>•</span>
+<span class="text-on-surface-variant">61m 15s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">4/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">2,740</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between opacity-80">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#09</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Profile avatar for coder BitShifter with geometric glasses on dark studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfDLQbJ5GTeGMkijSSk5k8zWb29Ntej1hLrDtMNZYbhN37vvqUZMD12nKWfL3XSg0BEeNk3rR6a32RQHOsoRh_Bsexn6-vnVu7-L0rJcQyWvQ31Sz78qFpGQgkMCL8mNIPNgHUj4x50wjmo3Ud7bo13zEy9BD_B_Zgz1fdyMY8JweZ0FH5fN4cqTxcVesRWlik_CwsIdOsS5snP5UzvUp92KqTeXVHv2h89Wu_8GFk"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">BitShifter</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-primary">Cand. Master</span>
+<span>•</span>
+<span class="text-on-surface-variant">64m 40s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">4/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">2,610</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors flex items-center justify-between opacity-75">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-mono-metric-md text-on-surface-variant font-semibold w-6 text-center text-body-md">#10</span>
+<div class="w-9 h-9 rounded-full bg-surface-container-highest shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Competitor profile avatar of Algoriddim wearing sleek headphones in dim neon arena glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDE4lQwOHk0EUd1_CJ73_Op4jWy1BG93Oa9KOcLELxGdXCAk9JUqz8LhpNN9KxmY5Szc6PWrbNJj4QyezkQcIjg95DjfQK1J7XIhDjTPJEr1ol4aAwP9C7t27WH_z1npxBr-xF-eX1QSI-cRs020v-4SoTcelGr7UcFnSFbX3C93gkNkXoFQiVqfeB5MMXLwZ1oLnyBKqIFswVKMFxvbs8LSdd2lqaXr6kksqze6Tg"/>
+</div>
+<div class="min-w-0 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-sm text-title-sm text-on-surface truncate">Algoriddim</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-mono-code text-[11px]">
+<span class="text-outline">Expert</span>
+<span>•</span>
+<span class="text-on-surface-variant">67m 02s</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md text-right shrink-0">
+<span class="font-mono-code text-[12px] text-on-surface-variant px-2 py-0.5 rounded bg-surface-container-lowest">4/6</span>
+<div class="w-16">
+<span class="font-mono-metric-md text-on-surface font-bold">2,490</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm flex flex-col items-center gap-space-xs text-center">
+<button class="w-full py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors font-title-sm text-title-sm text-on-surface flex items-center justify-center gap-1.5 shadow-sm">
+<span>Load Next 50 Ranks</span>
+<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+<span class="font-mono-code text-[10px] text-outline">Showing ranks 1 - 10 of 4,829 total active contenders</span>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const rows = document.querySelectorAll('.bg-surface-container, .bg-surface-container-low');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        row.classList.toggle('ring-0');
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-low/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.45)]" data-active-classes="text-secondary"><div class="flex justify-around items-center h-16 px-gutter"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="contests" href="#"><span class="material-symbols-outlined text-[22px]">emoji_events</span><span class="font-label-md text-label-md mt-0.5">Contests</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] transition-colors text-secondary" data-path="leaderboard" href="#"><span class="material-symbols-outlined text-[22px]">leaderboard</span><span class="font-label-md text-label-md mt-0.5">Ranks</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="problems" href="#"><span class="material-symbols-outlined text-[22px]">code</span><span class="font-label-md text-label-md mt-0.5">Problems</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="profile-teams" href="#"><span class="material-symbols-outlined text-[22px]">group</span><span class="font-label-md text-label-md mt-0.5">Teams</span></a></div></nav></body></html>

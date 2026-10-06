@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Rankstack - Precision Competitive Benchmark</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary-container":"#663500","on-background":"#0b1c30","inverse-surface":"#213145","on-primary-fixed":"#100069","surface-container-high":"#dce9ff","primary":"#2a14b4","inverse-primary":"#c3c0ff","on-primary-container":"#c1beff","error-container":"#ffdad6","surface-dim":"#cbdbf5","secondary":"#904d00","error":"#ba1a1a","on-primary":"#ffffff","on-error-container":"#93000a","surface-bright":"#f8f9ff","surface":"#f8f9ff","on-surface":"#0b1c30","on-tertiary-fixed":"#002114","primary-fixed-dim":"#c3c0ff","surface-container-low":"#eff4ff","on-surface-variant":"#464554","surface-container-highest":"#d3e4fe","on-primary-fixed-variant":"#372abf","secondary-container":"#fe932c","surface-container":"#e5eeff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed":"#2f1500","tertiary-container":"#005e40","tertiary-fixed":"#85f8c4","background":"#f8f9ff","on-tertiary":"#ffffff","inverse-on-surface":"#eaf1ff","surface-tint":"#5148d7","on-error":"#ffffff","on-secondary":"#ffffff","secondary-fixed":"#ffdcc3","tertiary":"#00442d","outline-variant":"#c7c4d7","surface-container-lowest":"#ffffff","primary-fixed":"#e3dfff","on-tertiary-container":"#66daa8","primary-container":"#4338ca","on-secondary-fixed-variant":"#6e3900","surface-variant":"#d3e4fe","tertiary-fixed-dim":"#68dba9","outline":"#777586"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","space-md":"1rem","margin-mobile":"1rem","space-xl":"2.5rem","margin":"2rem","gutter-mobile":"0.75rem","space-lg":"1.5rem","space-sm":"0.5rem"},fontFamily:{"headline-lg-mobile":["Montserrat"],"headline-sm":["Montserrat"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"body-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"label-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],"mono-data":["JetBrains Mono"],"headline-lg":["Montserrat"],"display-hero-mobile":["Montserrat"],"label-md":["Hanken Grotesk"],"mono-sm":["JetBrains Mono"],"mono-rank":["JetBrains Mono"]},fontSize:{"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a aria-current="page" class="px-3 py-1.5 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="contest-catalog" href="#">Contests</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="leaderboard" href="#">Leaderboard</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="teams" href="#">Teams</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Submissions</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><button class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1440px] mx-auto px-6 lg:px-8 py-8 md:py-10 space-y-8">
+<!-- Top Headline & Direct Action Area -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2">
+<div class="space-y-2 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-semibold uppercase tracking-wider">
+            Season 2025.1
+          </span>
+<span class="text-on-surface-variant font-mono-sm text-mono-sm">● Global Tier 1 Sync Active</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+          Active & Upcoming Contests
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+          Compete against global talent, earn ELO rating points, and win bounty rewards.
+        </p>
+</div>
+<!-- Quick Search Bar -->
+<div class="w-full lg:w-96 relative">
+<div class="relative flex items-center bg-surface-container-lowest rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] ml-3 select-none">search</span>
+<input class="w-full bg-transparent pl-2.5 pr-14 py-2.5 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none" id="contest-search" placeholder="Search contests by title, tag, or language..." type="text"/>
+<div class="absolute right-2.5 flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded text-on-surface-variant font-mono-sm text-mono-sm shadow-xs border-0 select-none">
+<span class="text-[10px]">⌘</span>K
+          </div>
+</div>
+</div>
+</div>
+<!-- Filter Control Strip: Primary Status Tabs & Secondary Selectors -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm space-y-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<!-- Status Filter Tabs -->
+<div class="flex flex-wrap items-center gap-1.5 p-1 bg-surface-container-low rounded-lg" id="status-tabs">
+<button class="tab-btn px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg transition-all shadow-xs" data-filter="all" type="button">
+            All <span class="ml-1 opacity-80 font-mono-sm text-mono-sm">24</span>
+</button>
+<button class="tab-btn px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-1.5" data-filter="live" type="button">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+            Live <span class="font-mono-sm text-mono-sm opacity-70">3</span>
+</button>
+<button class="tab-btn px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-all" data-filter="upcoming" type="button">
+            Upcoming <span class="ml-1 font-mono-sm text-mono-sm opacity-70">9</span>
+</button>
+<button class="tab-btn px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-all" data-filter="ended" type="button">
+            Ended <span class="ml-1 font-mono-sm text-mono-sm opacity-70">12</span>
+</button>
+</div>
+<!-- Telemetry Summary Metric -->
+<div class="hidden xl:flex items-center gap-4 text-on-surface-variant font-mono-sm text-mono-sm pr-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">bolt</span>
+<span>Median Speed: <strong class="text-on-surface">148ms</strong></span>
+</div>
+<span class="text-outline-variant">/</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">emoji_events</span>
+<span>Bounty Pool: <strong class="text-on-surface">$128,500</strong></span>
+</div>
+</div>
+</div>
+<!-- Secondary Filter Row -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+<div class="flex flex-wrap items-center gap-2.5">
+<!-- Difficulty Dropdown -->
+<div class="relative inline-block">
+<button class="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container px-3 py-1.5 rounded-lg text-on-surface font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">tune</span>
+<span>Difficulty: <strong>All Difficulties</strong></span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+</button>
+</div>
+<!-- Format Dropdown -->
+<div class="relative inline-block">
+<button class="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container px-3 py-1.5 rounded-lg text-on-surface font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">dashboard</span>
+<span>Format: <strong>All Formats</strong></span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+</button>
+</div>
+<!-- Tag Chips -->
+<div class="hidden sm:flex items-center gap-1.5 pl-2">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm hover:text-on-surface cursor-pointer">#GraphTheory</span>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm hover:text-on-surface cursor-pointer">#Rust</span>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm hover:text-on-surface cursor-pointer">#Concurreny</span>
+</div>
+</div>
+<!-- Sort Select -->
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant font-label-md text-label-md">Sort by:</span>
+<button class="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container px-3 py-1.5 rounded-lg text-on-surface font-label-md text-label-md font-semibold transition-colors">
+<span>Starting Soonest</span>
+<span class="material-symbols-outlined text-[16px]">sort</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Active Global Announcement Banner -->
+<div class="bg-surface-container-high rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">military_tech</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-bold">2025 World Algorithmic Invitational Finals Announced</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Regional qualifying windows open in 14 days. Ensure your ELO verification is authenticated.</p>
+</div>
+</div>
+<a class="px-4 py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-bright text-primary font-label-lg text-label-lg font-bold transition-all shadow-xs flex-shrink-0" href="#">
+        Read Tournament Manifesto
+      </a>
+</div>
+<!-- 3-Column Responsive Grid of Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- CARD 1: LIVE Global Division 1 -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container text-on-tertiary font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed animate-ping"></span>
+                LIVE
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Rated Div 1</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-mono-sm text-mono-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">monetization_on</span>
+              $15,000
+            </div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Global Division 1: Graph Theory & Heuristics
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              Solve 6 rigorous graph traversal and combinatorial optimization problems under strict 2-hour limits.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Hard</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">C++ / Rust / Python</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Strict I/O</span>
+</div>
+<!-- Micro Sparkline Telemetry Simulation -->
+<div class="bg-surface-container-low rounded-lg p-3 space-y-2">
+<div class="flex justify-between items-center font-mono-sm text-mono-sm text-on-surface-variant">
+<span>Submissions Pace</span>
+<span class="text-tertiary font-bold">14.2 / min</span>
+</div>
+<div class="w-full h-8 flex items-end gap-1">
+<div class="flex-1 bg-tertiary-fixed-dim/40 rounded-t h-2"></div>
+<div class="flex-1 bg-tertiary-fixed-dim/50 rounded-t h-4"></div>
+<div class="flex-1 bg-tertiary-fixed-dim/60 rounded-t h-3"></div>
+<div class="flex-1 bg-tertiary-fixed-dim/70 rounded-t h-6"></div>
+<div class="flex-1 bg-tertiary-fixed rounded-t h-8"></div>
+<div class="flex-1 bg-tertiary-fixed rounded-t h-7"></div>
+<div class="flex-1 bg-tertiary-container rounded-t h-8"></div>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">timer</span>
+<span>Ends in <strong>1h 14m</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+<span class="font-bold text-on-surface">2,491 Competitors</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>Enter Contest</span>
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</button>
+</div>
+</div>
+<!-- CARD 2: LIVE Winter Blitz MCQ Cup #12 -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container text-on-tertiary font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed animate-ping"></span>
+                LIVE
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Rapid MCQ</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-mono-sm text-mono-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+              350 ELO
+            </div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Winter Blitz MCQ Cup #12
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              50 rapid-fire architecture, complexity analysis, and concurrency questions.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Architecture</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">OS Internals</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Negative Marking</span>
+</div>
+<!-- Micro Countdown Meter -->
+<div class="bg-surface-container-low rounded-lg p-3 space-y-2">
+<div class="flex justify-between items-center font-mono-sm text-mono-sm text-on-surface-variant">
+<span>Time Remaining</span>
+<span class="text-secondary font-bold">45m 12s</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-container h-full rounded-full" style="width: 28%"></div>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">hourglass_bottom</span>
+<span>Ends in <strong>45m</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+<span class="font-bold text-on-surface">1,830 Competitors</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>Enter Contest</span>
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- CARD 3: LIVE Distributed Systems Hack Challenge -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container text-on-tertiary font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed animate-ping"></span>
+                LIVE
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Infra Track</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-mono-sm text-mono-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">military_tech</span>
+              $8,000
+            </div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Distributed Systems Hack Challenge
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              Design and patch real-time state machine replication consensus bugs.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Raft / Paxos</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Go / Rust</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Hard</span>
+</div>
+<!-- Leaderboard snippet -->
+<div class="bg-surface-container-low rounded-lg p-3 space-y-1.5 font-mono-sm text-mono-sm">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Top Score</span>
+<span class="text-on-surface font-bold">980 / 1000 (v_solov)</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span>Chaos Tests Passed</span>
+<span class="text-tertiary font-bold">92.4%</span>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">timer</span>
+<span>Ends in <strong>3h 12m</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+<span class="font-bold text-on-surface">980 Competitors</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>Enter Contest</span>
+<span class="material-symbols-outlined text-[18px]">developer_board</span>
+</button>
+</div>
+</div>
+<!-- CARD 4: UPCOMING Algorithm Sprint Series 08 -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                Upcoming
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Sprint #8</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-mono-sm text-mono-sm">
+<span>Div 2 & 3</span>
+</div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Algorithm Sprint Series 08
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              Fast-paced algorithmic challenge focusing on dynamic programming and bit manipulation.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Dynamic Prog</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Bitwise</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Medium</span>
+</div>
+<!-- Schedule breakdown -->
+<div class="bg-surface-container-low rounded-lg p-3 space-y-1 text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex justify-between">
+<span>Duration:</span>
+<span class="text-on-surface font-semibold">90 Minutes</span>
+</div>
+<div class="flex justify-between">
+<span>Penalty Rules:</span>
+<span class="text-on-surface font-semibold">10 min per W.A.</span>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">calendar_today</span>
+<span>Tomorrow <strong>14:00 UTC</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">how_to_reg</span>
+<span class="font-bold text-on-surface">3,410 Registered</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>Register</span>
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+</button>
+</div>
+</div>
+<!-- CARD 5: UPCOMING Collegiate Team Championship 2025 -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="material-symbols-outlined text-[14px]">groups</span>
+                Upcoming
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Trios</span>
+</div>
+<div class="flex items-center gap-1 text-secondary font-mono-sm text-mono-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">stars</span>
+              $50,000 Grants
+            </div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Collegiate Team Championship 2025
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              3-member squads battle across 12 algorithmic challenges with single computer constraints.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Team Event</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">ICPC Style</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Multi-Tier</span>
+</div>
+<!-- Team Slot Indicator -->
+<div class="bg-surface-container-low rounded-lg p-3 space-y-1 text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex justify-between">
+<span>Squad Cap:</span>
+<span class="text-on-surface font-semibold">1,024 Teams max</span>
+</div>
+<div class="flex justify-between">
+<span>Verification:</span>
+<span class="text-tertiary font-semibold">.edu / ACM Affiliated</span>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">event</span>
+<span>Starts in <strong>3 days</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">badge</span>
+<span class="font-bold text-on-surface">512 Teams</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>Register Team</span>
+<span class="material-symbols-outlined text-[18px]">group_add</span>
+</button>
+</div>
+</div>
+<!-- CARD 6: ENDED Autumn Invitational Grand Finals -->
+<div class="bg-surface-container-lowest rounded-xl flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-all duration-150 group opacity-90 hover:opacity-100">
+<div class="p-6 space-y-4">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-mono-sm text-mono-sm font-bold tracking-wide uppercase">
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+                Ended
+              </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-sm text-mono-sm">Archive</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-mono-sm text-mono-sm">
+<span>Nov 2024</span>
+</div>
+</div>
+<!-- Title & Meta -->
+<div class="space-y-1.5">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold group-hover:text-primary transition-colors">
+              Autumn Invitational Grand Finals
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+              Archive of the 2024 championship round solutions and test vectors.
+            </p>
+</div>
+<!-- Tags -->
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Editorial Ready</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">Test Data Open</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm">10 Problems</span>
+</div>
+<!-- Winner Capsule -->
+<div class="bg-surface-container-low rounded-lg p-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">workspace_premium</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Champion</span>
+</div>
+<div class="font-mono-sm text-mono-sm font-bold text-on-surface">
+              Winner: <span class="text-primary font-bold">0xKaelen</span>
+</div>
+</div>
+</div>
+<!-- Footer Area -->
+<div class="bg-surface-container-low p-5 space-y-3 mt-auto">
+<div class="flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">event_available</span>
+<span>Concluded <strong>Nov 28</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+<span class="font-bold text-on-surface">4,200 Participants</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all shadow-xs" type="button">
+<span>View Solutions & Standings</span>
+<span class="material-symbols-outlined text-[18px]">read_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Editorial Benchmark Quick Visualizer Section -->
+<div class="bg-surface-container-lowest rounded-xl p-6 md:p-8 shadow-sm">
+<div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+<div class="space-y-3 max-w-xl">
+<div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-mono-sm text-mono-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">psychology</span>
+            Adaptive Elo Rating Engine
+          </div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">
+            Rated contests adjust your global engineer percentile in real-time.
+          </h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Rankstack implements Bayesian TrueSkill telemetry to assess algorithmic execution velocity, runtime optimality, and edge-case resilience across every single test case.
+          </p>
+<div class="flex items-center gap-6 pt-2 font-mono-sm text-mono-sm text-on-surface">
+<div>
+<span class="block text-primary font-bold text-headline-sm">2,780</span>
+<span class="text-on-surface-variant text-[11px]">Grandmaster Cutoff</span>
+</div>
+<div>
+<span class="block text-secondary font-bold text-headline-sm">99.98%</span>
+<span class="text-on-surface-variant text-[11px]">Sandboxed Isolation</span>
+</div>
+<div>
+<span class="block text-tertiary font-bold text-headline-sm">< 0.2%</span>
+<span class="text-on-surface-variant text-[11px]">Plagiarism Threshold</span>
+</div>
+</div>
+</div>
+<!-- Inline Visual Architecture Graph (SVG under 2KB) -->
+<div class="w-full lg:w-96 bg-surface-container-low rounded-xl p-5 shadow-xs flex flex-col items-center justify-center">
+<div class="w-full flex items-center justify-between text-on-surface-variant font-mono-sm text-mono-sm pb-3">
+<span>Live Skill Dispersion</span>
+<span class="text-primary font-bold">Season 24 Peak</span>
+</div>
+<svg class="w-full h-28 text-primary" fill="none" viewbox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="grad-area" x1="0" x2="0" y1="0" y2="100">
+<stop stop-color="currentColor" stop-opacity="0.35"></stop>
+<stop offset="100%" stop-color="currentColor" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,85 Q40,82 70,70 T120,40 T150,15 T180,30 T220,65 T300,90 L300,100 L0,100 Z" fill="url(#grad-area)"></path>
+<path d="M0,85 Q40,82 70,70 T120,40 T150,15 T180,30 T220,65 T300,90" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path>
+<circle cx="150" cy="15" fill="#fe932c" r="4.5" stroke="#ffffff" stroke-width="2"></circle>
+<line stroke="#fe932c" stroke-dasharray="3 3" stroke-width="1.5" x1="150" x2="150" y1="15" y2="95"></line>
+</svg>
+<div class="w-full flex justify-between font-mono-sm text-mono-sm text-on-surface-variant pt-2">
+<span>1200 ELO (Novice)</span>
+<span class="text-secondary font-bold">1850 (You: Top 4%)</span>
+<span>3200 (Legend)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination & Catalog Telemetry -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+<div class="font-mono-sm text-mono-sm text-on-surface-variant">
+        Showing <span class="font-bold text-on-surface">1-6</span> of <span class="font-bold text-on-surface">24</span> contests
+      </div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg bg-surface-container-low text-outline cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-9 h-9 rounded-lg bg-primary-container text-on-primary font-mono-sm text-mono-sm font-bold flex items-center justify-center shadow-xs" type="button">
+          1
+        </button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium flex items-center justify-center transition-colors" type="button">
+          2
+        </button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium flex items-center justify-center transition-colors" type="button">
+          3
+        </button>
+<button class="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium flex items-center justify-center transition-colors" type="button">
+          4
+        </button>
+<button class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant font-label-md text-label-md">Per page:</span>
+<button class="bg-surface-container-low px-2.5 py-1 rounded font-mono-sm text-mono-sm text-on-surface font-bold flex items-center gap-1">
+<span>6</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple Interactive Filter Tab Micro-interaction
+  document.querySelectorAll('#status-tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#status-tabs .tab-btn').forEach(b => {
+        b.className = 'tab-btn px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg transition-all flex items-center gap-1.5';
+      });
+      btn.className = 'tab-btn px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg transition-all shadow-xs flex items-center gap-1.5';
+    });
+  });
+
+  // Global Quick-Search Hotkey listener (Cmd+K / Ctrl+K)
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      const searchInput = document.getElementById('contest-search');
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+  });
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant py-8 px-8"><div class="w-full flex flex-col md:flex-row justify-between items-start gap-8"><div class="flex flex-col gap-2 max-w-sm"><div class="flex items-center gap-2"><img alt="Rankstack" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rankstack</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Precision Competitive Benchmark & Skill Evaluation</p><p class="font-mono-sm text-mono-sm text-on-surface-variant mt-2">© 2025 Rankstack Inc. All rights reserved.</p></div><div class="grid grid-cols-3 gap-12"><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Product</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contest-catalog" href="#">Contests</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboards</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="problem-submission" href="#">Practice Sandbox</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Resources</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">API & Telemetry</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Rules & Scoring</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Documentation</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Legal</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Integrity Code</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"><div class="pointer-events-auto flex items-center gap-3 bg-surface-container-lowest border border-outline-variant shadow-lg px-4 py-3 rounded-lg"><span class="material-symbols-outlined text-secondary text-[20px]">info</span><span class="font-body-sm text-body-sm text-on-surface">System live: Evaluation cluster running at 99.98% efficiency</span></div></div></body></html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Rankstack - Precision Competitive Benchmark</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary-container":"#663500","on-background":"#0b1c30","inverse-surface":"#213145","on-primary-fixed":"#100069","surface-container-high":"#dce9ff","primary":"#2a14b4","inverse-primary":"#c3c0ff","on-primary-container":"#c1beff","error-container":"#ffdad6","surface-dim":"#cbdbf5","secondary":"#904d00","error":"#ba1a1a","on-primary":"#ffffff","on-error-container":"#93000a","surface-bright":"#f8f9ff","surface":"#f8f9ff","on-surface":"#0b1c30","on-tertiary-fixed":"#002114","primary-fixed-dim":"#c3c0ff","surface-container-low":"#eff4ff","on-surface-variant":"#464554","surface-container-highest":"#d3e4fe","on-primary-fixed-variant":"#372abf","secondary-container":"#fe932c","surface-container":"#e5eeff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed":"#2f1500","tertiary-container":"#005e40","tertiary-fixed":"#85f8c4","background":"#f8f9ff","on-tertiary":"#ffffff","inverse-on-surface":"#eaf1ff","surface-tint":"#5148d7","on-error":"#ffffff","on-secondary":"#ffffff","secondary-fixed":"#ffdcc3","tertiary":"#00442d","outline-variant":"#c7c4d7","surface-container-lowest":"#ffffff","primary-fixed":"#e3dfff","on-tertiary-container":"#66daa8","primary-container":"#4338ca","on-secondary-fixed-variant":"#6e3900","surface-variant":"#d3e4fe","tertiary-fixed-dim":"#68dba9","outline":"#777586"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","space-md":"1rem","margin-mobile":"1rem","space-xl":"2.5rem","margin":"2rem","gutter-mobile":"0.75rem","space-lg":"1.5rem","space-sm":"0.5rem"},fontFamily:{"headline-lg-mobile":["Montserrat"],"headline-sm":["Montserrat"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"body-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"label-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],"mono-data":["JetBrains Mono"],"headline-lg":["Montserrat"],"display-hero-mobile":["Montserrat"],"label-md":["Hanken Grotesk"],"mono-sm":["JetBrains Mono"],"mono-rank":["JetBrains Mono"]},fontSize:{"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="leaderboard" href="#">Leaderboard</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="teams" href="#">Teams</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Submissions</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><button class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full relative overflow-hidden">
+<!-- Hero Section with Background Dot-Matrix Grid -->
+<section class="relative w-full px-6 lg:px-12 pt-10 pb-20 max-w-[1440px] mx-auto">
+<!-- Ambient Backdrop Gradient & Subtle SVG Grid Mask -->
+<div class="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden">
+<svg class="w-full h-full opacity-35" height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="28" id="rankstack-hero-dots" patternunits="userSpaceOnUse" width="28" x="0" y="0">
+<circle class="fill-outline-variant" cx="2" cy="2" r="1.2"></circle>
+</pattern>
+<radialgradient cx="50%" cy="40%" id="rankstack-fade" r="55%">
+<stop offset="0%" stop-color="#000" stop-opacity="1"></stop>
+<stop offset="70%" stop-color="#000" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#000" stop-opacity="0"></stop>
+</radialgradient>
+<mask id="hero-mask">
+<rect fill="url(#rankstack-fade)" height="100%" width="100%"></rect>
+</mask>
+</defs>
+<rect fill="url(#rankstack-hero-dots)" height="100%" mask="url(#hero-mask)" width="100%"></rect>
+</svg>
+<div class="absolute -top-24 right-1/4 w-[480px] h-[480px] bg-primary-fixed/30 rounded-full blur-[110px] pointer-events-none"></div>
+<div class="absolute top-1/3 left-10 w-[360px] h-[360px] bg-secondary-container/15 rounded-full blur-[90px] pointer-events-none"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+<!-- Left Column: Typography & CTAs -->
+<div class="lg:col-span-6 flex flex-col items-start gap-6 z-10">
+<!-- Live Benchmark Badge -->
+<div class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-surface-container-high/80 text-on-surface shadow-sm backdrop-blur-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</span>
+<span class="font-mono-sm text-mono-sm uppercase tracking-wider text-secondary font-bold">
+            Season 14 Live Benchmarks
+          </span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">| 24ms Realtime Sync</span>
+</div>
+<!-- Headline with Scramble Effect Container -->
+<div class="flex flex-col gap-2">
+<h1 class="font-display-hero text-display-hero text-on-surface tracking-tight leading-[1.08] select-none" id="kinetic-headline">
+            Rise Through the <span class="text-primary-container">Ranks</span> with Pure <span class="bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent">Algorithmic</span> Craft
+          </h1>
+</div>
+<!-- Subheading -->
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl font-normal leading-relaxed">
+          Join competitive coding contests, benchmark speed and accuracy, and claim your place among the top 1% engineers.
+        </p>
+<!-- CTA Buttons -->
+<div class="flex flex-wrap items-center gap-4 pt-2">
+<a class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md hover:bg-primary transition-all duration-150 transform hover:-translate-y-0.5 group" data-path="contest-catalog" href="#">
+<span>Browse Contests</span>
+<span class="material-symbols-outlined text-[19px] transition-transform duration-200 group-hover:translate-x-1">arrow_forward</span>
+</a>
+<a class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-surface-container-lowest text-on-surface font-label-lg text-label-lg shadow-sm hover:bg-surface-container transition-all duration-150 hover:-translate-y-0.5" data-path="create-account" href="#">
+<span class="material-symbols-outlined text-[19px] text-on-surface-variant">person_add</span>
+<span>Create Account</span>
+</a>
+</div>
+<!-- Inline Credibility Stat Strip -->
+<div class="pt-6 flex items-center gap-6 text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container text-[20px]">verified</span>
+<span class="font-body-sm text-body-sm font-medium">Sandboxed Kernel Grading</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">military_tech</span>
+<span class="font-body-sm text-body-sm font-medium">FIDE-Graded ELO Engine</span>
+</div>
+</div>
+</div>
+<!-- Right Column: 3D Stacked Dynamic Cards -->
+<div class="lg:col-span-6 relative flex justify-center items-center py-6 min-h-[500px]">
+<!-- Layer 3 (Deepest Layer): Submission Status Card -->
+<div class="absolute w-full max-w-[430px] rounded-xl bg-surface-container-low p-5 shadow-sm transform -rotate-6 translate-x-8 translate-y-16 transition-all duration-300 hover:rotate-0 hover:z-30 hover:scale-105">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-[22px]">terminal</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate max-w-[200px]">Graph Shortest Path Optimization</span>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-mono-sm text-mono-sm font-bold uppercase">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+              Accepted
+            </span>
+</div>
+<div class="grid grid-cols-3 gap-3 pt-3 bg-surface-container-lowest rounded-lg p-3">
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Exec Time</p>
+<p class="font-mono-data text-mono-data font-bold text-on-surface text-tertiary">42ms</p>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Memory</p>
+<p class="font-mono-data text-mono-data font-bold text-on-surface">18.4MB</p>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Complexity</p>
+<p class="font-mono-data text-mono-data font-bold text-primary-container">O(V + E log V)</p>
+</div>
+</div>
+</div>
+<!-- Layer 2 (Middle Layer): Leaderboard Snippet Card -->
+<div class="absolute w-full max-w-[420px] rounded-xl bg-surface-container-lowest p-5 shadow-md transform rotate-3 -translate-x-6 translate-y-4 transition-all duration-300 hover:rotate-0 hover:z-30 hover:scale-105">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">leaderboard</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Live Standings Preview</span>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">Global Div 1</span>
+</div>
+<div class="flex flex-col gap-2 pt-1">
+<!-- Row 1 Gold -->
+<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-high/60 transition-colors">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-secondary-container text-on-secondary font-mono-sm text-mono-sm font-bold shadow-sm">1</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">0xKaelen</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-sm bg-primary-fixed text-on-primary-fixed font-bold">C++23</span>
+</div>
+<span class="font-mono-data text-mono-data font-bold text-secondary">2,980 pts</span>
+</div>
+<!-- Row 2 Silver -->
+<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-highest text-on-surface-variant font-mono-sm text-mono-sm font-bold">2</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Elena_V</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-sm bg-surface-container text-on-surface-variant font-bold">Rust</span>
+</div>
+<span class="font-mono-data text-mono-data font-semibold text-on-surface">2,840 pts</span>
+</div>
+<!-- Row 3 Bronze -->
+<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-bold">3</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">DevRyu</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-sm bg-surface-container text-on-surface-variant font-bold">Go</span>
+</div>
+<span class="font-mono-data text-mono-data font-semibold text-on-surface">2,750 pts</span>
+</div>
+</div>
+</div>
+<!-- Layer 1 (Top Layer): Featured Contest Card -->
+<div class="relative w-full max-w-[440px] rounded-xl bg-surface-container-lowest p-6 shadow-xl transform -rotate-1 hover:rotate-0 transition-all duration-300 z-20">
+<div class="flex items-center justify-between mb-4">
+<div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-container opacity-85"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-container"></span>
+</span>
+<span class="font-mono-sm text-mono-sm font-bold uppercase tracking-wider">Live Now</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span class="font-mono-sm text-mono-sm font-semibold">1,420 joined</span>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight mb-2">
+            Algorithmic Masters Cup #42
+          </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-5 line-clamp-1">
+            Dynamic Programming, Computational Geometry, and Concurrency Locks
+          </p>
+<div class="grid grid-cols-2 gap-4 p-4 rounded-lg bg-surface-container-low mb-5">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Prize Pool</span>
+<span class="font-mono-rank text-mono-rank font-bold text-secondary">$10,000 USD</span>
+</div>
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Time Remaining</span>
+<span class="font-mono-rank text-mono-rank font-bold text-primary-container tracking-wider">02:45:18</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex -space-x-2 overflow-hidden">
+<img class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest object-cover" data-alt="Close up competitive coder avatar with stylish neon lighting and cyber headset, high fidelity modern portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvshfyfXCjEvQQsDWoCyAYj7wDI0aWq01a3ULudNWaf-h-kYGyFOkhq_M_yelHSLjY343vWZOrjjiJjMGl9ybH3PcvFDpu_bL3-nuSmEcJpT8_UuUoav4i-u7t8_HTyT9GpsBRA1lGPsPb1wNGWL2zFbef7sowD2IbH2phRCAr4w4V2aVgLK4tlGA6qX1js8edJ3vlFR_qQN6bcL0zhElJtmixsTTf4UbiqcJ5Rhc_"/>
+<img class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest object-cover" data-alt="Confident software engineer female competitor avatar wearing spectacles in studio lighting, professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBeudwAPrrJ4UgGKvNoujJEz4z-bb7wfXoemzw2Hptg0anR_mC1qcS7n2PK4zAoI0UuAWN3WnOHj-YzRWm-B9kii5lwKSsDz_grhgfJ0TAc3mBW-RKZDfJxePYjZg4GQ1CTg2zZzFInZ4cVQARykSvpOPetdTVBa9TntkFePhp00NI0FypF_70gL9g6f9LoUaZ2jr6WOjhrw8BHqfSfo8eWQ_Lx_U0BeaHa1Ut052h"/>
+<img class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest object-cover" data-alt="Young coder male portrait with vibrant background, high visual fidelity portrait headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB41_aefH0B_HswKG4UEoqtoAhVUjSFJhnenSj1ijc627IkS-ee39sHV5XvUqqU8KkUOckqJcqLE0eNi17qHxBaLG6Ayh5IhJ9X6RwEt8BnJnsL2XD8biPtpuyNILD5TXyuL1hspcAyMf1LSISnotmGm5Jze1fkHdP-tex294cnnsLYE13nnLuR2y7b-dJip5Sn7lc3bjVw3pjDePybb62i5wqi4vCRWDZk2O7TP94q"/>
+<div class="flex items-center justify-center h-8 w-8 rounded-full bg-surface-container-highest text-on-surface font-mono-sm text-mono-sm font-bold">
+                +1.4k
+              </div>
+</div>
+<a class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg shadow-sm hover:bg-primary-container transition-colors inline-flex items-center gap-1.5" data-path="contest-arena" href="#">
+<span>Enter Arena</span>
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Three-Column Feature Architecture Row -->
+<section class="w-full max-w-[1440px] mx-auto px-6 lg:px-12 py-14">
+<div class="flex flex-col items-center text-center max-w-2xl mx-auto mb-12">
+<span class="font-mono-sm text-mono-sm uppercase tracking-widest text-primary font-bold mb-2">Engineered For Mastery</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">The Precision Competitive Standard</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Built from the kernel up to eliminate grading lag, guarantee deterministic execution, and support extreme concurrent load.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1: Real-Time Leaderboard -->
+<div class="flex flex-col rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 group">
+<div class="w-12 h-12 rounded-lg bg-primary-fixed flex items-center justify-center text-primary-container mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]">speed</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-3">Live Real-Time Leaderboard</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-6">
+          Experience animated ranking updates with zero latency recalculation. Watch your position surge in real time as test suites complete execution across distributed evaluation clusters.
+        </p>
+<!-- Mini Telemetry Visualizer Card -->
+<div class="mt-auto p-4 rounded-lg bg-surface-container-low flex flex-col gap-2">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-mono-sm text-mono-sm">Cluster Sync Delay</span>
+<span class="font-mono-sm text-mono-sm font-bold text-tertiary">0.08 ms</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-tertiary-container h-1.5 rounded-full w-[94%]"></div>
+</div>
+</div>
+</div>
+<!-- Feature 2: Multiple Problem Formats -->
+<div class="flex flex-col rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 group">
+<div class="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]">category</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-3">Multiple Problem Formats</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-6">
+          Tackle ultra-fast Speed MCQs, deep Algorithmic Coding challenges with strict asymptotic boundaries, and Subjective System Architecture blueprints scored by peer panels.
+        </p>
+<!-- Mini Badges Showcase -->
+<div class="mt-auto flex flex-wrap gap-2 pt-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium">Lightning MCQ</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium">Algorithmic</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-mono-sm text-mono-sm font-medium">System Design</span>
+</div>
+</div>
+<!-- Feature 3: Team & Guild Competition -->
+<div class="flex flex-col rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 group">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]">diversity_3</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-3">Team & Guild Competition</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-6">
+          Synchronize squad matches, aggregate collective ELO, and climb global collegiate and enterprise brackets in seasonal division qualifiers with granular role delegation.
+        </p>
+<!-- Mini Team Avatars Row -->
+<div class="mt-auto p-3.5 rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">shield</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Turing Guild Div 1</span>
+</div>
+<span class="font-mono-data text-mono-data font-bold text-primary-container">#4 Global</span>
+</div>
+</div>
+</div>
+</section>
+<!-- High-Density Statistics Strip -->
+<section class="w-full bg-surface-container-lowest py-10 shadow-sm">
+<div class="max-w-[1440px] mx-auto px-6 lg:px-12">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<!-- Metric 1 -->
+<div class="flex flex-col items-center sm:items-start">
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface text-[28px] sm:text-[34px] tracking-tight mb-1">
+            1,280+
+          </span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium uppercase tracking-wider">
+            Total Contests
+          </span>
+</div>
+<!-- Metric 2 -->
+<div class="flex flex-col items-center sm:items-start">
+<span class="font-mono-rank text-mono-rank font-bold text-primary-container text-[28px] sm:text-[34px] tracking-tight mb-1">
+            185,000+
+          </span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium uppercase tracking-wider">
+            Active Competitors
+          </span>
+</div>
+<!-- Metric 3 -->
+<div class="flex flex-col items-center sm:items-start">
+<span class="font-mono-rank text-mono-rank font-bold text-secondary text-[28px] sm:text-[34px] tracking-tight mb-1">
+            4.2M+
+          </span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium uppercase tracking-wider">
+            Submissions Graded
+          </span>
+</div>
+<!-- Metric 4 -->
+<div class="flex flex-col items-center sm:items-start">
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary-container text-[28px] sm:text-[34px] tracking-tight mb-1">
+            99.98%
+          </span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium uppercase tracking-wider">
+            Uptime SLA
+          </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Activity Toast Preview (Bottom-Right) -->
+<div class="fixed bottom-6 right-6 z-40 max-w-sm w-full bg-surface-container-lowest p-3.5 rounded-lg shadow-xl flex items-center justify-between transition-all duration-300 transform translate-y-0 opacity-100" id="live-activity-toast">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold font-mono-sm">
+        EV
+      </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-bold">Elena_V</span>
+<span class="text-tertiary font-mono-sm text-mono-sm font-semibold">+450 pts</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Solved Problem C • 2s ago</span>
+</div>
+</div>
+<button aria-label="Dismiss toast" class="text-on-surface-variant hover:text-on-surface transition-colors p-1" onclick="document.getElementById('live-activity-toast').style.display='none'">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<script>
+  // Subtle Kinetic Scramble Micro-interaction on Mount
+  (function initKineticHeader() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>_";
+    const targetEl = document.getElementById("kinetic-headline");
+    if (!targetEl) return;
+    
+    // Periodically pulse live submission toasts for rich atmosphere
+    const toastMsgs = [
+      { user: "Elena_V", diff: "+450 pts", action: "Solved Problem C • 2s ago" },
+      { user: "0xKaelen", diff: "+510 pts", action: "Fastest Sub: Problem E • 14s ago" },
+      { user: "DevRyu", diff: "+320 pts", action: "Passed 48/48 Testcases • 28s ago" }
+    ];
+    let msgIdx = 0;
+    const toast = document.getElementById("live-activity-toast");
+    if (toast) {
+      setInterval(() => {
+        msgIdx = (msgIdx + 1) % toastMsgs.length;
+        const data = toastMsgs[msgIdx];
+        const userEl = toast.querySelector(".font-label-md");
+        const diffEl = toast.querySelector(".text-tertiary");
+        const actionEl = toast.querySelector(".font-body-sm");
+        const avatarEl = toast.querySelector(".rounded-full");
+        if (userEl && diffEl && actionEl && avatarEl) {
+          userEl.textContent = data.user;
+          diffEl.textContent = data.diff;
+          actionEl.textContent = data.action;
+          avatarEl.textContent = data.user.substring(0, 2).toUpperCase();
+        }
+      }, 7000);
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant py-8 px-8"><div class="w-full flex flex-col md:flex-row justify-between items-start gap-8"><div class="flex flex-col gap-2 max-w-sm"><div class="flex items-center gap-2"><img alt="Rankstack" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rankstack</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Precision Competitive Benchmark & Skill Evaluation</p><p class="font-mono-sm text-mono-sm text-on-surface-variant mt-2">© 2025 Rankstack Inc. All rights reserved.</p></div><div class="grid grid-cols-3 gap-12"><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Product</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contest-catalog" href="#">Contests</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboards</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="problem-submission" href="#">Practice Sandbox</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Resources</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">API & Telemetry</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Rules & Scoring</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Documentation</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Legal</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Integrity Code</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"><div class="pointer-events-auto flex items-center gap-3 bg-surface-container-lowest border border-outline-variant shadow-lg px-4 py-3 rounded-lg"><span class="material-symbols-outlined text-secondary text-[20px]">info</span><span class="font-body-sm text-body-sm text-on-surface">System live: Evaluation cluster running at 99.98% efficiency</span></div></div></body></html>
