@@ -1,11 +1,11 @@
 """CRUD routes for `teams`, plus member add/remove via atomic transactions."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
 
 from api import services
 from api.db import get_db
-from api.dependencies import get_current_user
+from api.dependencies import CurrentUser, TeamMemberOrAdmin
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.teams import TeamCreate, TeamMemberOp, TeamOut, TeamUpdate
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/teams", tags=["teams"])
 
 
 @router.post("", response_model=TeamOut, status_code=201)
-def create_team(payload: TeamCreate, _: dict = Depends(get_current_user)):
+def create_team(payload: TeamCreate, _: CurrentUser):
     db = get_db()
     doc = {
         "name": payload.name,
@@ -29,7 +29,7 @@ def create_team(payload: TeamCreate, _: dict = Depends(get_current_user)):
 
 
 @router.get("", response_model=list[TeamOut])
-def list_teams(limit: int = 50, _: dict = Depends(get_current_user)):
+def list_teams(_: CurrentUser, limit: int = 50):
     db = get_db()
     docs = db["teams"].find().limit(min(limit, 200))
     return [serialize_doc(d) for d in docs]
@@ -45,7 +45,7 @@ def get_team(team_id: str):
 
 
 @router.patch("/{team_id}", response_model=TeamOut)
-def update_team(team_id: str, payload: TeamUpdate, _: dict = Depends(get_current_user)):
+def update_team(team_id: str, payload: TeamUpdate, _: TeamMemberOrAdmin):
     db = get_db()
     updates = payload.model_dump(exclude_unset=True)
     if not updates:
@@ -60,9 +60,7 @@ def update_team(team_id: str, payload: TeamUpdate, _: dict = Depends(get_current
 
 
 @router.post("/{team_id}/members", response_model=TeamOut)
-def add_member(
-    team_id: str, payload: TeamMemberOp, _: dict = Depends(get_current_user)
-):
+def add_member(team_id: str, payload: TeamMemberOp, _: TeamMemberOrAdmin):
     db = get_db()
     team = services.add_team_member(db, oid(team_id), oid(payload.userId))
     if team is None:
@@ -71,7 +69,7 @@ def add_member(
 
 
 @router.delete("/{team_id}/members/{user_id}", response_model=TeamOut)
-def remove_member(team_id: str, user_id: str, _: dict = Depends(get_current_user)):
+def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
     db = get_db()
     team = services.remove_team_member(db, oid(team_id), oid(user_id))
     if team is None:
@@ -80,7 +78,7 @@ def remove_member(team_id: str, user_id: str, _: dict = Depends(get_current_user
 
 
 @router.delete("/{team_id}", status_code=204)
-def delete_team(team_id: str, _: dict = Depends(get_current_user)):
+def delete_team(team_id: str, _: TeamMemberOrAdmin):
     db = get_db()
     result = db["teams"].delete_one({"_id": oid(team_id)})
     if result.deleted_count == 0:

@@ -1,10 +1,10 @@
 """CRUD routes for the polymorphic `problems` collection."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
 
-from api.dependencies import get_admin_user
 from api.db import get_db
+from api.dependencies import AdminUser
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.problems import ProblemCreate, ProblemOut, ProblemUpdate
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/problems", tags=["problems"])
 
 
 @router.post("", response_model=ProblemOut, status_code=201)
-def create_problem(payload: ProblemCreate, _: dict = Depends(get_admin_user)):
+def create_problem(payload: ProblemCreate, _: AdminUser):
     db = get_db()
     body = payload.model_dump()
     contest_id = oid(body.pop("contestId"))
@@ -41,9 +41,7 @@ def get_problem(problem_id: str):
 
 
 @router.patch("/{problem_id}", response_model=ProblemOut)
-def update_problem(
-    problem_id: str, payload: ProblemUpdate, _: dict = Depends(get_admin_user)
-):
+def update_problem(problem_id: str, payload: ProblemUpdate, _: AdminUser):
     db = get_db()
     updates = payload.model_dump(exclude_unset=True, exclude_none=True)
     if "testCases" in updates:
@@ -60,7 +58,7 @@ def update_problem(
 
 
 @router.delete("/{problem_id}", status_code=204)
-def delete_problem(problem_id: str, _: dict = Depends(get_admin_user)):
+def delete_problem(problem_id: str, _: AdminUser):
     db = get_db()
     pid = oid(problem_id)
     doc = db["problems"].find_one({"_id": pid})

@@ -1,6 +1,6 @@
 """Authentication and authorization dependencies for API routes."""
 
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -13,7 +13,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> dict[str, Any]:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Invalid or expired session")
@@ -30,7 +30,29 @@ def get_current_user(
     return user
 
 
-def get_admin_user(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+CurrentUser = Annotated[dict[str, Any], Depends(get_current_user)]
+
+
+def get_admin_user(user: CurrentUser) -> dict[str, Any]:
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin privileges required")
     return user
+
+
+AdminUser = Annotated[dict[str, Any], Depends(get_admin_user)]
+
+
+def get_team_member_or_admin(team_id: str, user: CurrentUser) -> dict[str, Any]:
+    """Require an administrator or a member of the requested team."""
+    if user.get("role") == "admin":
+        return user
+
+    team = get_db()["teams"].find_one(
+        {"_id": oid(team_id), "memberIds": user["_id"]}, {"_id": 1}
+    )
+    if team is None:
+        raise HTTPException(status_code=403, detail="Team membership required")
+    return user
+
+
+TeamMemberOrAdmin = Annotated[dict[str, Any], Depends(get_team_member_or_admin)]

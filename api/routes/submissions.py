@@ -1,21 +1,34 @@
 """CRUD routes for `submissions`, backed by the create/status-update transactions
 and Redis rate limiting / leaderboard sync."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 from api import redis_ops, services
-from api.dependencies import get_admin_user, get_current_user
 from api.db import get_db
+from api.dependencies import AdminUser, CurrentUser
 from api.models.common import oid, serialize_doc
-from api.models.submissions import SubmissionCreate, SubmissionOut, SubmissionStatusUpdate
+from api.models.submissions import (
+    SubmissionCreate,
+    SubmissionOut,
+    SubmissionStatusUpdate,
+)
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
 
 
 @router.post("", response_model=SubmissionOut, status_code=201)
-def create_submission(payload: SubmissionCreate, _: dict = Depends(get_current_user)):
+def create_submission(payload: SubmissionCreate, current: CurrentUser):
     db = get_db()
-    allowed, count = redis_ops.check_and_increment_rate_limit(payload.submittedBy.refId)
+    submitter_id = oid(payload.submittedBy.refId)
+    if payload.submittedBy.refType == "user":
+        if submitter_id != current["_id"]:
+            raise HTTPException(status_code=403, detail="Cannot submit for another user")
+    elif db["teams"].find_one(
+        {"_id": submitter_id, "memberIds": current["_id"]}, {"_id": 1}
+    ) is None:
+        raise HTTPException(status_code=403, detail="Team membership required")
+
+    allowed, count = redis_ops.check_and_increment_rate_limit(str(current["_id"]))
     if not allowed:
         raise HTTPException(
             status_code=429,
@@ -25,7 +38,7 @@ def create_submission(payload: SubmissionCreate, _: dict = Depends(get_current_u
         db,
         oid(payload.contestId),
         oid(payload.problemId),
-        {"refType": payload.submittedBy.refType, "refId": oid(payload.submittedBy.refId)},
+        {"refType": payload.submittedBy.refType, "refId": submitter_id},
         payload.answer,
     )
     return serialize_doc(doc)
@@ -63,7 +76,7 @@ def get_submission(submission_id: str):
 def update_status(
     submission_id: str,
     payload: SubmissionStatusUpdate,
-    _: dict = Depends(get_admin_user),
+    _: AdminUser,
 ):
     db = get_db()
     sub_id = oid(submission_id)
@@ -81,7 +94,7 @@ def update_status(
 
 
 @router.delete("/{submission_id}", status_code=204)
-def delete_submission(submission_id: str, _: dict = Depends(get_admin_user)):
+def delete_submission(submission_id: str, _: AdminUser):
     db = get_db()
     result = db["submissions"].delete_one({"_id": oid(submission_id)})
     if result.deleted_count == 0:
