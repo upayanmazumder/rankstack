@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 
 from api import redis_ops, services
 from api.db import get_db
-from api.dependencies import AdminUser, CurrentUser
+from api.dependencies import CurrentUser
 from api.models.common import oid, serialize_doc
 from api.models.submissions import (
     SubmissionCreate,
@@ -76,8 +76,10 @@ def get_submission(submission_id: str):
 def update_status(
     submission_id: str,
     payload: SubmissionStatusUpdate,
-    _: AdminUser,
+    current: CurrentUser,
 ):
+    if current.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
     db = get_db()
     sub_id = oid(submission_id)
     existing = db["submissions"].find_one({"_id": sub_id}, {"score": 1})
@@ -94,7 +96,9 @@ def update_status(
 
 
 @router.delete("/{submission_id}", status_code=204)
-def delete_submission(submission_id: str, _: AdminUser):
+def delete_submission(submission_id: str, current: CurrentUser):
+    if current.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
     db = get_db()
     result = db["submissions"].delete_one({"_id": oid(submission_id)})
     if result.deleted_count == 0:
