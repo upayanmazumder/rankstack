@@ -3,7 +3,7 @@
 from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
 
-from api import redis_ops
+from api import redis_ops, services
 from api.db import get_db
 from api.dependencies import AdminUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -105,6 +105,5 @@ def get_leaderboard(contest_id: str, top: int = 10):
 @router.delete("/{contest_id}", status_code=204)
 def delete_contest(contest_id: str, _: AdminUser):
     db = get_db()
-    result = db["contests"].delete_one({"_id": oid(contest_id)})
-    if result.deleted_count == 0:
+    if services.delete_contest_transaction(db, oid(contest_id)) is None:
         raise HTTPException(status_code=404, detail="Contest not found")

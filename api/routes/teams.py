@@ -80,6 +80,5 @@ def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
 @router.delete("/{team_id}", status_code=204)
 def delete_team(team_id: str, _: TeamMemberOrAdmin):
     db = get_db()
-    result = db["teams"].delete_one({"_id": oid(team_id)})
-    if result.deleted_count == 0:
+    if services.delete_team_transaction(db, oid(team_id)) is None:
         raise HTTPException(status_code=404, detail="Team not found")

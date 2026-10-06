@@ -64,3 +64,13 @@ def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int]:
         r.expire(key, settings.rate_limit_window_seconds)
     allowed = count <= settings.rate_limit_max_submissions
     return allowed, count
+
+
+def remove_leaderboard_member(contest_id: str, member_id: str) -> None:
+    """Remove one participant from a contest leaderboard."""
+    get_redis_client().zrem(leaderboard_key(contest_id), member_id)
+
+
+def delete_leaderboard(contest_id: str) -> None:
+    """Remove a contest leaderboard."""
+    get_redis_client().delete(leaderboard_key(contest_id))

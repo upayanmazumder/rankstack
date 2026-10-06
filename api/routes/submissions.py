@@ -100,6 +100,5 @@ def delete_submission(submission_id: str, current: CurrentUser):
     if current.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin privileges required")
     db = get_db()
-    result = db["submissions"].delete_one({"_id": oid(submission_id)})
-    if result.deleted_count == 0:
+    if services.delete_submission_transaction(db, oid(submission_id)) is None:
         raise HTTPException(status_code=404, detail="Submission not found")

@@ -9,6 +9,7 @@ from typing import Any
 from bson import ObjectId
 from pymongo.database import Database
 
+from api import redis_ops
 from api.models.common import utcnow
 
 
@@ -108,3 +109,144 @@ def remove_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> di
                 {"_id": user_id}, {"$pull": {"teamIds": team_id}}, session=session
             )
     return db["teams"].find_one({"_id": team_id})
+
+
+def _reverse_submission_scores(
+    db: Database, submissions: list[dict[str, Any]], session
+) -> None:
+    for submission in submissions:
+        score = submission.get("score", 0)
+        if score == 0:
+            continue
+        submitter = submission["submittedBy"]
+        collection = "users" if submitter["refType"] == "user" else "teams"
+        db[collection].update_one(
+            {"_id": submitter["refId"]},
+            {"$inc": {"totalScore": -score}},
+            session=session,
+        )
+
+
+def _remove_submission_scores(submissions: list[dict[str, Any]]) -> None:
+    for submission in submissions:
+        score = submission.get("score", 0)
+        if score == 0:
+            continue
+        submitter = submission["submittedBy"]
+        redis_ops.update_leaderboard_score(
+            str(submission["contestId"]),
+            str(submitter["refId"]),
+            -score,
+        )
+
+
+def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] | None:
+    """Delete a team and its submissions and references atomically."""
+    with db.client.start_session() as session:  # noqa: SIM117
+        with session.start_transaction():
+            team = db["teams"].find_one({"_id": team_id}, session=session)
+            if team is None:
+                return None
+            contest_docs = list(
+                db["contests"].find(
+                    {"participants.refType": "team", "participants.refId": team_id},
+                    {"_id": 1},
+                    session=session,
+                )
+            )
+            submissions = list(
+                db["submissions"].find(
+                    {"submittedBy.refType": "team", "submittedBy.refId": team_id},
+                    {"contestId": 1, "problemId": 1},
+                    session=session,
+                )
+            )
+            for submission in submissions:
+                db["problems"].update_one(
+                    {"_id": submission["problemId"]},
+                    {"$inc": {"attemptCount": -1}},
+                    session=session,
+                )
+            db["submissions"].delete_many(
+                {"submittedBy.refType": "team", "submittedBy.refId": team_id},
+                session=session,
+            )
+            db["users"].update_many(
+                {"teamIds": team_id}, {"$pull": {"teamIds": team_id}}, session=session
+            )
+            db["contests"].update_many(
+                {"participants.refType": "team", "participants.refId": team_id},
+                {"$pull": {"participants": {"refType": "team", "refId": team_id}}},
+                session=session,
+            )
+            db["teams"].delete_one({"_id": team_id}, session=session)
+    contest_ids = {doc["_id"] for doc in contest_docs}
+    contest_ids.update(submission["contestId"] for submission in submissions)
+    for contest_id in contest_ids:
+        redis_ops.remove_leaderboard_member(str(contest_id), str(team_id))
+    return team
+
+def delete_contest_transaction(
+    db: Database, contest_id: ObjectId
+) -> dict[str, Any] | None:
+    """Delete a contest and its problems and submissions atomically."""
+    with db.client.start_session() as session:  # noqa: SIM117
+        with session.start_transaction():
+            contest = db["contests"].find_one({"_id": contest_id}, session=session)
+            if contest is None:
+                return None
+            submissions = list(
+                db["submissions"].find({"contestId": contest_id}, session=session)
+            )
+            _reverse_submission_scores(db, submissions, session)
+            db["submissions"].delete_many({"contestId": contest_id}, session=session)
+            db["problems"].delete_many({"contestId": contest_id}, session=session)
+            db["contests"].delete_one({"_id": contest_id}, session=session)
+    redis_ops.delete_leaderboard(str(contest_id))
+    return contest
+
+
+def delete_problem_transaction(
+    db: Database, problem_id: ObjectId
+) -> dict[str, Any] | None:
+    """Delete a problem, its submissions, and its contest reference atomically."""
+    with db.client.start_session() as session:  # noqa: SIM117
+        with session.start_transaction():
+            problem = db["problems"].find_one({"_id": problem_id}, session=session)
+            if problem is None:
+                return None
+            submissions = list(
+                db["submissions"].find({"problemId": problem_id}, session=session)
+            )
+            _reverse_submission_scores(db, submissions, session)
+            db["submissions"].delete_many({"problemId": problem_id}, session=session)
+            db["contests"].update_one(
+                {"_id": problem["contestId"]},
+                {"$pull": {"problemIds": problem_id}},
+                session=session,
+            )
+            db["problems"].delete_one({"_id": problem_id}, session=session)
+    _remove_submission_scores(submissions)
+    return problem
+
+
+def delete_submission_transaction(
+    db: Database, submission_id: ObjectId
+) -> dict[str, Any] | None:
+    """Delete a submission and reverse its score and attempt count atomically."""
+    with db.client.start_session() as session:  # noqa: SIM117
+        with session.start_transaction():
+            submission = db["submissions"].find_one({"_id": submission_id}, session=session)
+            if submission is None:
+                return None
+            db["problems"].update_one(
+                {"_id": submission["problemId"]},
+                {"$inc": {"attemptCount": -1}},
+                session=session,
+            )
+            _reverse_submission_scores(db, [submission], session)
+            db["submissions"].delete_one({"_id": submission_id}, session=session)
+    _remove_submission_scores([submission])
+    return submission
+
+
