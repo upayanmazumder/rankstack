@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600;700&amp;family=Montserrat:wght@600;700&amp;family=Red+Hat+Display:wght@400;600;700&amp;family=Red+Hat+Mono:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"surface-container-low":"#141b2b","secondary-container":"#ee9800","on-secondary-fixed-variant":"#653e00","tertiary-fixed":"#e2dfff","on-primary-fixed-variant":"#2f2ebe","on-error":"#690005","surface-container-lowest":"#070e1d","on-surface":"#dce2f7","surface-container-high":"#232a3a","error-container":"#93000a","primary-container":"#8083ff","on-tertiary":"#1d00a5","surface-dim":"#0c1322","inverse-surface":"#dce2f7","on-secondary-container":"#5b3800","secondary-fixed":"#ffddb8","surface-container-highest":"#2e3545","surface-tint":"#c0c1ff","on-primary":"#1000a9","on-tertiary-container":"#180092","tertiary-fixed-dim":"#c3c0ff","on-background":"#dce2f7","on-surface-variant":"#c7c4d7","surface-bright":"#323949","tertiary":"#c3c0ff","inverse-on-surface":"#293040","inverse-primary":"#494bd6","surface":"#0c1322","primary":"#c0c1ff","on-error-container":"#ffdad6","surface-variant":"#2e3545","secondary-fixed-dim":"#ffb95f","on-primary-fixed":"#07006c","on-primary-container":"#0d0096","primary-fixed-dim":"#c0c1ff","primary-fixed":"#e1e0ff","on-secondary-fixed":"#2a1700","secondary":"#ffb95f","outline-variant":"#464554","tertiary-container":"#8582ff","surface-container":"#191f2f","on-tertiary-fixed":"#0f0069","on-secondary":"#472a00","background":"#0c1322","error":"#ffb4ab","outline":"#908fa0","on-tertiary-fixed-variant":"#3323cc"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"1rem","gutter":"1rem","margin-lg":"2.5rem","space-lg":"1.5rem","space-xs":"0.25rem","gutter-lg":"1.5rem","margin":"1rem","margin-md":"1.5rem","space-sm":"0.5rem","space-xl":"2rem"},"fontFamily":{"body-lg":["Red Hat Display"],"body-md":["Red Hat Display"],"headline-lg-mobile":["Montserrat Alternates"],"title-lg":["Montserrat"],"body-sm":["Red Hat Display"],"title-md":["Montserrat"],"mono-code":["Red Hat Mono"],"display-lg":["Montserrat Alternates"],"headline-lg":["Montserrat Alternates"],"display-lg-mobile":["Montserrat Alternates"],"mono-metric-md":["Red Hat Mono"],"label-md":["Red Hat Display"],"title-sm":["Montserrat"],"mono-metric-lg":["Red Hat Mono"]},"fontSize":{"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"title-lg":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"title-md":["16px",{"lineHeight":"24px","fontWeight":"600"}],"mono-code":["13px",{"lineHeight":"20px","fontWeight":"400"}],"display-lg":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.01em","fontWeight":"600"}],"display-lg-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-metric-md":["14px",{"lineHeight":"20px","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","fontWeight":"600"}],"mono-metric-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><a class="flex items-center gap-space-sm" data-path="contests" href="#"><img alt="Rankstack app icon 512x512 with sleek dark theme, stacked ascending geometric podium bars representing algorithmic mastery and rankings, glowing indigo and warm amber accents on dark slate background.. Brand logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WCfOrI40pAJ0JDpYqJpVEPBw9aahVZ6DZnWrRWbbd5BwkeYKIe6w6PFSsdp4Kwh1a3r9uGbQP1cqYUaeDCGmMJ9DHNvIwY9v8vK9YmynbxqjRZROPZ02eG5t8RpufrkZgTypX0_H-2WhJ10XjI6RuGVJQJrEGxq4ud5e-vAu-aZIIfmdyGweEHID_-oIodxorPDBTQRWQwxCQiMHC48iuK1IhuIKFGzLcWYENXIbDhag"/><span class="font-title-lg text-title-lg tracking-tight text-on-surface font-bold">Rank<span class="text-primary">stack</span></span></a><div class="hidden sm:flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high border border-outline-variant/30"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-mono-metric-md text-mono-code text-secondary">SEASON 4 LIVE</span></div></div><nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary font-bold"><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="contests" href="#">Contests</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboard</a><a aria-current="page" class="transition-colors text-primary font-bold" data-path="teams" href="#">Teams</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="submissions" href="#">Submissions</a></nav><div class="flex items-center gap-space-md"><button class="p-space-xs text-on-surface-variant hover:text-on-surface rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><button class="relative p-space-xs text-on-surface-variant hover:text-on-surface rounded transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-secondary"></span></button><a class="hidden md:flex items-center gap-space-xs px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-sm text-title-sm transition-colors" data-path="admin-overview" href="#"><span class="material-symbols-outlined text-[16px]">terminal</span><span>Admin</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface flex-1"><div class="flex flex-col w-full">
+<div class="w-full px-gutter-lg py-space-xl max-w-[1720px] mx-auto space-y-space-xl">
+<!-- Top Context & Header Banner -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-xl shadow-xl">
+<div class="absolute -right-20 -top-20 w-96 h-96 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute right-1/3 -bottom-24 w-80 h-80 bg-secondary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+<div class="space-y-space-sm max-w-3xl">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-1 rounded bg-surface-container-high text-secondary">
+<span class="material-symbols-outlined text-[16px] text-secondary">military_tech</span>
+<span class="font-mono-metric-md text-body-sm tracking-wider uppercase">DIVISION SEASON IV • Synchronized Multi-Tier Matchmaking</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">Teams &amp; Guilds</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+            Collaborate with squad members, aggregate collective ELO, and compete in multi-tier team invitationals.
+          </p>
+</div>
+<div class="flex items-center gap-space-md self-start lg:self-center shrink-0">
+<button class="group flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm transition-all shadow-md hover:shadow-lg" type="button">
+<span class="material-symbols-outlined text-[20px] group-hover:rotate-90 transition-transform">add</span>
+<span>Create Team</span>
+</button>
+</div>
+</div>
+<!-- Controls & Filter Toolbar -->
+<div class="mt-space-xl pt-space-lg flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md">
+<!-- Division Segmented Tabs -->
+<div class="inline-flex p-1 rounded-lg bg-surface-container-lowest gap-1 overflow-x-auto">
+<button class="px-space-md py-1.5 rounded-lg font-title-sm text-title-sm bg-surface-container-high text-on-surface shadow-sm whitespace-nowrap">
+            All Tiers <span class="ml-1 text-primary font-mono-metric-md">(48)</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors whitespace-nowrap">
+            Division 1 Elite
+          </button>
+<button class="px-space-md py-1.5 rounded-lg font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors whitespace-nowrap">
+            Division 2
+          </button>
+<button class="px-space-md py-1.5 rounded-lg font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors whitespace-nowrap">
+            Collegiate
+          </button>
+</div>
+<!-- Search & Filter Cluster -->
+<div class="flex flex-wrap sm:flex-nowrap items-center gap-space-sm">
+<div class="relative flex-1 sm:w-80">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
+<input class="w-full bg-surface-container-lowest text-on-surface placeholder:text-outline text-body-sm font-body-sm rounded-lg pl-9 pr-space-md py-2 focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" placeholder="Search guild name, captain, tag..." type="text"/>
+</div>
+<div class="relative shrink-0">
+<button class="flex items-center gap-space-xs px-space-md py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-title-sm text-title-sm shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[18px] text-outline">swap_vert</span>
+<span>Sort: Rank</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Workspace (8-col squads / 4-col personal squad) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT 2/3 COLUMN: SQUADS DIRECTORY -->
+<div class="xl:col-span-8 space-y-space-lg">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<!-- Card 1: ByteForge Syndicate -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary/5 rounded-bl-full pointer-events-none"></div>
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-secondary-container/20 text-secondary font-mono-metric-md text-[11px] font-bold">
+                  #1 GLOBAL
+                </span>
+<span class="flex items-center gap-1 text-secondary font-mono-metric-md text-body-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                  Gold
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary font-headline-lg text-title-md">
+                  BF
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">ByteForge Syndicate</h3>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-wider">Div 1 Elite</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">14,820 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">82%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Close up competitive programmer profile picture in neon blue cyber lighting with glasses against dark modern studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBp3eI4KbFGjfMEou9e1aW1IFhdfK0_uUU0DEB8YjTh6w4Ocw5eLsaBDGqghfB0qmrK8u8vTVywzXSY3qXJl4PHzzcwoq6LMG-bEcqkjnK-ZEdApesQTSWsnSQjjLshNcU8i5YS2ajJnPdeGJ4vfy1o9CmRLuZGG60941ho8zgytjFDN3uMb25NW1Gl4soie9X1xAh12bDOPQJp-a43RtJxfpX7y-h_pd0MKUU_L9LS"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Portrait of an elite computer scientist with dark hair and high-tech headphone gear in violet mood light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsbhpAzF5Y5jYP9_ABYV57pJ45Ye8DiuOpRN9vaW9PMG2xlkNKW6mbB10zFq-iNxC0BeHAPbv-BoBcNJg7z6emapZ3LYq9PoIwpVW7zUb1I3YP4o1nkUlPaO0wRVcZ-44y8BJqNhGEKFfahy_K5HPWcquLAtjWw4buRqMJuMImPa5DQJW8AyMT0-7iXe4Sf_Qe-ZumobzO6Z93-wDk9MUcQKkEgu5HZKasMXSjWSsw"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Profile of young female technical software engineer with focused gaze illuminated by screen luminescence" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF41109qt4o9bMRQFujmLGHNiLidMOkS9eX1-QdKc66JrC4i32OEtMGZOwwuhzVc7NZp-lYjBL6hiWfwaA6HQvKR2xF5EbqQQJd8awTKIF6v2uAmeo9YaMp44VshTm-71-0UR0g2FDObZl7t6pukZWIlpFB-o_s3r2toV4nWbwNjZ1Pr3dhA6fCyoU_DQTOKechfnNDnVR-bL9PU7x03JdXNjjH6r-Xc0U3yXGRrIA"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Minimalist esports coder portrait with orange subtle amber rim lighting and high contrast styling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiYgMUsMTBe7APCj55Kx1Z6eZwZ4Lr25JnnvdcGoh1evjCbWOtw3xUj65SWtxTxrvPnuSF3WnLETF2aQiRRYkGDYY74E20lt2_UdHmfaAitrjeeGOxR5RZIaYF139PTWZda-Z344MdQioCB37XEwRJzSOJnnAZcJ5RVe3hwbrWHfe0gZtuIWSW64RvMh3vhwbV0iBb-06jJzyzIA1MUTi_b4RUXL8DxCrSLvFdvAyt"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Professional competitive algorithmic contest participant with neutral calm focused look in low light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTgwmG0PLpBvq60JOsKqYrfwS09Je2rJyGsNh1E0qzN03Dk6c0GCXzr7eOnIMAOqZbe3PwWZJLzf1iHztAW4sIeHlwxyk1z7Vs88R_YQRE19MoMZJrnD8cF43TI5Pw2QxrGA4fVs3NCx8LwkaaSP1GLfFOoX7ZbfmD1R5cjosvEmrJdQmLoiYGDVQB4XqMkQaWwTufD1vmTx-qmAhNW2tfjZYZpomiQsqETOX55Twq"/>
+</div>
+<span class="font-mono-code text-[11px] text-outline">5/5 Full</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-sm text-title-sm transition-colors text-center" type="button">
+                View Roster
+              </button>
+</div>
+</div>
+<!-- Card 2: NullPointer Guild -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant font-mono-metric-md text-[11px] font-bold">
+                  #2 GLOBAL
+                </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-mono-metric-md text-body-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                  Silver
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container font-headline-lg text-title-md">
+                  NP
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">NullPointer Guild</h3>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-wider">Div 1 Elite</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">14,210 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">79%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Close up competitive programmer profile picture in cool indigo lighting against dark workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4TKHe3BgfbV-KpCYIAkcO5pK4bI2nPbZYSd3WuYT9CgAUbG0U6rdy_lyCvCBQC8UyzXIjdHJN__UTwx-_DGbU0Icp3v2rM2Q9_jC8YVe8BTU0vIVxpJOI8_P0BjCLsVVh6OnfISPGVH4FOL0FeqKMYEpFzN8zCjD0mOqSp-wA1T0d2pQZcmmvhAxpNwp6GvfvCawBOf2u9yZI9WnW2nBhDJCW0s8GwsO-Pv20itD3"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Male software developer avatar focused on dual code monitors with deep navy backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSsKkKuZ9cTMrK1ejqbGVPG-zirVmcd6N0jC1DnrwlcGxlt_qZFdsHh2mlqrX-xN2F0v5uKn9IXe3ql2ZXCrzz7GvthzIH494s-GhvRAL60uBgjtVxUzfy13q4bjfxlW-Kw5hZfeNT7QaMlJyVunTcB14M8rTwaMOC2_3qZVl8_ap_Zd2jsjF4mAp7PsEvUqGD5qH7aKsiB24U4KfLA1uwkoV4ZABoynEhJ8a7ftw9"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="High-contrast studio portrait of young coder with modern eyewear and dark jacket" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzt2hqWjtDjHoa_u2y0BXCYP0WF2DrwjxyPSVS9XLgeSJGf2Ln_37b-0tmM7qkXyqe01up_LxCvQuKGg1EW22L_Ws0Kmvj4qgslQV5IbLN6ApTO2FWMugk1WIkR6kYRyG2h0vz5LOEeUTaSM4jhaHyjMwFtDUlTLFBJ_3DmUF8GZ9NUabq6O9F56hPb3kNrjq5mseTOMJ88mCendCkOOkQhX2SfhAMmrZluKyJfrFf"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Casual esports contestant headshot with moody gradient background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnZdW1oZeyrf5a9A3LRlHqmMRxXqTIK6nTwCouz6YAmqmNf3Mdc8qcisHUJXrw8Cz183RbNhwDPaZAjr3BxNQkJa9IdG_b2iFIkjbG--fjEZBsjBdyrbWvIWdst8t2XOHP6qy7iXcekUpfJRdvq_PR1U4kmBHlFDqbyS37f05vzAIOpH2pbvADfFVjFLb6SQDpcJmabAX6cOZYvqwCd7Oxa_uGOt13Fqinig23CFyQ"/>
+<div class="h-7 w-7 rounded-full ring-2 ring-surface-container-low bg-surface-container-highest flex items-center justify-center text-[10px] font-mono-code text-on-surface-variant">+1</div>
+</div>
+<span class="font-mono-code text-[11px] text-secondary">4/5 Open</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm transition-colors text-center" type="button">
+                Request to Join
+              </button>
+</div>
+</div>
+<!-- Card 3: QuantumLab Core -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant font-mono-metric-md text-[11px] font-bold">
+                  #3 GLOBAL
+                </span>
+<span class="flex items-center gap-1 text-secondary-fixed-dim font-mono-metric-md text-body-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                  Bronze
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary font-headline-lg text-title-md">
+                  QL
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">QuantumLab Core</h3>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-wider">Div 1 Elite</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">13,950 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">74%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Frontal portrait of an algorithm research lead in dark attire with subtle ambient purple highlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJVCulKyZP9czz9e2dwpYBtqfjPhNJYrX3PH_IzxTC7VfHeBLKeSsJfcHTRy48xgEpWE8GzDBP08K-JNnjKI0eMzYUcoUTbRSQ-SXrHn8Wq25tXxTjJfBKwmFxaoFNlEK09ZNzqlhiHFAdR39wQstzonyXKHmGbILe3AlNl3DQxLj-g2qapRX9npRcfvZKI3BeldZ2at3rSvt9e-rdo5dlNBKuO7a3LCqp1n6fAO2V"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Young female data engineer with headset in low key studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCChKNlPqA3tKjRkCdpsRRawEZWv5bk-Y-bJTtNGL2Af52VTObl-wsuNkdzlDNiuvbao67LkUw2knvU6IaTVCZEBcmOhXvEynsBlayUeZZR_5ywMflIL7AFDSgCIWEkkjVA3-aN8Zl_NKlvbRAis93Yeu_o9_tqVije1eM5Pv8-VlyGOWof7sVXO4Fw8lGIbpsN_u0BqkCWWWM7K-C_G2wFiU1fCAnUnbKh9xkpLgw9"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Technical designer programmer with determined expression illuminated by neon monitor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArDj-gKGVyNeynh7o2Slj414jo0AjRZy44Il0MYnvGCLwdEn89iJyFUN0pIHTsfqT7tiGgHeNLq5zpeekneU95OB0HAg7rAMFI9IY0Tu88OKrYZeCKeHIpOCUhPuUo9X_vDAgiIEUD1STLbPnZWyjmPMQhApgGlhpJeXQ8sTkBNvDpn8_p7iDGO44IzvzksoP2TkL0wdw_U8UzAVXNCwxRS0-FDkDrei6ZSL7BaewJ"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Cybersecurity contest competitor with hood and sharp focus in low illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx8wRoOVyxWHynSG8CedIoxQZHUREUrqdLpYtCxVM1djYiTZPi1VFMQu84d5tv6bis_hIz87SktJKlQvWt4eDID7jpdxtwyFl7vODtcXKSCX_HxV4oUBC-EwOlouXajsjxgRN_Iqz7RAXLtgdWTTJPwfIF4vlvqpwpqVCiOo8qe27o_ybJqRiDWo10wjfDIoSAZ2PvN-73xP-IPY-Ljqnmv3-8CqS_WCZwIwe98lQ2"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Headshot of math contest winner with reflective specs and dark minimal aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5n9WRng-pooSUtM882RLx1caKmmqHOrHFRNCI1km9a6OuO9r2MyCM8yQJAAR3-ZoRGdqDPSjYqiR1A1FJXnQsvTf0Qkf5sPJ_7p-dqlufvKqLk3ePgVuQs-_m5-ASGHiZ5WQdVPD64DuLq36ZuxhvoeDoFhvzBWFVc1vx3_UnuwBz8gAobSforo-0ewsariKINrcvur37ZyCDs4Bj6jI663YjWji44o0tGXutqnKT"/>
+</div>
+<span class="font-mono-code text-[11px] text-outline">5/5 Full</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-sm text-title-sm transition-colors text-center" type="button">
+                View Roster
+              </button>
+</div>
+</div>
+<!-- Card 4: Singularity Ops -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface font-mono-metric-md text-[11px] font-bold">
+                  #4 GLOBAL
+                </span>
+<span class="text-outline font-mono-metric-md text-body-sm">
+                  ELO 2,688
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary font-headline-lg text-title-md">
+                  SO
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">Singularity Ops</h3>
+<p class="font-label-md text-label-md text-primary uppercase tracking-wider">Collegiate Master</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">13,440 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">71%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="University collegiate coding squad member portrait in modern university lab with soft blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrbE3483UL-_lo199wnZEyD45Z5tfbSOU_xhcvdkK-mtofDFaweKDixG7V7mYOXKeXbOnao18lw9fTqr-scwZDcezx5rn0-0ow4Bq4i1xkuNMHfskmIdmAb9PspfyUHYwuoOVVwdyckHV-v_XGXVZBemtALS7iUla-SSjMFLGCv_j6-mypzHaWmiVtzArPNSTiYZnitw9hSxuik5NqBcvm_plnJlHNsOLKBBLbHW2Y"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Asian university CS student with laptop in tech hackathon setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJOtX0NUKy36hrJEaGcMSBohqKSF-dqX0Py_VFsPEAY3DvwTn4e2mniIhZCP3BWU4KzGgM95VGmtIOKZwE3gjoeHRE0-XRL_3eJK1aiOBiHewNcrlaLOEE-UnJZCz7jG-Peb2V0Rm7I-iOPhu1X6joRvG1FcSGPYQdn3kudWulozDwBx-gjcZwGOim9my4nTeefjk03SkSGSmgPK0arVC1QytLefSaEL4kzV_3Ild2"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Student competitor with sharp focus, low exposure, illuminated by algorithmic IDE terminal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTfA-tQKKqH8bEms4eQzizGXPG1QlBElZnR6tpZbliSbEH25NqalqU8CE2no1kboJ3Lo_LnxhjmxBmc4dGECVoih3KOePsamaO99_l0ld-oLWDk6YicxqdizIy_-YvIbHnPA1kaOEcSbwCgBd1ywhqbJGUnsrW-L10C_-OzvxRWf2JFkSajaxByLH7g3r63Bm_xSb18OYoPh2IRQleNpv7VCCtE7K01JewkL7--42N"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Collegiate tournament programmer avatar portrait with warm overhead glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJdvC822C4VqhC5_eKoSIeAwUDSdcat_0SI3290wesy5HRd8OLJE436FJaI65EAsUVteBQBGMaYKnuMcxxp6r3M3wdqX_mhIIQTaBf4ylkJmz2Z4Wn4zae6R4Pr8YuQkqu5Xr50H4e_W2tZmkkRlJY-T_LgArYRHIRqYnhA8OPOfIY3WJSChnaKFeHe-rAywQ3STRuzEh6b7oxWcMaecPhqUDUh-lWPA7BHPd2Hjvt"/>
+<div class="h-7 w-7 rounded-full ring-2 ring-surface-container-low bg-surface-container-highest flex items-center justify-center text-[10px] font-mono-code text-on-surface-variant">+1</div>
+</div>
+<span class="font-mono-code text-[11px] text-secondary">4/5 Open</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm transition-colors text-center" type="button">
+                Request to Join
+              </button>
+</div>
+</div>
+<!-- Card 5: Apex Binary -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface font-mono-metric-md text-[11px] font-bold">
+                  #5 GLOBAL
+                </span>
+<span class="text-outline font-mono-metric-md text-body-sm">
+                  ELO 2,596
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant font-headline-lg text-title-md">
+                  AB
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">Apex Binary</h3>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Division 1</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">12,980 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">68%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Portrait of senior backend algorithmic developer with focused stance in clean dark terminal lab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQPgpAfVGMgXMra74sN5-BpT5umOZnLlgrb18XHfeHDLB_fGa_4yZBa4rsL1Ywo3g6TzxLKAPCWLDRBPyNY6umyCEGD2xLjRMLGhyBBCxfsVGPpGPjOYRY7ZHGUeYsiJVrptBkfgV1yIpetX_hGGZs3OV0t0xJ7G_apnzydHkmLzW-SokaMwBEDjVvtEBaUzxCsSmQLEyfgQXIdqbU0Ywvs_LITN-RavgEL7GG2SSI"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Software architect with glasses in deep shadow illuminated by blue led telemetry" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzgzJpXZzT0huNN9zR8VlNod03PO4t3o5Dbe25rGlZvK_oWDLaKwd6qbFCyKH0cJebKDewkf7KXJ1gVnpG3yPJb6UoGg38yfvXFcGhwcxibBf10aJbeBRDAaLtmmDeGV9YcujUp49qHdGuR8GlvmVFzLT9WowAqfIMISCRGg_Ry_2pJSnRS9kejCJ1wXhyALbWJ2LIoJAxim92J7f0e_0MR16YExAG0aZU6hqYb-i8"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Coder portrait with subtle smile and casual hoodie against midnight blue office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFkK2TT5HhtMWlfH_sC9f6ugPLvCQehiKJ_yahCTugVy1x_UGnVF5XPMl4IjRCsdL2o-JjT5pLRgbdGszQebATv6BzTdnaJMxw2O9fx0DKp6RQ8TlrMpNMzbJ22cbAmSzsJb57f-gCX0w0Ydwiq72tIWj6KKoZeOnOFkss2n9xEnAXDcOz2sU4CrLQ8NDdBO0MAtLOk96ssy7DJQi3v7jYcsmPyTVAdVBVZUuqbjKw"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Female systems programmer avatar in sharp graphic portrait style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRbdJSfXUMza02wQOdgekTQHMtJompRDM-oxzzjF1opIPUwlhY7gpwEw-8b71i3fJE6IaEv-ZniT6AfNXRgOt-zySWC8Fe2VV_YstEhx4EsCLHmUhyviwIzESYafm0W5DlTaYZ6lWrZhbhbrHcPE69QGxZbBysQJE3JkSZwCAzOzvRDLPnkTdN32JmztXATOTLCj5uJMQeUA8-dsYkBxLJWR1q83JemkAlg8F5nTeP"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Focused team coder with headphones listening to deep work frequencies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrisxAIeMWpfY4K-Pve8eol8Z-_fGxSJ1SdSTZ52cMLG4Mc9p09tu-NBuK9P2MVtUX8eKAH6WHDjpm28CBrKfun0GEiR6p2R7ndznVUZcs6JeNIRCMl7y_bmWEy6IvbLhvGgePOV9Cl_SNYaWWrBySiZEhg646ypv9xyDS3zBKosd6gCJz1aZPuHGxv_cU05u7Hv6UoyJ5XY6uEVhuk8gvIGXxmyU-OAUOZMJKbdmc"/>
+</div>
+<span class="font-mono-code text-[11px] text-outline">5/5 Full</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-sm text-title-sm transition-colors text-center" type="button">
+                View Roster
+              </button>
+</div>
+</div>
+<!-- Card 6: Nordic Algorithmics -->
+<div class="group relative rounded-xl bg-surface-container-low p-space-md shadow-md hover:shadow-xl hover:bg-surface-container transition-all flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-sm">
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface font-mono-metric-md text-[11px] font-bold">
+                  #6 GLOBAL
+                </span>
+<span class="text-outline font-mono-metric-md text-body-sm">
+                  ELO 2,530
+                </span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-xs">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container font-headline-lg text-title-md">
+                  NA
+                </div>
+<div class="min-w-0">
+<h3 class="font-title-md text-title-md text-on-surface truncate">Nordic Algorithmics</h3>
+<p class="font-label-md text-label-md text-primary uppercase tracking-wider">Collegiate Master</p>
+</div>
+</div>
+<!-- Metrics telemetry -->
+<div class="mt-space-md grid grid-cols-2 gap-space-xs p-space-xs rounded bg-surface-container-lowest">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Total Score</div>
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface">12,650 <span class="text-[11px] text-outline">PTS</span></div>
+</div>
+<div class="text-right">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">Win Rate</div>
+<div class="font-mono-metric-md text-mono-metric-md text-primary">65%</div>
+</div>
+</div>
+<!-- Avatar Stack & Capacity -->
+<div class="mt-space-md flex items-center justify-between">
+<div class="flex -space-x-2 overflow-hidden items-center">
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Scandinavian software developer portrait with blonde hair and dark wool turtleneck in arctic dark room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4xT8l2cmEtKONr7cnN56aqG3RaxZmKByNsx9LcAVwGy3hg-nhFTMOSL4IluLQ4_raLwLIFoCsah8JnIV_EUcWCK3qT3NQ80ftczVHvsdQo5CPlHZiqVLm84635TGmL5t7c7hblnlQpOHUorNKIs0U4G3LmQ2mDwSJDD3pF-1sjdadOznutYR5TjJvQLSb7rWJ2wztycBT79YyC5zNGdc_Xg-vrRclw5UxqKC4ofkT"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Nordic collegiate hackathon team lead with calm focused look in low key studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx-GtEspaVRBmbwdCgfd3EUzDN7Jv1GxTdP6fe3FGSbfAyBKxekjaBef_-_pTqEDJtJ-kRxQpJ6i-5MpCj5vOxWH7xBP_3fiBV7A6A9RwvDP76vZlCwP-Q42vyBgyOMBUar-jFhYg3UDtFQKdDH3dqsUZYkvEEJrCz3YuG6BWpX_cOR2Kb__iyEMVslCJSZBp_xO7p113HngKc95TP1UZeZBxKK0czyBRY-ClB6nsS"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Helsinki university coder girl portrait in dark tech hub with soft back rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqtc8BoD1FRz8KHvLwrcgeKD862B8aqy7iTL484Qoy7FpbWW8dph9loH5ahRDXcE9RIsTj1SJw9-aC_7kWvxmM2CQG6VmvyggFPuuOBnvyFi2NIHAKkVjtM69VOyn_16eQ5M857O8ttvwfDOsEK_ybmrSMq32h1T7Vys_OEIubxQXOD-USWba8g-5_heVhL58c5NOvv--O5xA6xv5X4GofaKyt2VHo430nhkWHutYi"/>
+<img class="inline-block h-7 w-7 rounded-full ring-2 ring-surface-container-low object-cover" data-alt="Algorithmic problem solver with stylish glasses in dark environment with code display" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcjWEBHI1Siyt18CLpcy2im9geg1UNVM-7tCKjngSV3rtbMiRDmPs0LR0GYmFOWURA9iYE23n9MG0EZFJKjUXrtMVTYh_S9ILOt9i9abkD1I7ON7vs_A4yIbTKcm5LoFNSl6TttYupFzJl85BLuvVmHbn7NStN4xzqnYEDakJOiYod0bgGfPgK5LUtMGZWFZ3f61jXHaedsTPXnRF4VXVJb-eAlaMUSbjUN9v1FvgT"/>
+<div class="h-7 w-7 rounded-full ring-2 ring-surface-container-low bg-surface-container-highest flex items-center justify-center text-[10px] font-mono-code text-on-surface-variant">+1</div>
+</div>
+<span class="font-mono-code text-[11px] text-secondary">4/5 Open</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm">
+<button class="w-full py-2 px-space-sm rounded bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm transition-colors text-center" type="button">
+                Request to Join
+              </button>
+</div>
+</div>
+</div>
+<!-- Pagination Bar -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center gap-space-sm font-body-sm text-body-sm text-outline">
+<span>Showing <span class="text-on-surface font-bold">1-6</span> of 288 teams</span>
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+<span class="font-mono-code">Page 1 of 48</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg bg-surface-container text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors disabled:opacity-40" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary text-on-primary font-mono-metric-md text-body-sm flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-mono-metric-md text-body-sm flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-mono-metric-md text-body-sm flex items-center justify-center transition-colors">3</button>
+<span class="px-2 text-outline font-mono-code">...</span>
+<button class="w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-mono-metric-md text-body-sm flex items-center justify-center transition-colors">48</button>
+<button class="p-2 rounded-lg bg-surface-container text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- RIGHT 1/3 COLUMN: ACTIVE SQUAD SIDEBAR -->
+<div class="xl:col-span-4 space-y-space-md">
+<!-- User Squad Control Hub -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl relative overflow-hidden">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary-container"></div>
+<!-- Squad Identity Header -->
+<div class="flex items-start justify-between gap-space-sm mb-space-md">
+<div>
+<div class="flex items-center gap-space-xs mb-1">
+<span class="px-2 py-0.5 rounded bg-primary-container/20 text-primary font-mono-metric-md text-[11px] font-bold">
+                  YOU ARE CAPTAIN
+                </span>
+<span class="px-2 py-0.5 rounded bg-secondary-container/20 text-secondary font-mono-metric-md text-[11px] font-bold">
+                  #07 GLOBAL
+                </span>
+</div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Rankstack Elite Fleet</h2>
+<p class="font-body-sm text-body-sm text-outline">Tag: [REF-PRO] • Division 1 Contender</p>
+</div>
+<a class="p-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors" href="#" title="Guild Settings">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</a>
+</div>
+<!-- Aggregate Metric Bento Grid -->
+<div class="grid grid-cols-3 gap-space-xs p-space-sm rounded-lg bg-surface-container-lowest mb-space-md">
+<div>
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">ELO AGGREGATE</div>
+<div class="font-mono-metric-lg text-title-lg text-on-surface font-bold">12,450</div>
+<div class="font-mono-code text-[11px] text-outline">PTS</div>
+</div>
+<div class="border-l border-surface-container-high pl-space-sm">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">STREAK</div>
+<div class="font-mono-metric-lg text-title-lg text-secondary font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+                6W
+              </div>
+<div class="font-mono-code text-[11px] text-outline">Arena Runs</div>
+</div>
+<div class="border-l border-surface-container-high pl-space-sm">
+<div class="font-body-sm text-[11px] text-outline uppercase tracking-wider">CAPACITY</div>
+<div class="font-mono-metric-lg text-title-lg text-primary font-bold">4 / 5</div>
+<div class="font-mono-code text-[11px] text-secondary">1 Slot Open</div>
+</div>
+</div>
+<!-- Weekly Cumulative Delta Sparkline Graph -->
+<div class="p-space-md rounded-lg bg-surface-container mb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-title-sm text-title-sm text-on-surface">Weekly ELO Trajectory</span>
+<span class="font-mono-metric-md text-mono-metric-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                +340 PTS
+              </span>
+</div>
+<div class="font-body-sm text-[11px] text-outline mb-space-sm">Synchronized cycle delta (Mon - Today)</div>
+<!-- Inline SVG Sparkline -->
+<div class="w-full h-20 pt-1">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 320 70">
+<defs>
+<lineargradient id="squadGradient" x1="0" x2="0" y1="0" y2="1">
+<stop class="text-primary/40" offset="0%" stop-color="currentColor"></stop>
+<stop class="text-primary/0" offset="100%" stop-color="currentColor"></stop>
+</lineargradient>
+</defs>
+<!-- Area -->
+<path d="M 0 55 Q 30 50, 60 48 T 120 42 T 180 34 T 240 22 T 320 8 L 320 70 L 0 70 Z" fill="url(#squadGradient)"></path>
+<!-- Stroke line -->
+<path class="text-primary" d="M 0 55 Q 30 50, 60 48 T 120 42 T 180 34 T 240 22 T 320 8" fill="none" stroke="currentColor" stroke-width="2.5"></path>
+<!-- Data Nodes -->
+<circle class="fill-surface stroke-primary" cx="0" cy="55" r="3" stroke-width="2"></circle>
+<circle class="fill-surface stroke-primary" cx="60" cy="48" r="3" stroke-width="2"></circle>
+<circle class="fill-surface stroke-primary" cx="120" cy="42" r="3" stroke-width="2"></circle>
+<circle class="fill-surface stroke-primary" cx="180" cy="34" r="3" stroke-width="2"></circle>
+<circle class="fill-surface stroke-primary" cx="240" cy="22" r="3" stroke-width="2"></circle>
+<circle class="fill-secondary stroke-surface" cx="320" cy="8" r="4.5" stroke-width="2"></circle>
+</svg>
+</div>
+<div class="flex justify-between items-center text-[10px] font-mono-code text-outline mt-1 px-1">
+<span>DAY 01</span>
+<span>DAY 03</span>
+<span>DAY 05</span>
+<span class="text-secondary font-bold">TODAY</span>
+</div>
+</div>
+<!-- Current Squad Roster List -->
+<div class="space-y-space-sm mb-space-lg">
+<div class="flex items-center justify-between">
+<span class="font-title-sm text-title-sm text-on-surface uppercase tracking-wider">Active Roster (4)</span>
+<span class="font-mono-code text-[11px] text-outline">Sorted by ELO</span>
+</div>
+<div class="space-y-space-xs">
+<!-- Member 1: Captain -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative shrink-0">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-primary" data-alt="Portrait of Alex Rivera, lead competitive team captain with intense focused eyes and cyber indigo backlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVkH0pyWznqNabekc18m875OGoCsBsJU4JmmpsrtMgDDZeby2JzeztdaYP6BuAo3ZvBDa8AXQ_qs_x01JDVZMSIrrEZj8PCgygpYrU8YsOkDO8BatAzZdJ2LcORA6kg7Y0J65VeS7BWCC3ULQpt_93pSn-DrH8y9Lxb6Q7EdDrzmwanxIKVIo3iNkCtkuAQjHAN2sKYAEBC8dr6wRfPdZ_fZu5BWetD7n7MaqkQclH"/>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-[10px] text-on-secondary font-bold" title="Captain">C</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1">
+<span class="font-title-sm text-title-sm text-on-surface truncate">Alex Rivera</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-primary font-mono-code text-[10px]">YOU</span>
+</div>
+<div class="font-body-sm text-[12px] text-outline truncate">Captain / DP Specialist</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-mono-metric-md text-mono-metric-md text-secondary font-bold">2,420</div>
+<div class="font-mono-code text-[10px] text-outline">ELO</div>
+</div>
+</div>
+<!-- Member 2 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="shrink-0">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of Sarah Chen, graph algorithms specialist with analytical glasses in soft violet computer monitor glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVTBkBUGGdOlsnR8QmvoUEb4OS5tqdt44RW9HEYLIkRBhkll_MF_7QgFgJQC6B_gnAN6pbWtI3a9RagrWMtxYELpjRoGAj8KMY97WOfSPkclFzxR1aaKUP0_-3SwlsFmtv8yZqASSg5NJHsPTUGLBiY-axNUec7UM3nGzwZpMGsFFlNxHr3fA1_FsGNLOEX3ajLkaBvsQvdqwkme3ew2PJYLI3bj-BsCXuz8T9tEVr"/>
+</div>
+<div class="min-w-0">
+<div class="font-title-sm text-title-sm text-on-surface truncate">Sarah Chen</div>
+<div class="font-body-sm text-[12px] text-outline truncate">Graph Theory &amp; Combinatorics</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface font-bold">2,390</div>
+<div class="font-mono-code text-[10px] text-outline">ELO</div>
+</div>
+</div>
+<!-- Member 3 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="shrink-0">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Kenneth Wu systems coder avatar in front of low light mechanical keyboard and vertical coding display" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNcsLEqOlhwPAp2kMPkJ_G_6LpxY0IlBn0AOkgI3DNfrzltg3oxN4GTGyf9Qp7bZAuqgd41SZANjRwEdU_E1C7Esrf3rbDikON0FvxW7gOKgsKyTL_OuLcUsKDKaUratnZ5fRvKWCqGZV42Pw_MGjnnAya3RZL0WGxdDm6Nyw1N8koymuKuXyzvraCzHEh7MDHSfrEInNqlEhHjD-uAM6sBBY8-KGqVCczfTpwwjHP"/>
+</div>
+<div class="min-w-0">
+<div class="font-title-sm text-title-sm text-on-surface truncate">Kenneth Wu</div>
+<div class="font-body-sm text-[12px] text-outline truncate">Systems &amp; Concurrency</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface font-bold">2,280</div>
+<div class="font-mono-code text-[10px] text-outline">ELO</div>
+</div>
+</div>
+<!-- Member 4 -->
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="shrink-0">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Competitive math coder avatar DeepPath_Seeker with hood and ambient amber edge glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7qUiJob57M4MXCJ2lSY67oW8TxVVtQY_2p0Troyn0mrFB2YUXd_sIo61wwPLVRa3wBmBXfGuCd9gKpkkXcX33rejqkCyQXgX9FhGDCMooLxXpbH3GphcROLM4KXTK8SJPzkhcu1LLFYmGOImZIRt6kGRALaCvIqNper7KihRU8JHy39kd7c9RbHfbPaJC8ALhKW_tl96iLS0rbZsPWcLsPhwCv5jJPxNgGH8vz9C9"/>
+</div>
+<div class="min-w-0">
+<div class="font-title-sm text-title-sm text-on-surface truncate">DeepPath_Seeker</div>
+<div class="font-body-sm text-[12px] text-outline truncate">Geometry &amp; Math</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-mono-metric-md text-mono-metric-md text-on-surface font-bold">2,210</div>
+<div class="font-mono-code text-[10px] text-outline">ELO</div>
+</div>
+</div>
+<!-- Empty 5th Slot Card -->
+<div class="p-space-sm rounded-lg bg-surface-container-lowest border-dashed border-2 border-outline-variant/30 flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+</div>
+<div>
+<div class="font-title-sm text-title-sm text-outline">Open Squad Slot</div>
+<div class="font-body-sm text-[11px] text-outline">Awaiting 5th member</div>
+</div>
+</div>
+<button class="px-space-sm py-1 rounded bg-secondary hover:bg-secondary-fixed text-on-secondary font-title-sm text-[12px] transition-colors" type="button">
+                  Invite
+                </button>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="space-y-space-sm">
+<button class="w-full py-2.5 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm flex items-center justify-center gap-space-xs transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Invite New Member</span>
+</button>
+<div class="flex items-center justify-between text-body-sm font-body-sm pt-space-xs">
+<a class="text-primary hover:underline flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span>Squad Config &amp; Roles</span>
+</a>
+<a class="text-error hover:underline flex items-center gap-1" href="#">
+<span>Disband</span>
+</a>
+</div>
+</div>
+</div>
+<!-- System Operational Status Banner -->
+<div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></div>
+<div class="min-w-0 flex-1">
+<div class="font-title-sm text-title-sm text-on-surface">Division Matchmaking Live</div>
+<div class="font-body-sm text-[12px] text-outline truncate">Synchronous lock in 04h : 22m : 18s</div>
+</div>
+<span class="font-mono-code text-[11px] text-secondary bg-secondary-container/20 px-2 py-0.5 rounded">
+              PING 18ms
+            </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/20 py-space-xl"><div class="w-full px-gutter-lg flex flex-col md:flex-row justify-between gap-space-xl"><div class="max-w-md"><div class="flex items-center gap-space-sm mb-space-sm"><span class="font-title-md text-title-md font-bold tracking-tight text-on-surface">Rank<span class="text-primary">stack</span></span><span class="px-space-xs py-0.5 rounded bg-surface-container text-on-surface-variant font-mono-code text-[11px]">v2.4-PROD</span></div><p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">High-stakes competitive coding, automated unit testing, algorithmic hackathons, and real-time telemetric skill ranking platform.</p><p class="font-body-sm text-body-sm text-outline">© 2025 Rankstack Technologies Inc. All systems operational.</p></div><div class="grid grid-cols-2 sm:grid-cols-3 gap-space-lg text-body-sm font-body-sm"><div class="flex flex-col gap-space-xs"><span class="font-title-sm text-title-sm text-on-surface uppercase tracking-wider mb-space-xs">Platform</span><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="contests" href="#">Active Arenas</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Global Ranking</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="submissions" href="#">Telemetry Feed</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="teams" href="#">Guild Rosters</a></div><div class="flex flex-col gap-space-xs"><span class="font-title-sm text-title-sm text-on-surface uppercase tracking-wider mb-space-xs">Resources</span><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Compiler API</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Anti-Cheat Engine</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Documentation</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Status Telemetry</a></div><div class="flex flex-col gap-space-xs col-span-2 sm:col-span-1"><span class="font-title-sm text-title-sm text-on-surface uppercase tracking-wider mb-space-xs">Legal</span><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Competition Rules</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Security Disclosures</a></div></div></div></footer></body></html>

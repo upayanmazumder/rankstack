@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_blank" name="shell-type"/><title>Rankstack - Security Access</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error":"#ba1a1a","secondary":"#904d00","on-surface":"#0b1c30","on-error-container":"#93000a","on-error":"#ffffff","background":"#f8f9ff","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#100069","secondary-container":"#fe932c","on-secondary":"#ffffff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed":"#002114","on-secondary-container":"#663500","on-primary-container":"#c1beff","surface-container":"#e5eeff","inverse-primary":"#c3c0ff","outline":"#777586","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed":"#ffdcc3","surface-container-low":"#eff4ff","primary-fixed":"#e3dfff","on-secondary-fixed-variant":"#6e3900","on-secondary-fixed":"#2f1500","on-primary-fixed-variant":"#372abf","on-tertiary":"#ffffff","tertiary":"#00442d","tertiary-container":"#005e40","outline-variant":"#c7c4d7","tertiary-fixed-dim":"#68dba9","on-background":"#0b1c30","surface-bright":"#f8f9ff","on-tertiary-fixed-variant":"#005137","surface-tint":"#5148d7","on-surface-variant":"#464554","surface-dim":"#cbdbf5","on-primary":"#ffffff","surface-container-high":"#dce9ff","error-container":"#ffdad6","surface-variant":"#d3e4fe","on-tertiary-container":"#66daa8","primary-container":"#4338ca","primary-fixed-dim":"#c3c0ff","inverse-surface":"#213145","surface-container-highest":"#d3e4fe","primary":"#2a14b4","tertiary-fixed":"#85f8c4"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xl":"2.5rem","space-lg":"1.5rem","margin":"2rem","margin-mobile":"1rem","space-xs":"0.25rem","gutter-mobile":"0.75rem"},fontFamily:{"label-md":["Hanken Grotesk"],"display-hero-mobile":["Montserrat"],"mono-data":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"body-lg":["Hanken Grotesk"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"mono-rank":["JetBrains Mono"],"mono-sm":["JetBrains Mono"],"headline-lg":["Montserrat"],"headline-sm":["Montserrat"],"label-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"headline-lg-mobile":["Montserrat"]},fontSize:{"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><main class="w-full"><div class="flex flex-col w-full">
+<div class="w-full min-h-[calc(100vh-2rem)] flex flex-col lg:flex-row items-stretch justify-between relative overflow-hidden">
+<!-- LEFT PANEL: Brand & Visual Identity -->
+<div class="lg:w-1/2 w-full bg-surface-container-low relative flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden">
+<!-- Decorative Faint Dot-Grid Pattern Layer -->
+<div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(#777586 1px, transparent 1px); background-size: 24px 24px; mask-image: radial-gradient(ellipse 65% 65% at 50% 50%, #000 70%, transparent 100%);"></div>
+<!-- Subtle Accent Glow -->
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute bottom-0 right-0 w-80 h-80 bg-secondary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Top Header / Meta Brand Mark -->
+<div class="relative z-10 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<!-- Custom geometric stacked-podium icon -->
+<div class="relative flex items-end gap-1 h-9 px-2 py-1.5 bg-surface-container rounded-lg shadow-sm">
+<span class="w-2 h-4 bg-outline-variant rounded-xs"></span>
+<span class="w-2.5 h-6 bg-primary rounded-xs"></span>
+<span class="w-2 h-3 bg-secondary-container rounded-xs"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">RANKSTACK</span>
+<span class="font-mono-sm text-mono-sm text-outline tracking-wider uppercase font-semibold">Arena Engine // 4.2</span>
+</div>
+</div>
+<div class="hidden sm:flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-full shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-container"></span>
+</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">185,420 ACTIVE CODES</span>
+</div>
+</div>
+<!-- Center Brand Content Block -->
+<div class="relative z-10 my-auto py-12 max-w-xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-label-md font-label-md mb-6">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>ENTERPRISE BENCHMARK STANDARD</span>
+</div>
+<h1 class="font-display-hero text-headline-lg sm:text-display-hero text-on-surface tracking-tight mb-6 leading-tight">
+          Where Algorithmic Mastery Meets Global Recognition.
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">
+          Benchmark your problem-solving velocity against 185,000+ top engineers in synchronized real-time contests, verified by automated execution telemetry.
+        </p>
+<!-- Floating Live Stat Card Widget -->
+<div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm max-w-md">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary"></span>
+</span>
+<span class="font-mono-data text-mono-data font-semibold text-secondary">LIVE SCHEDULE</span>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">RATING TIER 1</span>
+</div>
+<div class="flex items-baseline justify-between">
+<div>
+<div class="text-headline-md font-headline-md text-on-surface">Next Contest in 01h 42m</div>
+<div class="font-body-sm text-body-sm text-outline mt-0.5">Grandmaster Round #412 • Distributed Systems</div>
+</div>
+<div class="text-right">
+<div class="font-mono-rank text-mono-rank text-secondary font-bold">$10,000</div>
+<div class="font-label-md text-label-md text-outline">Prize Pool</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Testimonial Block at Bottom -->
+<div class="relative z-10 pt-6">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md rounded-xl p-5 shadow-sm">
+<div class="flex items-center gap-1 text-secondary mb-2">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-mono-sm text-mono-sm text-on-surface font-semibold ml-2">5.0 / 5.0 RATING</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface italic mb-3">
+            “Rankstack stripped away interview theater. My verified sub-second solution ranks directly landed me senior architectural offers without a single recruiter screening.”
+          </p>
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="High detail portrait photo of Elena Rostova, elite competitive software engineer, wearing minimalist glasses with soft studio blue ambient backlighting, looking confident." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClBbZLA9Yeek8NfXvruQYnMcEKnTH0nNYCsAk6eVDe3ZTCoLXBKZsNqnXd7dqhAXC92hV8BocwjIxIiOMdlKOXrFmdVmabNf1DvioB6EJr93F_aAousXIs2QLli-g2Chv1tB_NbeFC3vFfcQ8oIrB1_-DuxJjsUCc8G1GBLRCi37k21--neRStge3z5yb-SJKQgKSS2kYGWAqwmghzwqCwDJlBNOOdkvKZRp0GdHB6"/>
+</div>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Elena Rostova</div>
+<div class="font-mono-sm text-mono-sm text-outline">Grandmaster Rank #14 • ex-DeepMind Fellow</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Centered Authentication Card -->
+<div class="lg:w-1/2 w-full flex items-center justify-center p-6 sm:p-10 lg:p-16 bg-surface">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-md p-8 sm:p-10 flex flex-col">
+<!-- Header -->
+<div class="text-left mb-6">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight" id="auth-title">
+              Welcome to Rankstack
+            </h2>
+<span class="font-mono-sm text-mono-sm text-primary font-bold px-2 py-0.5 rounded bg-primary-fixed">SSL SECURE</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant" id="auth-subtitle">
+            Sign in with your competitive developer handle or email.
+          </p>
+</div>
+<!-- Social / OAuth Quick Sign In Buttons -->
+<div class="grid grid-cols-2 gap-3 mb-6">
+<!-- GitHub OAuth -->
+<button class="group flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors shadow-sm active:translate-y-0.5 duration-150" type="button">
+<svg class="w-4 h-4 fill-on-surface transition-transform group-hover:scale-105" viewbox="0 0 24 24">
+<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path>
+</svg>
+<span class="font-label-md text-label-md text-on-surface font-semibold">GitHub</span>
+</button>
+<!-- Google OAuth -->
+<button class="group flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors shadow-sm active:translate-y-0.5 duration-150" type="button">
+<svg class="w-4 h-4 transition-transform group-hover:scale-105" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Google</span>
+</button>
+</div>
+<!-- Clean Divider Line -->
+<div class="relative flex items-center justify-center my-4">
+<div class="w-full h-px bg-surface-container-high"></div>
+<span class="absolute bg-surface-container-lowest px-3 font-mono-sm text-mono-sm text-outline uppercase tracking-wider">
+            or continue with credentials
+          </span>
+</div>
+<!-- Auth Form -->
+<form class="space-y-4 mt-2" id="auth-form" onsubmit="event.preventDefault(); handleAuthSubmit();">
+<!-- Optional Name Field for Registration Mode (Toggled via JS) -->
+<div class="hidden flex-col gap-1.5" id="field-name-group">
+<label class="font-label-md text-label-md text-on-surface font-medium" for="full-name">Developer Handle or Full Name</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">badge</span>
+<input class="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" id="full-name" placeholder="alex_codeflow" type="text"/>
+</div>
+</div>
+<!-- Email / Username Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-medium" for="identifier">Email or Competitor Handle</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">alternate_email</span>
+<input class="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" id="identifier" placeholder="elena@algo.dev" required="" type="text" value="elena@algo.dev"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface font-medium" for="password">Password</label>
+<a class="font-label-md text-label-md text-primary hover:underline" href="javascript:void(0)">Forgot password?</a>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">lock</span>
+<input class="w-full h-10 pl-9 pr-10 rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" id="password" placeholder="Enter secure passphrase" required="" type="password" value="••••••••••••"/>
+<button class="absolute right-3 text-outline hover:text-on-surface flex items-center" onclick="togglePasswordVisibility()" type="button">
+<span class="material-symbols-outlined text-[18px]" id="eye-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Checkbox Options -->
+<div class="flex items-center justify-between pt-1">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Keep me signed in for 30 days</span>
+</label>
+<span class="font-mono-sm text-mono-sm text-tertiary-container bg-surface-container-low px-1.5 py-0.5 rounded font-semibold">2FA READY</span>
+</div>
+<!-- CTA Primary Button -->
+<button class="w-full mt-3 h-11 bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-2 rounded-lg font-label-lg text-label-lg font-semibold shadow-sm hover:translate-y-[-1px] active:translate-y-[1px]" id="submit-btn" type="submit">
+<span id="submit-text">Sign In to Rankstack</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<!-- Dynamic Success Toast Mock -->
+<div class="hidden mt-4 p-3 rounded-lg bg-surface-container-high text-on-surface flex items-center gap-2" id="auth-alert">
+<span class="material-symbols-outlined text-tertiary-container text-[20px]">check_circle</span>
+<span class="font-body-sm text-body-sm font-medium" id="alert-msg">Authenticated. Redirecting to Arena Dashboard...</span>
+</div>
+<!-- Bottom Mode Toggle -->
+<div class="text-center mt-6 pt-4 border-t-0 bg-surface-container-low/40 py-2.5 rounded-lg">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+<span id="toggle-prompt">Don't have an account?</span>
+<button class="font-label-md text-label-md text-primary font-bold hover:underline ml-1 cursor-pointer" id="toggle-btn" onclick="toggleAuthMode()" type="button">
+              Sign up for free
+            </button>
+</p>
+</div>
+<!-- Footnote Disclaimers -->
+<p class="text-center font-body-sm text-[11px] text-outline mt-6 leading-tight">
+          By continuing, you agree to Rankstack's <a class="underline hover:text-on-surface" href="javascript:void(0)">Terms of Service</a> and competitive <a class="underline hover:text-on-surface" href="javascript:void(0)">Code of Integrity</a>. Automated anti-cheat telemetry enabled.
+        </p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let isSignUp = false;
+
+  function toggleAuthMode() {
+    isSignUp = !isSignUp;
+    const title = document.getElementById('auth-title');
+    const subtitle = document.getElementById('auth-subtitle');
+    const nameField = document.getElementById('field-name-group');
+    const submitText = document.getElementById('submit-text');
+    const togglePrompt = document.getElementById('toggle-prompt');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const alertBox = document.getElementById('auth-alert');
+
+    alertBox.classList.add('hidden');
+
+    if (isSignUp) {
+      title.textContent = "Create Rankstack Account";
+      subtitle.textContent = "Enter your credentials to enter global ranked algorithms.";
+      nameField.classList.remove('hidden');
+      nameField.classList.add('flex');
+      submitText.textContent = "Create Competitive Account";
+      togglePrompt.textContent = "Already have an arena account?";
+      toggleBtn.textContent = "Sign in instead";
+    } else {
+      title.textContent = "Welcome to Rankstack";
+      subtitle.textContent = "Sign in with your competitive developer handle or email.";
+      nameField.classList.add('hidden');
+      nameField.classList.remove('flex');
+      submitText.textContent = "Sign In to Rankstack";
+      togglePrompt.textContent = "Don't have an account?";
+      toggleBtn.textContent = "Sign up for free";
+    }
+  }
+
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      eyeIcon.textContent = 'visibility_off';
+    } else {
+      passwordInput.type = 'password';
+      eyeIcon.textContent = 'visibility';
+    }
+  }
+
+  function handleAuthSubmit() {
+    const alertBox = document.getElementById('auth-alert');
+    const alertMsg = document.getElementById('alert-msg');
+    alertBox.classList.remove('hidden');
+    if (isSignUp) {
+      alertMsg.textContent = "Profile provisioned! Allocating contest seat...";
+    } else {
+      alertMsg.textContent = "Verified credentials. Synching telemetry profile...";
+    }
+  }
+</script></main></body></html>

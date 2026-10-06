@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Rankstack - Precision Competitive Benchmark</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-secondary-container":"#663500","on-background":"#0b1c30","inverse-surface":"#213145","on-primary-fixed":"#100069","surface-container-high":"#dce9ff","primary":"#2a14b4","inverse-primary":"#c3c0ff","on-primary-container":"#c1beff","error-container":"#ffdad6","surface-dim":"#cbdbf5","secondary":"#904d00","error":"#ba1a1a","on-primary":"#ffffff","on-error-container":"#93000a","surface-bright":"#f8f9ff","surface":"#f8f9ff","on-surface":"#0b1c30","on-tertiary-fixed":"#002114","primary-fixed-dim":"#c3c0ff","surface-container-low":"#eff4ff","on-surface-variant":"#464554","surface-container-highest":"#d3e4fe","on-primary-fixed-variant":"#372abf","secondary-container":"#fe932c","surface-container":"#e5eeff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed-variant":"#005137","on-secondary-fixed":"#2f1500","tertiary-container":"#005e40","tertiary-fixed":"#85f8c4","background":"#f8f9ff","on-tertiary":"#ffffff","inverse-on-surface":"#eaf1ff","surface-tint":"#5148d7","on-error":"#ffffff","on-secondary":"#ffffff","secondary-fixed":"#ffdcc3","tertiary":"#00442d","outline-variant":"#c7c4d7","surface-container-lowest":"#ffffff","primary-fixed":"#e3dfff","on-tertiary-container":"#66daa8","primary-container":"#4338ca","on-secondary-fixed-variant":"#6e3900","surface-variant":"#d3e4fe","tertiary-fixed-dim":"#68dba9","outline":"#777586"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","space-md":"1rem","margin-mobile":"1rem","space-xl":"2.5rem","margin":"2rem","gutter-mobile":"0.75rem","space-lg":"1.5rem","space-sm":"0.5rem"},fontFamily:{"headline-lg-mobile":["Montserrat"],"headline-sm":["Montserrat"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"body-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"label-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],"mono-data":["JetBrains Mono"],"headline-lg":["Montserrat"],"display-hero-mobile":["Montserrat"],"label-md":["Hanken Grotesk"],"mono-sm":["JetBrains Mono"],"mono-rank":["JetBrains Mono"]},fontSize:{"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests</a><a aria-current="page" class="px-3 py-1.5 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="leaderboard" href="#">Leaderboard</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="teams" href="#">Teams</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Submissions</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><button class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1440px] mx-auto px-6 lg:px-8 py-8 flex flex-col gap-10">
+<!-- Header Block -->
+<div class="flex flex-col gap-6">
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
+<div class="flex flex-col gap-2">
+<div class="flex flex-wrap items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold" style="font-family: 'Montserrat', sans-serif;">
+              Global Season 14 Leaderboard
+            </h1>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest shadow-sm">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+</span>
+<span class="font-mono-data text-mono-data font-bold tracking-wider text-emerald-800 uppercase text-xs">LIVE</span>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Updates in real-time (last synced 2s ago)</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+            Official rankings across all sanctioned coding and quiz matches. Computed dynamically with penalty matrix validation.
+          </p>
+</div>
+<!-- Telemetry Pill / Quick Badge Stats -->
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2.5 rounded-lg shadow-sm">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase tracking-wider">Active Cohort</span>
+<span class="font-mono-data text-mono-data font-bold text-on-surface">3,124 Competitors</span>
+</div>
+<div class="h-8 w-px bg-surface-container-highest"></div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase tracking-wider">Cluster Speed</span>
+<span class="font-mono-data text-mono-data font-bold text-tertiary-container">42ms Sub-lag</span>
+</div>
+</div>
+</div>
+<!-- Controls & Filter Toolbar -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+<!-- Contest Selector Dropdown -->
+<div class="lg:col-span-4 relative">
+<label class="block font-mono-sm text-mono-sm text-on-surface-variant mb-1 font-semibold uppercase tracking-wider">Tournament Segment</label>
+<div class="relative">
+<select class="w-full h-10 pl-3.5 pr-10 appearance-none bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md font-medium shadow-sm focus:outline-none focus:bg-surface-container transition-colors cursor-pointer">
+<option selected="">Algorithmic Masters Cup #42 (Current)</option>
+<option>Dynamic Systems Invitational 2025</option>
+<option>Heuristic Search Sprint #19</option>
+<option>Weekly ByteDuel Series XIV</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-2.5 text-on-surface-variant text-[20px]">keyboard_arrow_down</span>
+</div>
+</div>
+<!-- Division Filter -->
+<div class="lg:col-span-3 relative">
+<label class="block font-mono-sm text-mono-sm text-on-surface-variant mb-1 font-semibold uppercase tracking-wider">Rating Bracket</label>
+<div class="relative">
+<select class="w-full h-10 pl-3.5 pr-10 appearance-none bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md font-medium shadow-sm focus:outline-none focus:bg-surface-container transition-colors cursor-pointer">
+<option selected="">Div 1 (Rating > 2100)</option>
+<option>Div 2 (Rating 1600 - 2099)</option>
+<option>Div 3 (Rating < 1600)</option>
+<option>Open All-Divisions</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-2.5 text-on-surface-variant text-[20px]">tune</span>
+</div>
+</div>
+<!-- Region Filter -->
+<div class="lg:col-span-2 relative">
+<label class="block font-mono-sm text-mono-sm text-on-surface-variant mb-1 font-semibold uppercase tracking-wider">Region Zone</label>
+<div class="relative">
+<select class="w-full h-10 pl-3.5 pr-10 appearance-none bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md font-medium shadow-sm focus:outline-none focus:bg-surface-container transition-colors cursor-pointer">
+<option selected="">Global</option>
+<option>North America (NA)</option>
+<option>Europe / EMEA</option>
+<option>Asia-Pacific (APAC)</option>
+<option>Latin America</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-2.5 text-on-surface-variant text-[20px]">public</span>
+</div>
+</div>
+<!-- Search Competitor Input -->
+<div class="lg:col-span-3 relative">
+<label class="block font-mono-sm text-mono-sm text-on-surface-variant mb-1 font-semibold uppercase tracking-wider">Lookup Handle</label>
+<div class="relative">
+<input class="w-full h-10 pl-10 pr-4 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/70 rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:bg-surface-container transition-colors" placeholder="Search competitor or team..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[20px]">search</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Elevated Podium Section (Top 3 Competitors Side-by-Side) -->
+<div class="relative w-full pt-6 pb-2">
+<!-- Background Ambient Aura for Top Rank -->
+<div class="absolute left-1/2 -top-6 -translate-x-1/2 w-96 h-64 bg-secondary-container/15 rounded-full blur-3xl pointer-events-none -z-0"></div>
+<div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+<!-- Rank 2: Silver Tier (Left) -->
+<div class="order-2 md:order-1 flex flex-col justify-between rounded-xl bg-surface-container-lowest p-6 shadow-md transition-transform duration-200 hover:-translate-y-1" style="box-shadow: inset 0 0 0 2px #94A3B8, 0 4px 16px -2px rgba(15, 23, 42, 0.06);">
+<div class="flex items-start justify-between mb-4">
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface-variant">02</span>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-slate-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-mono-sm text-mono-sm font-bold uppercase tracking-wider text-on-surface-variant">Silver</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="relative mb-3">
+<div class="w-20 h-20 rounded-full overflow-hidden shadow-sm" style="box-shadow: 0 0 0 3px #94A3B8;">
+<img class="w-full h-full object-cover" data-alt="High quality studio portrait photo of competitive software engineer woman Elena with headphones around neck, subtle gray background, professional tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNTlksIrB3Y1X7_kzKdwdATizBSFo1ymaqvMvREsNAXL_NLeV9ThAXByDRn9cASOQj6M_O6-mGQsHY4Kp1HoLkokVKu7ncB4L57MOhg2NjlibD10BpbLAnP7fygqB26zx2EqV_hC7YJCfAn34uEmMGwLkEBT5_PXcN0H1M6dwS0yxpU16akasqRMNXYgg_8IwB_ialDkPwIQEhckVq5cT3A0BNiJ9QhhEZLMUWEwa8"/>
+</div>
+<span class="absolute -bottom-2 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-slate-200 text-slate-700 shadow-sm font-mono-sm font-black">2</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Elena_V</h3>
+<span class="px-2 py-0.5 rounded text-[11px] font-mono-data font-bold bg-error-container text-on-error-container">Grandmaster</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-medium mb-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">shield</span>
+              NeuralOps
+            </p>
+<div class="w-full py-3.5 px-4 rounded-lg bg-surface-container-low flex flex-col items-center gap-1">
+<span class="font-mono-rank text-headline-md font-extrabold text-on-surface">3,650 <span class="text-xs font-semibold text-on-surface-variant font-body-sm">PTS</span></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">6/6 Solved • 01:28:45 penalty</span>
+</div>
+</div>
+</div>
+<!-- Rank 1: Gold Tier (Center - TALLER, Elevated) -->
+<div class="order-1 md:order-2 flex flex-col justify-between rounded-xl bg-gradient-to-b from-amber-50/60 to-surface-container-lowest p-7 shadow-xl md:-mt-8 transition-transform duration-200 hover:-translate-y-1 relative" style="box-shadow: inset 0 0 0 2px #F59E0B, 0 12px 30px -4px rgba(245, 158, 11, 0.18);">
+<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-secondary-container text-on-secondary shadow-md">
+<span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="font-mono-sm text-mono-sm font-extrabold uppercase tracking-widest text-white">Season Leader</span>
+</div>
+<div class="flex items-start justify-between mb-4 mt-2">
+<span class="font-mono-rank text-headline-sm font-black text-secondary">01</span>
+<div class="flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100/90 text-on-secondary-container shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+<span class="font-mono-sm text-mono-sm font-bold uppercase tracking-wider text-secondary">1st Place</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="relative mb-3.5">
+<div class="w-24 h-24 rounded-full overflow-hidden shadow-lg" style="box-shadow: 0 0 0 4px #F59E0B, 0 0 20px 2px rgba(245, 158, 11, 0.4);">
+<img class="w-full h-full object-cover" data-alt="Intense portrait shot of tech competitor 0xKaelen with focused gaze, rim lighting in amber-gold tones, dark technical backdrop, sharp focus professional photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGpqxD5rP4PJ0oIoap9hG0QvZfCOOl5d1FxQg0UcBOnmxBlJ7jNXa9TIRDbVJj6-4QUQQnxIzSJUHXgV77DOmo9Cn7sx7ZU62oQIVtTEWvo13krDR3H4rsORFy_TfPz_p8pOdPru7XYEOe83VmzHCkuNkvT3XuZmADr2uDCMKWv_LwoUoNF3LiEKA1gS3Hfhx-HX88bQtSuSGFBmHksdnSTQMs3eXMt-iGbPAIURPW"/>
+</div>
+<span class="absolute -bottom-2.5 -right-1 flex items-center justify-center w-8 h-8 rounded-full bg-secondary-container text-white shadow-md font-mono-sm font-black text-sm">1</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-md text-headline-md text-on-surface font-extrabold tracking-tight">0xKaelen</h3>
+<span class="px-2 py-0.5 rounded text-[11px] font-mono-data font-bold bg-amber-100 text-on-secondary-container">Master</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-medium mb-5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">groups</span>
+              ByteForge Syndicate
+            </p>
+<div class="w-full py-4 px-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col items-center gap-1 border-amber-200">
+<span class="font-mono-rank text-headline-lg font-black text-secondary">3,840 <span class="text-xs font-semibold text-on-surface-variant font-body-sm">PTS</span></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-semibold tracking-wide">6/6 Solved • 01:14:22 penalty</span>
+</div>
+</div>
+</div>
+<!-- Rank 3: Bronze Tier (Right) -->
+<div class="order-3 flex flex-col justify-between rounded-xl bg-surface-container-lowest p-6 shadow-md transition-transform duration-200 hover:-translate-y-1" style="box-shadow: inset 0 0 0 2px #D97706, 0 4px 16px -2px rgba(15, 23, 42, 0.06);">
+<div class="flex items-start justify-between mb-4">
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface-variant">03</span>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-secondary shadow-sm">
+<span class="material-symbols-outlined text-amber-700 text-[18px]" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-mono-sm text-mono-sm font-bold uppercase tracking-wider text-amber-800">Bronze</span>
+</div>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="relative mb-3">
+<div class="w-20 h-20 rounded-full overflow-hidden shadow-sm" style="box-shadow: 0 0 0 3px #D97706;">
+<img class="w-full h-full object-cover" data-alt="Portrait photography of young male developer DevRyu with spectacles, focused confident half-smile, clean studio illumination, high resolution editorial tech portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxujQvr1jLb6A1NVMOsoPcqKN5jVDrjIWZDp6wFq1bKis1g2Wxgmyx8A4fwYMfp1bs0VhQ7bG-EptfcOQGBLwLfkSZsY8F9gfG93IG9pf0bZOlpzbvvh4yPVEFTOi5LxWgUEVquwnFFbnnSko_fn8nKslmYFTSDVxBTq74hfLFSbnR73NKgH3-wtmhoFgQGBdRjQb31z3YCk5Z_T1-XFl6u5bdlOMLQR9NBRlSX9mM"/>
+</div>
+<span class="absolute -bottom-2 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-amber-700 text-white shadow-sm font-mono-sm font-black">3</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">DevRyu</h3>
+<span class="px-2 py-0.5 rounded text-[11px] font-mono-data font-bold bg-amber-100 text-on-secondary-container">Master</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant font-medium mb-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">terminal</span>
+              NullPointer Guild
+            </p>
+<div class="w-full py-3.5 px-4 rounded-lg bg-surface-container-low flex flex-col items-center gap-1">
+<span class="font-mono-rank text-headline-md font-extrabold text-on-surface">3,420 <span class="text-xs font-semibold text-on-surface-variant font-body-sm">PTS</span></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">5/6 Solved • 01:05:10 penalty</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Full Ranking Table (Rows 4 to 12) -->
+<div class="flex flex-col w-full bg-surface-container-lowest rounded-xl shadow-md overflow-hidden">
+<!-- Table Header -->
+<div class="w-full overflow-x-auto">
+<div class="min-w-[840px] flex items-center px-6 py-3.5 bg-surface-container-low text-on-surface-variant font-mono-sm text-mono-sm font-bold uppercase tracking-wider">
+<div class="w-24 text-left">RANK</div>
+<div class="flex-1 min-w-[220px] text-left">COMPETITOR</div>
+<div class="w-36 text-left">TIER</div>
+<div class="w-36 text-center">PROBLEMS SOLVED</div>
+<div class="w-36 text-right">PENALTY TIME</div>
+<div class="w-36 text-right">SCORE</div>
+<div class="w-24 text-center">TREND</div>
+</div>
+<!-- Table Body Rows -->
+<div class="min-w-[840px] flex flex-col">
+<!-- Row 4 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">04</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Headshot of software engineer Sarah Chen smiling calmly, modern startup aesthetic, softly blurred modern lab background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlw1pxDJmF4cVjKsZqJ69Au1VPGK2YIkjBtB_mCx1vIcSkZmsNwUoXSZuiR_1QAcHN-6cVxGm_0ksB4RMljjrdY_ix-mpJRwByC9ysmJ34FSsphmhWvRdZPTwIm3d9moTVYYpixeHMIujC1pVGU6EdRx_wzgLwRJu0xh-a6_IEAeKdKZw3ybWH3rv5qDnTmut-zA2Xb_I5kv0o4OUEjLqQwZbmELwAGywLrrPKglK9"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">SarahChen_AI</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">QuantumLab Core</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-amber-50 text-amber-800">Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">5 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:34:12</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">3,200</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-emerald-600 font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+<span>+2</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 5 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">05</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Portrait of male programmer Marcus Vance wearing glasses, focused expression, high dynamic range portrait lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgZuIwr7nakkuJlVUhRanlVTRJJsEsJ7ZyY4X5EXzMnneVXFENA9pOrRHWRzOsSaPWA-8s7RxrJUujHqmcU1g5xhSvWTgGtop7XzQNxH1vwnNgFcjKNopTHjmCiH8Ia8YIMTyIG5ARwmY2IbGC6ATmuNnovmznBXCtaE9fgg8XkuhxlvslsWn7x3fpgB6tQs498OOApcCXebdQdzcQwAxalcSvZgSZF3D1_wu-gS7d"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">MarcusVance</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Apex Binary</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-surface-container text-on-surface">Candidate Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">5 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:42:05</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">3,150</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-error font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+<span>-1</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 6 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">06</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Creative profile avatar of male systems developer in dark hoodie, moody teal-indigo studio light, sharp rim focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU4sMc-JjJ1i0tPYhdHmxE2MTfbiGPbBAvG_XZiCDKfOCzZFGkXymQt-LnGxtl3qdHgvT9V9qmBVn1jyqqwitxadgApkvB-r6sXByiDKwu8EbzLCGJpAYrMJB3zSvkp8GjO85S5gvK2blnJWRSetp5wJx0dxtl1lUVC3Tw4ObnSTuDxdN_MUNe292jdHC0t7x9UMYk9x9_pJ5BdjEUp5Yt7Inbh6L0hWroK538GtBc"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">TuringMachine99</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Lambda Guild</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-amber-50 text-amber-800">Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">5 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:50:33</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">3,050</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-on-surface-variant font-bold">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+<span>=</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 7: SIGNED-IN USER HIGHLIGHT -->
+<div class="flex items-center px-6 py-4.5 bg-primary-fixed/30 hover:bg-primary-fixed/40 transition-colors relative" style="box-shadow: inset 3px 0 0 #4338CA;">
+<div class="w-24 flex items-center gap-1">
+<span class="font-mono-rank text-mono-rank font-extrabold text-primary-container">07</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-container text-on-primary font-mono-sm text-[10px] font-bold">YOU</span>
+</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 shadow-sm" style="box-shadow: 0 0 0 2px #4338CA;">
+<img alt="Alex Rivera" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-primary-container font-extrabold truncate">Alex Rivera (You)</span>
+<span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Rankstack Elite Fleet</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-bold bg-primary-fixed text-on-primary-fixed-variant">Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-3 py-1 rounded bg-surface-container-lowest text-primary font-bold shadow-sm">4 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data font-semibold text-primary">01:12:40</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-black text-primary-container">2,950 <span class="text-xs font-semibold text-on-surface-variant font-body-sm">PTS</span></div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-emerald-700 font-extrabold">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+<span>+5</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 8 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">08</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Portrait of competitive female coder with short dark hair, clean contemporary indoor setting, warm accent light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3722tb8fDmRvPsgz9pwqJEoV_R-D8sJ5T_gxVBWdaJXQ3vRvTIryOF6t2p0EOXv7-A2FljewZOt7ApitvI5Zn3-OBeNtWxuyreLSBYYBLvgiM-mvHk6marj56uN6SqR0Y38kQnZaqyygFuRu4PvzQvkNLqxjG9yLCJHBu01p97YfTuCnNdaqLkJE1W-AEv3HMcuX5iaq8e9wLVihW0F6QW6v6fnxVmu6Ywkm3snQ_"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">NathalieK</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Nordic Algorithmics</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-surface-container text-on-surface">Candidate Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">4 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:18:02</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">2,880</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-error font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+<span>-2</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 9 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">09</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Headshot of tech competitor Kenneth Wu wearing turtleneck, soft neutral lighting, authentic developer portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwBD9jmPbqFjcxbDEJ_Xv_2y33Q6RvzkpECrbIpine0IDdU2YgmPv8zmEMcgskEaWC6ULgKNr0-k82X1gmqS-c2cX7G4LiszA-75JV2kmLjkFI4oGrTqkTgrgeri4ZGJ91YWlapTXYLEb7J6FJhCFu3pcK81OEvXFFngmpaKKUGs8si_zERoAoCN3xqHpZLWWSx5zAN9eR9di0j1o9PApIiJaS0Yw6YvYwhdDLwVCr"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">KennethWu</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Singularity Ops</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-amber-50 text-amber-800">Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">4 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:21:49</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">2,810</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-emerald-600 font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+<span>+3</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 10 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">10</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Studio portrait of tech contestant DeepPath with serious focused look, clean lighting, crisp detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsfoPIcOFbUMANt5gv2b-qUWJAIuvBppKnIDR3I4dc40fja5u1rPsTk9LVMurTtCsUwJzKsrBB3ziho2llbE5ZZp5aW3ZcTfq1uuMnAnpYihDzRrKquHyG0dgg5n7SgrzIAQzHjw9cLNsoC0APPgo0R0VFK8z4ocNcFbe9PfVBH-kBAXZceuEh7w3NTXObHnKSN2ISeaw9CAHPyIHcvcYAz_i_dFE8yAIOSSkNOHtL"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">DeepPath_Seeker</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">DeepTree Labs</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-surface-container text-on-surface">Expert</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">4 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:29:15</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">2,760</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-on-surface-variant font-bold">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+<span>=</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 11 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">11</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Profile photo of young male programmer Aris Thorne outdoors against urban technology hub architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK9UAkPkVkgYktFC9ycHyVD6YEvYZ9HHsW_RE2G3ydmgLMGEGPPbHl8QFTbwI4NmDYel-8Y_Y6IW6J24UqssMIWtHN7xa-7ToPiDq8u-8K0TVy05oUzMraN2iaoQDYAcVGGwKMmGUFR0qd2h6DDn-vp9CEIgelU1OOsblBHaU5hNVCuMzS2_1zSIR_f20Ak5oLqznuJGcjoLUXzkTD3Tkpa-CdoVSZ52gphsn_FzSU"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">ArisThorne</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Solvers Guild</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-surface-container text-on-surface">Expert</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">4 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">01:31:04</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">2,710</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-emerald-600 font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+<span>+1</span>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<!-- Row 12 -->
+<div class="flex items-center px-6 py-4 hover:bg-surface-container-low/70 transition-colors">
+<div class="w-24 font-mono-rank text-mono-rank font-bold text-on-surface-variant">12</div>
+<div class="flex-1 min-w-[220px] flex items-center gap-3">
+<div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Portrait of competitive coder Miriam holding tablet, warm confident smile, minimalist gray backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKWtsI-sn5Uyz72wWSwXQbzaeh8fIDIV6WqyhaFnUmo9TGE2Fio4bjwHBxJAFf2evE3pPTBJxkIyvLgW0v8ct1GHZA8KSLDFW8XITYbpdqSTAYi8ElIxbvU-AN5zqyxEutrluChNwfY2pGVNsONivl1nh49iULj2nWn53hkqDaCFo2JcA1Sb4vKn6GSbLTIP4piSnWFu1IGWzeYBlrB_dRM6hyqVYzYcRI9b3PsHjn"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate">Miriam_B</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Vector Forge</span>
+</div>
+</div>
+<div class="w-36">
+<span class="px-2.5 py-1 rounded text-xs font-mono-data font-semibold bg-amber-50 text-amber-800">Master</span>
+</div>
+<div class="w-36 text-center">
+<span class="inline-flex items-center justify-center font-mono-data text-mono-data px-2.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold">3 / 6</span>
+</div>
+<div class="w-36 text-right font-mono-data text-mono-data text-on-surface-variant">00:54:19</div>
+<div class="w-36 text-right font-mono-rank text-mono-rank font-bold text-on-surface">2,640</div>
+<div class="w-24 flex items-center justify-center gap-1 font-mono-data text-mono-data text-error font-bold">
+<span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+<span>-4</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination & Status Footer -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-surface-container-low">
+<div class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">
+          Page <span class="font-bold text-on-surface">1</span> of <span class="font-bold text-on-surface">125</span> • Showing ranks <span class="font-bold text-on-surface">1-25</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-on-surface-variant/50 font-label-md text-label-md font-semibold flex items-center gap-1 cursor-not-allowed" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+            Prev
+          </button>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 rounded-lg bg-primary-container text-on-primary font-mono-data text-mono-data font-bold flex items-center justify-center shadow-sm" type="button">1</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold flex items-center justify-center transition-colors" type="button">2</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold flex items-center justify-center transition-colors" type="button">3</button>
+<span class="px-1 text-on-surface-variant font-mono-data text-mono-data">...</span>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface font-mono-data text-mono-data font-semibold flex items-center justify-center transition-colors" type="button">125</button>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md font-semibold flex items-center gap-1 shadow-sm hover:bg-surface-container transition-colors" type="button">
+            Next
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant py-8 px-8"><div class="w-full flex flex-col md:flex-row justify-between items-start gap-8"><div class="flex flex-col gap-2 max-w-sm"><div class="flex items-center gap-2"><img alt="Rankstack" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rankstack</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Precision Competitive Benchmark & Skill Evaluation</p><p class="font-mono-sm text-mono-sm text-on-surface-variant mt-2">© 2025 Rankstack Inc. All rights reserved.</p></div><div class="grid grid-cols-3 gap-12"><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Product</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contest-catalog" href="#">Contests</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboards</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="problem-submission" href="#">Practice Sandbox</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Resources</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">API & Telemetry</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Rules & Scoring</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Documentation</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Legal</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Integrity Code</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"><div class="pointer-events-auto flex items-center gap-3 bg-surface-container-lowest border border-outline-variant shadow-lg px-4 py-3 rounded-lg"><span class="material-symbols-outlined text-secondary text-[20px]">info</span><span class="font-body-sm text-body-sm text-on-surface">System live: Evaluation cluster running at 99.98% efficiency</span></div></div></body></html>

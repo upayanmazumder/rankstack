@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Rankstack - Precision Competitive Benchmark</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error":"#ba1a1a","secondary":"#904d00","on-surface":"#0b1c30","on-error-container":"#93000a","on-error":"#ffffff","background":"#f8f9ff","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#100069","secondary-container":"#fe932c","on-secondary":"#ffffff","secondary-fixed-dim":"#ffb77d","on-tertiary-fixed":"#002114","on-secondary-container":"#663500","on-primary-container":"#c1beff","surface-container":"#e5eeff","inverse-primary":"#c3c0ff","outline":"#777586","surface":"#f8f9ff","surface-container-lowest":"#ffffff","secondary-fixed":"#ffdcc3","surface-container-low":"#eff4ff","primary-fixed":"#e3dfff","on-secondary-fixed-variant":"#6e3900","on-secondary-fixed":"#2f1500","on-primary-fixed-variant":"#372abf","on-tertiary":"#ffffff","tertiary":"#00442d","tertiary-container":"#005e40","outline-variant":"#c7c4d7","tertiary-fixed-dim":"#68dba9","on-background":"#0b1c30","surface-bright":"#f8f9ff","on-tertiary-fixed-variant":"#005137","surface-tint":"#5148d7","on-surface-variant":"#464554","surface-dim":"#cbdbf5","on-primary":"#ffffff","surface-container-high":"#dce9ff","error-container":"#ffdad6","surface-variant":"#d3e4fe","on-tertiary-container":"#66daa8","primary-container":"#4338ca","primary-fixed-dim":"#c3c0ff","inverse-surface":"#213145","surface-container-highest":"#d3e4fe","primary":"#2a14b4","tertiary-fixed":"#85f8c4"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter":"1.5rem","space-md":"1rem","space-sm":"0.5rem","space-xl":"2.5rem","space-lg":"1.5rem","margin":"2rem","margin-mobile":"1rem","space-xs":"0.25rem","gutter-mobile":"0.75rem"},fontFamily:{"label-md":["Hanken Grotesk"],"display-hero-mobile":["Montserrat"],"mono-data":["JetBrains Mono"],"body-md":["Hanken Grotesk"],"body-lg":["Hanken Grotesk"],"body-sm":["Hanken Grotesk"],"headline-md":["Montserrat"],"mono-rank":["JetBrains Mono"],"mono-sm":["JetBrains Mono"],"headline-lg":["Montserrat"],"headline-sm":["Montserrat"],"label-lg":["Hanken Grotesk"],"display-hero":["Montserrat"],"headline-lg-mobile":["Montserrat"]},fontSize:{"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"display-hero-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"mono-data":["13px",{"lineHeight":"18px","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"mono-rank":["18px",{"lineHeight":"22px","letterSpacing":"-0.02em","fontWeight":"700"}],"mono-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"700"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"display-hero":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant"><div class="w-full h-full px-8 flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-3" data-path="landing-page" href="#"><img alt="Rankstack Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">Rankstack</span></a><nav class="hidden md:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="contest-catalog" href="#">Contests</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="problem-and-submission" href="#">Problems</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="leaderboard" href="#">Leaderboard</a><a aria-current="page" class="px-3 py-1.5 rounded-lg transition-colors bg-primary-container text-on-primary font-semibold" data-path="teams" href="#">Teams</a><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="submission-history" href="#">Submissions</a></nav></div><div class="flex items-center gap-4"><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><button aria-label="Notifications" class="w-9 h-9 rounded-lg border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container relative transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-secondary-container"></span></button><div class="flex items-center gap-2 pl-2 border-l border-outline-variant"><a class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors" data-path="auth-login" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbNWS5tHtMKjbitWM5vtzvUBwYG4uANDF2e1hyiBkHoSm1Lv5CSt4km0N2OH_rAfwoD6_ACNE656vjYSuNGXSS3VhyVRVZvAbuE5JkUrezYWrWY0wrZOUog-YwLg3M5XEFlpypkYYwKXR_1UlhUTXlq2pP0Bc_GbojSSau9hEqelFOOO9PU5TS1gdBttHrZnesSwqlwLRHn1yTIMl5S6Pmhr71bVtyeNIeYGsi7TRh"/><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></a></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<!-- Subtle Gradient Ambient Depth Layer -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 left-1/4 w-96 h-96 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-48 right-10 w-80 h-80 bg-secondary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Header & Action Bar Section -->
+<section class="w-full max-w-[1440px] mx-auto px-8 pt-10 pb-8 flex flex-col gap-8 relative z-10">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+<div class="flex flex-col gap-2 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-primary-container text-on-primary font-mono-sm text-mono-sm uppercase tracking-wider font-semibold">Division Season IV</span>
+<span class="inline-flex items-center gap-1 font-mono-sm text-mono-sm text-secondary font-medium">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+              Synchronized Multi-Tier Matchmaking
+            </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">Teams & Guilds</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Collaborate with squad members, aggregate collective ELO, and compete in multi-tier team invitationals.</p>
+</div>
+<!-- Global Action Triggers -->
+<div class="flex items-center gap-3 shrink-0">
+<button class="px-5 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md hover:bg-primary transition-all duration-150 flex items-center gap-2 transform hover:-translate-y-0.5" onclick="document.getElementById('createTeamModal').classList.remove('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">group_add</span>
+            + Create Team
+          </button>
+</div>
+</div>
+<!-- Filter, Search & Status Bar -->
+<div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-2 rounded-xl bg-surface-container-low shadow-sm">
+<!-- Division Tabs -->
+<div class="flex items-center gap-1 overflow-x-auto p-1" id="tierTabs">
+<button class="tier-tab-btn px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-label-lg text-label-lg shadow-sm font-semibold transition-all" data-tier="all" type="button">
+            All Tiers <span class="ml-1.5 px-1.5 py-0.5 rounded bg-surface-container font-mono-sm text-mono-sm text-on-surface-variant">48</span>
+</button>
+<button class="tier-tab-btn px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-lg text-label-lg transition-all" data-tier="div1" type="button">
+            Division 1 <span class="ml-1.5 px-1.5 py-0.5 rounded bg-secondary-fixed/50 font-mono-sm text-mono-sm text-on-secondary-fixed">Elite</span>
+</button>
+<button class="tier-tab-btn px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-lg text-label-lg transition-all" data-tier="div2" type="button">
+            Division 2
+          </button>
+<button class="tier-tab-btn px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-lg text-label-lg transition-all" data-tier="collegiate" type="button">
+            Collegiate
+          </button>
+</div>
+<!-- Search & Control -->
+<div class="flex items-center gap-3 px-2">
+<div class="relative w-full md:w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full h-10 pl-9 pr-4 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md shadow-sm focus:outline-none focus:bg-surface-bright transition-colors" placeholder="Search teams, tags, or ELO..." type="text"/>
+</div>
+<button class="h-10 px-3.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md flex items-center gap-1.5 shadow-sm transition-colors" title="Filter options" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span class="hidden sm:inline">Sort: Rank</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Main Content Grid & Active Detail Panel -->
+<section class="w-full max-w-[1440px] mx-auto px-8 pb-16">
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+<!-- Left: Competitive Teams Roster Catalog (8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Registered Squads</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-mono-sm text-mono-sm text-on-surface-variant">Top Tier 2025</span>
+</div>
+<div class="flex items-center gap-2 font-mono-sm text-mono-sm text-on-surface-variant">
+<span>Dynamic Bracket Lock in</span>
+<span class="font-bold text-secondary">04d:18h:22s</span>
+</div>
+</div>
+<!-- Cards Grid: 3 cards per row on desktop -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+<!-- Team 1: ByteForge Syndicate (Rank 1 - Amber Highlight) -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-secondary-container"></div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-semibold tracking-wide flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary">workspace_premium</span>
+                    Div 1 Elite
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-secondary font-bold">
+<span class="material-symbols-outlined text-[16px] text-secondary">military_tech</span>
+                    #1 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">ByteForge Syndicate</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[BFS] • Lead: cypher_void</span>
+</div>
+<!-- Overlapping Avatars Stack -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Close up competitive programmer portrait of a focused young man with neon lighting reflections on face, high tech esports style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC54MvdO8JopyeuIgnnX3LqS3PKvntH05V7aPGo-aRPIaYD7lg6WNONKsjJxDpivEfhmbgVlA23oYqYGTKCg9Q0Pr08jKRq_1Qbfgy4sGDV34GhOpPixlg_sn2QkKA-e8B1GfrbZ0j3BZrvjzUPjE-KCDa_3o2LCMAXlDmmiCjdMlFDgTzwvjGuYvsWVg5JHlda660nSna-JskOarSCH38sT82K1PVBzaRPbVNTqHA4"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an algorithmic coding competitor with glasses smiling subtly, clean editorial studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHA_v_YfCzzVeoFSP95AM366gqTT51luUQYTMXMCHEhCcewsp-nnWHyKEDKRarldmRWfVK3cw6TWGdD1dzrQhiCd8D-7uuSaWA0I1JsFSnUymthFGMISmE_892buF6W1SKHCQk8ArwgVwPVlVFEzMskdvXpofz-GZ8GzvPfmW9yCXOLQ6B4pZH3BygzHtTmZp7S_vHCnFmwgx_zOeMMa1SNlS6ko-Pdpqt3bLg_vOF"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an Asian female engineer competitor with sleek ponytail, modern competitive hackathon attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtxnsUSpJZWt7BNU2KfTMqNYx5YDeRuj5H9qRQk9WnUDWxuYIt9Bgt_-6lgTirAYgHriXOv0Xh4NuQkBtlPM36RAMi-49i_yayGDXa7IgdWoIOeji7bmPDWr2nIiDy9tE_W2IxSaUb6QGzld-x_ouf3fiG7dLnAEv5RzfgOhXOV2wMhGkWwPMznDBFWHcmi7OWGEvR_0n-u5obKhb7aWVd2ed9h0y2d1yy7gRL_PCc"/>
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center font-mono-sm text-mono-sm font-bold shadow-sm">
+                      +2
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">5/5 Members</span>
+</div>
+<!-- Team Stats Row -->
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">14,820 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">82%</span>
+</div>
+</div>
+</div>
+<!-- Card Action -->
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                  View Roster
+                </button>
+</div>
+</div>
+<!-- Team 2: NullPointer Guild (#2 Silver accent) -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-outline"></div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-mono-sm text-mono-sm font-semibold tracking-wide">
+                    Div 1 Elite
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-on-surface-variant font-bold">
+<span class="material-symbols-outlined text-[16px]">military_tech</span>
+                    #2 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">NullPointer Guild</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[NPG] • Lead: zero_entropy</span>
+</div>
+<!-- Overlapping Avatars Stack -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an intense competitive algorithm coder in dark hoodie looking directly forward with sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATDMHJK11ys4MoGdF8nypOHGGEPx2BTwrjmVauuzJoZ-dDVpRUuBY7ACk7YwAxQRvTchm0aAXAhkPSN60c4nR5C8CARm1i9xIyi_7a8WTc_uOXt1qGwqjOqy6i5Tloyoq8vddK62kxhehc-7DXebY4ibTo9y-xNo2CM8-0v62v2k7et4fIW1yPW_kx5S4uGNZ1AwfeKRhODSy13iCp_DMKH8r_3Zl4VBH-hhDGfvCQ"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Headshot of a confident software developer woman with headphones around neck, professional technology profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChXW4DrNfcF7SRVjYb4yO-tm5OqIYUhPY8_RxBZtMxjjWmAP3d7MN_AMm3Cg5nSN9gBp_H9yO04gmeXoBI8-UCX4283FvNYJllqdmbFVwUDpM8FfDWCz_bSDDbpnxbZTgrwvl2tzoKe4Zz5-IlmOmFC9iDKTALRq5BNjEbNpseA3XrOue2AM9iuAFKZhSb3xi_ePQWMFqpGdWRqXWEPnYWMJk20pdjJWdI_nYy390f"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an engineering teammate reviewing code, soft studio lighting on clean backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDYiN0mix2WaaaBCvKZUdmRqNzVtkuFgl9i2LpoC_QOdQ70BmZaLdN16nf-bOTOJ53P6n7yTw61Q_6381R8zJKhvtD1QOBhwZPFlmVnBWyReYhjlD6BIUrvhM0ppj-R9zn5ho2zY_Z2P4YFUiCPm9wqxN7BZr1XpTRTyQPq8Z2C7FOBv_iL-RT2s_GZ_bENJoe_awP01pXW0HTsfmD6fPdhYNPbdVg6cXiIn6Ty-Af"/>
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-mono-sm text-mono-sm font-bold shadow-sm">
+                      +1
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">4/5 Members</span>
+</div>
+<!-- Team Stats Row -->
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">14,210 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">79%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+                  Request to Join
+                </button>
+</div>
+</div>
+<!-- Team 3: QuantumLab Core (#3 Bronze) -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-secondary"></div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-fixed font-mono-sm text-mono-sm font-semibold tracking-wide">
+                    Div 1 Elite
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-secondary font-bold">
+<span class="material-symbols-outlined text-[16px]">military_tech</span>
+                    #3 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">QuantumLab Core</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[QLC] • Lead: bra_ket</span>
+</div>
+<!-- Overlapping Avatars Stack -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a concentrated senior programmer with rimless glasses and subtle blue rim light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf3LQRjaIpwz0PWSSu8mpGlpKFcDns-NCxNjJh1qux4Dg7Bma3-YJONOVllQXmr1_xHZ0cnrswoNlgr7IJ1xrsOFiCVXP4j_AFiJa0k3efanqyc2qJe0JO9x60gxKZbSMoBoDbPNVoSMxIA99ID6oG-85-w-D5n3Tcn5NjMXU3NMqy0QCDpdOraR3Bc6cpZfCqWS5H6I99USJ2S8Bob06dB9D7jmO7TNuSRZ_rO_I1"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a young male math and computer science researcher with relaxed expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6ZCajbpbT50WKq9zDoSaxfycY-Nh3wqBArmFBdLWBu8CnYLLdPqJdXk9dfNPoGkoyqVh1nSEom0ADZf5v2UNv_d7Hi6KRg67ykcLHb4--dXdspAMmsMRvZtqvS6jEV7DYC1vFHoBRJzlizGSzIw94EOrREaou3dNqlagB-U8wowR3ai2SbVQRiQtTlvzxNOAk8JYvSTq52EHW1HoGopVIpWycdPfiVyDcJeO-XQik"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Female developer team member with warm ambient light, tech workspace setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJXbwg4gHLge1mq11tgJN8FXIvSmTW2gsZHwVcxIHvQm0wEAr-OKAK1yxXv_cm6-juw6vMmS7z_l2M6d4_iBPHMc6x1KgoK4jKhZ2qR5QGLTJB8YUD2Gut3PdDrbm9jP1jZ30BnRaWKPr_oEOr8OOchMa36A2RTVDE-TzzZ5NolDLyTWmMBCpyDGvDg71vvmia9a2DfPVdyU4JS2krfhDYGDcJuLH_nzSmmTsAySl5"/>
+<div class="w-8 h-8 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed flex items-center justify-center font-mono-sm text-mono-sm font-bold shadow-sm">
+                      +2
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">5/5 Members</span>
+</div>
+<!-- Team Stats Row -->
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">13,950 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">74%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                  View Roster
+                </button>
+</div>
+</div>
+<!-- Team 4: Singularity Ops -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-on-surface font-mono-sm text-mono-sm font-semibold tracking-wide">
+                    Collegiate Master
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-on-surface font-bold">
+                    #4 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">Singularity Ops</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[SGO] • MIT Vanguard</span>
+</div>
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an energetic collegiate computer scientist in university hackathon tournament hall." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj1U-Aiez007uxSTGvViE0Wsk594sz3LDZq9lNv4QYrawSt8ayButiiZd550c5X9QmxqOLi36_Z25d9_9Jr04URHLYd-bTF9e9KK3j2wksR1uWMIdLVtyGoVAzhIkf6e0pYssuw7_zWnd8o5IeW2f77biWiLwA_7V-rZW_QIg6zjeNTUAswLHUDeUX6zaZyp7MMUgu6TJKNIF9ksqcVuPCsdxbJYc7s_YbmQYKPW5B"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Student competitor portrait smiling during coding competition with laptop glowing in front." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGjRSZbR_6TRVKmSgULYXPVcWibrmAYUPGsjQDya3JBgpX_DXrlnFpu0So9D_NszHpajGOahHGrA8JCEorJJjmfmXgQjpMCnvgMVp6uPE-DqWcU2Bv7esF5ZI-CbZGyWuyjohzfszuxMxzetOUeCjsQu8PfBf67fJuDcg8Rdyx-S8GOxc05kt0nuSdjM6g85ahYYJBn-h_AQvDuzW-jM9YyPzwXUBsj_KIQtzEKE2E"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Sharp focused portrait of an Asian female student programmer during speed algorithms round." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPO3JMDk5ibYo4vAKvW_FgpOWkjgxZrdxlRRqom5wpAtUSROn9P5GW0cT0qd6KaZ5VFQkWSNNMDvVN60HqH49OAUQCbSXGv5z-ClLEadPRmoqS-Q47lDIpTatK-iXkZ7BzU6iCRuVOPotlqth8lMxI4KVPvEZK5BvErrC2lDnno9rg79LrHAk-wDbuQa2J7o-I_kuDZ8EPNxUBsaHKsceGpJxdajYJtMAW9lfCeBrv"/>
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface font-mono-sm text-mono-sm font-bold flex items-center justify-center">
+                      +1
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">4/5 Members</span>
+</div>
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">13,440 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">71%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+                  Request to Join
+                </button>
+</div>
+</div>
+<!-- Team 5: Apex Binary -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-on-surface font-mono-sm text-mono-sm font-semibold tracking-wide">
+                    Division 1
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-on-surface font-bold">
+                    #5 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">Apex Binary</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[APX] • Lead: bit_shift_k</span>
+</div>
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of an experienced male system architecture software engineer with beard and glasses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9NbMlkk1IwF30lye1RRD1CJpsRTrGjrOFD3n6lXDy0NBn0BbrjAaqsEjjq9fEWa45UMmvvRPaBa888wm002I3Umoj_afHWPVP8AqAvVcI85tQUrqQDxfLmAuiDper2-kZNCFr7WuX9LgS-atlQpE22q5iMRFUzSZ6j5REC7GEvsy6AWwRHsz-muJ4Jc3Rc-AhX2ARMCepxEA3HBFuUbfVX52TQ4J-83id_YpmZaSL"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a female machine learning hacker smiling calmly in front of monitor setups." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXhO4Mg3N85odKOVQEIxrEXpeK_NLi_gEPXZbVjAHcReNbfz9pkmVmv6RTTHNqHHCdw4bbcGXedadoqldt7CFiG77vEacx3wPh-LP8PPWi8iHFp195-NaxIg4MG3nJgipvnuXWECq_piCRe-zOg81MRRIPgPbHLjCcC-YVrYnckV32kzhejTDAGr4z9_iOEvQb5fqwV_BTXeaw2O5p4_f_UzylA2av-yYb9TOMrI4H"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a competitor holding coffee mug in front of multiple terminal windows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAksOwoAwM-zn19mKKZBjJxHGoMcKFFEG-lTVic-aYztNX_TySf5Ca5VZZcWvF2PxwnCptVACwIg1Mpm_c8iynVJihigZd6usSZXF0kKH6Ob90aafgarCTXqCti6irFlRRocbQYrgIeLDGnTrxM3tcrWcjJ9IMYklNKaBE_8t3VxAlbaWJpptwL9469nNIlMJ0Yx4tMnOpBmeXCZMu7-Nn4GOwhIJaClziPP8qrZIcj"/>
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface font-mono-sm text-mono-sm font-bold flex items-center justify-center">
+                      +2
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">5/5 Members</span>
+</div>
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">12,980 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">68%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                  View Roster
+                </button>
+</div>
+</div>
+<!-- Team 6: Nordic Algorithmics -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-150 transform hover:-translate-y-0.5 relative overflow-hidden group">
+<div class="flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-on-surface font-mono-sm text-mono-sm font-semibold tracking-wide">
+                    Collegiate Master
+                  </span>
+<div class="flex items-center gap-1 font-mono-rank text-mono-rank text-on-surface font-bold">
+                    #6 Global
+                  </div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface group-hover:text-primary transition-colors">Nordic Algorithmics</h2>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">[NALG] • KTH Royal Team</span>
+</div>
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center -space-x-2.5">
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a Scandinavian female algorithm researcher in minimalist modern technical workspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMLjq3pxPRt7ou_6ZVNCMEYKmJRZ6xUyZBGgvUG663Iwdz86k9DF-M-sMFJBRUZ67z0wYF58jJPP4St_3hXiNHdYznSFDsVkNYW-qin5NAGcvvjD_dH-RQVrgW9T2dVs1G4PjopMRPQDGj7i3pN8enDJlI-X6YULCsvF1z16_a8ijVdV8hsWwD-PEsMhFdS_Fw68QZn0AfSeR9cOqRoEIfXszjMCyOWsKDkehPz1KL"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Portrait of a blonde competitive coder wearing dark crewneck, crisp contemporary styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuu9xXoS8PKmIjI-d5niuyCLaHAXixogJithQkcs0t9wcA-yzBI3dBCICgG30ik3uBauIB7CoIuflgOpt5ugNzILSgE8RceTOovdmpzoJgKr-xOJXQaN5jwcI9umf1axs9fokjmM3Y75-MBFDRF6Km2SSX7eBj__-vLmcZ4CW_85ZCvY9HZYhuMrC7tj2zP5wqcZ6JqG2MzGkUTC-3iUdjpea6keA4wxWh2S5Wg0p_"/>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm bg-surface-container" data-alt="Side profile of a developer writing algorithm tests on whiteboard, high key light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDDBNfHv_gcygL3QPqjaksRYkhcHWPsDH_yLR0tEmWasQFKiEQcV693tbSVHdm9huZZPHlvxIu-YEx8Ox9IHIQk1CV3ZXAld5NmEj3PR5N7wOo1-hplqhqu4FCffeQ-QhaumqPqvrCbCPWqBcB-FroFcrr_QfAwrdQpWsMB0KIIlIy6I-ivKnnnarFMCT8js5bl8Paem2fpXgvbjEGfQaIf362nzehRHFFkuiXY29m"/>
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface font-mono-sm text-mono-sm font-bold flex items-center justify-center">
+                      +1
+                    </div>
+</div>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-medium">4/5 Members</span>
+</div>
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Total Score</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-surface">12,650 <span class="font-mono-sm text-mono-sm font-normal text-on-surface-variant">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-on-surface-variant uppercase">Win Rate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary">65%</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 flex items-center gap-2">
+<button class="w-full py-2 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary font-label-md text-label-md transition-colors font-semibold flex items-center justify-center gap-1.5" type="button">
+                  Request to Join
+                </button>
+</div>
+</div>
+</div>
+<!-- Mini Stats & Pagination Visual Spark -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low">
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+              Showing <span class="font-mono-data text-mono-data font-bold text-on-surface">1-6</span> of <span class="font-mono-data text-mono-data font-bold text-on-surface">48</span> qualified active teams
+            </span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary-container text-on-primary font-mono-sm text-mono-sm font-bold flex items-center justify-center shadow-sm" type="button">
+                1
+              </button>
+<button class="w-8 h-8 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-mono-sm text-mono-sm flex items-center justify-center shadow-sm" type="button">
+                2
+              </button>
+<button class="w-8 h-8 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-mono-sm text-mono-sm flex items-center justify-center shadow-sm" type="button">
+                3
+              </button>
+<button class="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Right: Selected Active Team Detail Section (Your Squad) (4 Cols) -->
+<div class="xl:col-span-4 flex flex-col gap-6 sticky top-20">
+<div class="rounded-xl bg-surface-container-lowest shadow-md overflow-hidden relative">
+<!-- Team Header Banner with Cumulative Score -->
+<div class="relative p-6 bg-gradient-to-br from-primary-container via-primary to-primary-container text-on-primary overflow-hidden">
+<div class="absolute -right-8 -bottom-8 w-40 h-40 bg-surface-bright/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-start justify-between relative z-10">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-bright/20 backdrop-blur-sm text-on-primary font-mono-sm text-mono-sm font-semibold uppercase">Your Active Squad</span>
+<span class="flex items-center gap-1 font-mono-sm text-mono-sm text-secondary-fixed font-bold">
+<span class="material-symbols-outlined text-[14px]">stars</span> Captain
+                    </span>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold text-on-primary mt-2">Rankstack Elite Fleet</h3>
+<span class="font-mono-sm text-mono-sm text-inverse-primary">[REF] • Division 1 Contender</span>
+</div>
+<div class="text-right">
+<div class="px-2.5 py-1 rounded-lg bg-surface-bright/20 backdrop-blur-sm font-mono-rank text-mono-rank font-bold text-on-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary-fixed">military_tech</span>
+                    #07
+                  </div>
+<span class="font-mono-sm text-mono-sm text-inverse-primary block mt-1">Global Rank</span>
+</div>
+</div>
+<!-- Cumulative Metric Callout Bar -->
+<div class="mt-6 pt-4 border-t border-surface-bright/20 grid grid-cols-3 gap-2 relative z-10">
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-inverse-primary uppercase">ELO Aggregate</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-primary">12,450 <span class="font-mono-sm text-mono-sm font-normal text-inverse-primary">PTS</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-inverse-primary uppercase">Streak</span>
+<span class="font-mono-rank text-mono-rank font-bold text-tertiary-fixed">6 Wins</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-sm text-mono-sm text-inverse-primary uppercase">Capacity</span>
+<span class="font-mono-rank text-mono-rank font-bold text-on-primary">4 / 5</span>
+</div>
+</div>
+</div>
+<!-- Squad Telemetry & Performance Sparkline SVG -->
+<div class="p-4 bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">Weekly Cumulative Delta</span>
+<span class="font-mono-sm text-mono-sm text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +340 PTS this cycle
+                </span>
+</div>
+<!-- Inline Micro Sparkline SVG -->
+<svg class="w-32 h-8 text-tertiary" fill="none" viewbox="0 0 100 24">
+<path d="M0 20 L20 18 L40 21 L55 12 L75 14 L88 4 L100 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<path d="M0 20 L20 18 L40 21 L55 12 L75 14 L88 4 L100 2 V24 H0 Z" fill="currentColor" fill-opacity="0.12"></path>
+</svg>
+</div>
+<!-- Member Roster List -->
+<div class="p-6 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Current Roster (4)</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Slot Available: 1</span>
+</div>
+<div class="flex flex-col divide-y divide-surface-container">
+<!-- Member 1: Captain (You) -->
+<div class="py-3.5 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative shrink-0">
+<img class="w-10 h-10 rounded-full object-cover bg-surface-container shadow-sm" data-alt="Portrait of Alex Rivera, lead team captain with glasses and sharp professional expression, contemporary tech studio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbgpFo_v5ukEsdYyzrHBrsMZL0VMckkmvJNaTX0m0aR9H91XX5avihCtvIZfOyEXszYom07M0UGs75nf0kaawc_bk6Onzl89lqdvlLj0fFhhyG6PJwK_uSsrx59_yuxP9N1qpSjvm5MF0o_5dDq37Ir-pbCGtAPi1li7uO4Z2FHEgTn3ld4bhtLkJ5Br0b3UVj7FV7YbcRU_js0JML8_2v5IV-YLJrYyxCdEgPVxUs"/>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-secondary-container text-on-secondary flex items-center justify-center font-mono-sm text-[10px] font-bold" title="Team Captain">★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-lg text-label-lg font-bold text-on-surface truncate">Alex Rivera</span>
+<span class="px-1.5 py-0.2 rounded bg-primary-fixed text-on-primary-fixed-variant font-mono-sm text-[10px] font-bold uppercase">You</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Team Lead / DP Specialist</span>
+</div>
+</div>
+<div class="text-right shrink-0">
+<span class="font-mono-data text-mono-data font-bold text-on-surface block">2,420</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">ELO</span>
+</div>
+</div>
+<!-- Member 2: Sarah Chen -->
+<div class="py-3.5 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 bg-surface-container shadow-sm" data-alt="Professional studio portrait of Sarah Chen, algorithmic software researcher with focused smile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuUlOd5sup7DW3P2iII4zH-zo5ItHyQVflDk_1nI7HowvjGHeGu4fngZlJDufo_1ipwqyCVKnPvemvKpsZTA3ErzCnwtedv8v4NGtjDl-OZPNTEdM7YBQ-WPT5ZvZoTO25U-wJaDHNQLObP_XNSy3JpiOcma9LYcx7VwVXDs0MCzNaOw61zRo9luSeH9Z9YEg5QcJCVRjX559Q7ofjLnWsAPhIipeWdtMQppebRFnC"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg font-bold text-on-surface truncate">Sarah Chen</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Graph Theory & Combinatorics</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="text-right">
+<span class="font-mono-data text-mono-data font-bold text-on-surface block">2,390</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">ELO</span>
+</div>
+<button class="w-7 h-7 rounded text-on-surface-variant hover:text-error hover:bg-error-container/40 flex items-center justify-center transition-colors" title="Remove member" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span>
+</button>
+</div>
+</div>
+<!-- Member 3: Kenneth Wu -->
+<div class="py-3.5 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 bg-surface-container shadow-sm" data-alt="Portrait of Kenneth Wu, systems software developer wearing dark tech sweater with focused calm gaze." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU3al2X36NeAb0wYxyyTbmCsURkyHzlL-ZqbjUTKdYdpoHBaSrMN8HCtB4E5ZQy8uUE3MYdQlnmRkBWxa6etfErSmcsRR8C6KQD8nw2dPV0twsZ5q-Ijvg6G1CT17PfblqzoE_vTkzwxAwHIRwxa2N3_OAZJZHvxDN6tRbQhTi4oyauOzrj1pWoTfn7y2aFuXEvScHNXlDpEZWqsHNT0bBGpZZ_Cd1oCXaW3QFjnzn"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg font-bold text-on-surface truncate">Kenneth Wu</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Systems & Concurrency</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="text-right">
+<span class="font-mono-data text-mono-data font-bold text-on-surface block">2,280</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">ELO</span>
+</div>
+<button class="w-7 h-7 rounded text-on-surface-variant hover:text-error hover:bg-error-container/40 flex items-center justify-center transition-colors" title="Remove member" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span>
+</button>
+</div>
+</div>
+<!-- Member 4: DeepPath_Seeker -->
+<div class="py-3.5 flex items-center justify-between gap-3 group">
+<div class="flex items-center gap-3 min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shrink-0 bg-surface-container shadow-sm" data-alt="Portrait of competitive mathematician DeepPath_Seeker in ambient indigo lighting, high focus hackathon arena." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjBoS8yHHwD-Hgi9pwdTVUhJ-Lfgh1sIxh4dEEzhoJdvwxgoS4KxWf7U5vKEaShl6UqRg1skGVD6HeI6TRiM7xPsC9seXcb6cOar06JFL2E4p6yv7n2U5fjfdwt_qvhXXzBZD696dp4exh6otSNzege3_HL7pLsOCEa9fAnhzXuk1GYG-XvQVcVR2agnEH4tnu6fV_lgXtoPBcXZ72mvs78zTPWUvOCD19a_tfc2ca"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg font-bold text-on-surface truncate">DeepPath_Seeker</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Geometry & Math</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="text-right">
+<span class="font-mono-data text-mono-data font-bold text-on-surface block">2,210</span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">ELO</span>
+</div>
+<button class="w-7 h-7 rounded text-on-surface-variant hover:text-error hover:bg-error-container/40 flex items-center justify-center transition-colors" title="Remove member" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Invite Member Trigger -->
+<div class="pt-2">
+<button class="w-full py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all" onclick="document.getElementById('inviteInputContainer').classList.toggle('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                  Invite New Member
+                </button>
+<!-- Hidden Inline Invite Input Drawer -->
+<div class="hidden mt-3 p-3 rounded-lg bg-surface-container-low flex flex-col gap-2" id="inviteInputContainer">
+<label class="font-label-md text-label-md text-on-surface-variant font-medium">Send Invitation Link / Handle</label>
+<div class="flex gap-2">
+<input class="w-full px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm focus:outline-none" placeholder="e.g. quantum_coder_99" type="text"/>
+<button class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md font-semibold whitespace-nowrap" type="button">Send</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer: Squad Activity Digest -->
+<div class="p-4 bg-surface-container-lowest border-t border-surface-container flex items-center justify-between text-on-surface-variant">
+<span class="font-mono-sm text-mono-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+                All members checked in for Stage 2
+              </span>
+<a class="font-mono-sm text-mono-sm text-primary hover:underline font-semibold" href="#">Settings</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Create Team Modal Dialog (Active Accessible Overlay) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm hidden transition-opacity duration-200" id="createTeamModal">
+<div class="relative w-full max-w-xl rounded-xl bg-surface-container-lowest shadow-2xl overflow-hidden flex flex-col transform transition-all duration-200">
+<!-- Modal Header -->
+<div class="px-6 py-5 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Create New Competitive Team</h3>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant">Form a squad to compete in Division leagues & grand invitationals</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors" onclick="document.getElementById('createTeamModal').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Modal Body / Form Fields -->
+<div class="p-6 flex flex-col gap-5">
+<!-- Field 1: Team Name -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-lg text-label-lg font-semibold text-on-surface flex justify-between">
+<span>Team Name <span class="text-error">*</span></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-normal">Max 32 chars</span>
+</label>
+<input class="w-full h-10 px-3.5 rounded-lg bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md focus:outline-none focus:bg-surface-bright transition-colors" placeholder="Enter unique team handle (e.g. ByteForge Syndicate)" type="text"/>
+</div>
+<!-- Field 2: Team Tag / Abbreviation -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-lg text-label-lg font-semibold text-on-surface flex justify-between">
+<span>Team Tag / Abbreviation <span class="text-error">*</span></span>
+<span class="font-mono-sm text-mono-sm text-on-surface-variant font-normal">3-5 characters</span>
+</label>
+<div class="relative">
+<span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono-data text-mono-data text-on-surface-variant font-bold">[</span>
+<input class="w-full h-10 pl-7 pr-7 uppercase font-mono-data text-mono-data rounded-lg bg-surface-container-low text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-bright transition-colors" maxlength="5" placeholder="REF" type="text"/>
+<span class="absolute right-3.5 top-1/2 -translate-y-1/2 font-mono-data text-mono-data text-on-surface-variant font-bold">]</span>
+</div>
+</div>
+<!-- Field 3: Member Search Multi-select -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-lg text-label-lg font-semibold text-on-surface">Initial Squad Members (Up to 4)</label>
+<div class="p-2 rounded-lg bg-surface-container-low flex flex-wrap items-center gap-1.5 min-h-[44px]">
+<!-- Selected Pill 1 -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded bg-primary-container text-on-primary font-mono-sm text-mono-sm">
+<span>alex_rivera (You - Captain)</span>
+</div>
+<!-- Selected Pill 2 -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-lowest text-on-surface font-mono-sm text-mono-sm shadow-sm">
+<span>sarah_chen</span>
+<button class="text-on-surface-variant hover:text-error ml-1 flex items-center" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<!-- Input to add more -->
+<input class="grow h-7 px-2 bg-transparent text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm focus:outline-none min-w-[200px]" placeholder="Search competitors by username or ID..." type="text"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Invites will be dispatched automatically upon squad genesis.</span>
+</div>
+<!-- Field 4: Team Visibility Toggle -->
+<div class="flex flex-col gap-2 pt-1">
+<label class="font-label-lg text-label-lg font-semibold text-on-surface">Team Visibility & Membership</label>
+<div class="grid grid-cols-2 gap-3">
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="mt-0.5 text-primary-container focus:ring-0" name="teamVisibility" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">Public Squad</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Open join requests from certified benchmark coders</span>
+</div>
+</label>
+<label class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<input class="mt-0.5 text-primary-container focus:ring-0" name="teamVisibility" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">Invite Only</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Hidden roster with restricted private invitations</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-4 bg-surface-container-low flex items-center justify-end gap-3">
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-lg text-label-lg font-semibold shadow-sm transition-colors" onclick="document.getElementById('createTeamModal').classList.add('hidden')" type="button">
+          Cancel
+        </button>
+<button class="px-5 py-2 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-semibold shadow-md transition-all flex items-center gap-2" onclick="document.getElementById('createTeamModal').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+          Create Team & Send Invites
+        </button>
+</div>
+</div>
+</div>
+<!-- Interactive Filter Scripts -->
+<script>
+    document.querySelectorAll('.tier-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tier-tab-btn').forEach(b => {
+          b.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm', 'font-semibold');
+          b.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm', 'font-semibold');
+        btn.classList.remove('text-on-surface-variant');
+      });
+    });
+  </script>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant py-8 px-8"><div class="w-full flex flex-col md:flex-row justify-between items-start gap-8"><div class="flex flex-col gap-2 max-w-sm"><div class="flex items-center gap-2"><img alt="Rankstack" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UFz_cKO6vfFJBqfqcbbpk5ha7GLn826lGzu5t0jN-Ho6rpje-mZd1Y3SBEJ0VSEgJ_3Lw3c0by4WQDoRdm8wyM_1IYEKzxDEQq55eY8LI572GctFn9GVjDluGfalt30H8J0uchP8GOTYdhDWUkCSSYhcCHTTnNTPgq49LtT5D6L96o5_M61hb5mIkdhdJW9D2939lQFhw7C5aB8NQLWV6Vh-BBom9LOeXduahxvxzbFA"/><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Rankstack</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">Precision Competitive Benchmark & Skill Evaluation</p><p class="font-mono-sm text-mono-sm text-on-surface-variant mt-2">© 2025 Rankstack Inc. All rights reserved.</p></div><div class="grid grid-cols-3 gap-12"><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Product</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contest-catalog" href="#">Contests</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaderboard" href="#">Leaderboards</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="problem-and-submission" href="#">Practice Sandbox</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Workspace</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="teams" href="#">Teams</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="submission-history" href="#">Submissions</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="admin-dashboard" href="#">Admin Console</a></div><div class="flex flex-col gap-3"><span class="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">Security</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="auth-login" href="#">Account Access</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Integrity Code</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none" id="toast-container"><div class="pointer-events-auto flex items-center gap-3 bg-surface-container-lowest border border-outline-variant shadow-lg px-4 py-3 rounded-lg"><span class="material-symbols-outlined text-secondary text-[20px]">info</span><span class="font-body-sm text-body-sm text-on-surface">System live: Evaluation cluster running at 99.98% efficiency</span></div></div></body></html>
