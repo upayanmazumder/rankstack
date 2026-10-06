@@ -1,9 +1,10 @@
 """CRUD routes for `contests`, plus status transitions and participant adds."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pymongo import ReturnDocument
 
 from api import redis_ops
+from api.dependencies import get_admin_user
 from api.db import get_db
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.contests import (
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/contests", tags=["contests"])
 
 
 @router.post("", response_model=ContestOut, status_code=201)
-def create_contest(payload: ContestCreate):
+def create_contest(payload: ContestCreate, _: dict = Depends(get_admin_user)):
     db = get_db()
     doc = {
         "title": payload.title,
@@ -54,7 +55,9 @@ def get_contest(contest_id: str):
 
 
 @router.patch("/{contest_id}", response_model=ContestOut)
-def update_contest(contest_id: str, payload: ContestUpdate):
+def update_contest(
+    contest_id: str, payload: ContestUpdate, _: dict = Depends(get_admin_user)
+):
     db = get_db()
     updates = payload.model_dump(exclude_unset=True)
     if not updates:
@@ -69,7 +72,9 @@ def update_contest(contest_id: str, payload: ContestUpdate):
 
 
 @router.patch("/{contest_id}/status", response_model=ContestOut)
-def update_status(contest_id: str, payload: ContestStatusUpdate):
+def update_status(
+    contest_id: str, payload: ContestStatusUpdate, _: dict = Depends(get_admin_user)
+):
     db = get_db()
     doc = db["contests"].find_one_and_update(
         {"_id": oid(contest_id)},
@@ -82,7 +87,9 @@ def update_status(contest_id: str, payload: ContestStatusUpdate):
 
 
 @router.post("/{contest_id}/participants", response_model=ContestOut)
-def add_participant(contest_id: str, payload: ContestAddParticipant):
+def add_participant(
+    contest_id: str, payload: ContestAddParticipant, _: dict = Depends(get_admin_user)
+):
     db = get_db()
     entry = {"refType": payload.refType, "refId": oid(payload.refId)}
     doc = db["contests"].find_one_and_update(
@@ -102,7 +109,7 @@ def get_leaderboard(contest_id: str, top: int = 10):
 
 
 @router.delete("/{contest_id}", status_code=204)
-def delete_contest(contest_id: str):
+def delete_contest(contest_id: str, _: dict = Depends(get_admin_user)):
     db = get_db()
     result = db["contests"].delete_one({"_id": oid(contest_id)})
     if result.deleted_count == 0:

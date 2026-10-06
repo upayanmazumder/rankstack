@@ -1,9 +1,10 @@
 """CRUD routes for `submissions`, backed by the create/status-update transactions
 and Redis rate limiting / leaderboard sync."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from api import redis_ops, services
+from api.dependencies import get_admin_user, get_current_user
 from api.db import get_db
 from api.models.common import oid, serialize_doc
 from api.models.submissions import SubmissionCreate, SubmissionOut, SubmissionStatusUpdate
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 
 
 @router.post("", response_model=SubmissionOut, status_code=201)
-def create_submission(payload: SubmissionCreate):
+def create_submission(payload: SubmissionCreate, _: dict = Depends(get_current_user)):
     db = get_db()
     allowed, count = redis_ops.check_and_increment_rate_limit(payload.submittedBy.refId)
     if not allowed:
@@ -59,7 +60,11 @@ def get_submission(submission_id: str):
 
 
 @router.patch("/{submission_id}/status", response_model=SubmissionOut)
-def update_status(submission_id: str, payload: SubmissionStatusUpdate):
+def update_status(
+    submission_id: str,
+    payload: SubmissionStatusUpdate,
+    _: dict = Depends(get_admin_user),
+):
     db = get_db()
     sub_id = oid(submission_id)
     existing = db["submissions"].find_one({"_id": sub_id}, {"score": 1})
@@ -76,7 +81,7 @@ def update_status(submission_id: str, payload: SubmissionStatusUpdate):
 
 
 @router.delete("/{submission_id}", status_code=204)
-def delete_submission(submission_id: str):
+def delete_submission(submission_id: str, _: dict = Depends(get_admin_user)):
     db = get_db()
     result = db["submissions"].delete_one({"_id": oid(submission_id)})
     if result.deleted_count == 0:

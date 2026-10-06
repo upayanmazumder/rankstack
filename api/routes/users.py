@@ -1,10 +1,11 @@
 """CRUD routes for `users`."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from api.db import get_db
+from api.dependencies import get_admin_user, get_current_user
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.users import UserCreate, UserOut, UserUpdate
 from api.security import hash_password
@@ -19,7 +20,7 @@ def create_user(payload: UserCreate):
         "name": payload.name,
         "email": payload.email,
         "passwordHash": hash_password(payload.password),
-        "role": payload.role,
+        "role": "participant",
         "totalScore": 0,
         "teamIds": [],
         "createdAt": utcnow(),
@@ -50,9 +51,9 @@ def get_user(user_id: str):
 
 
 @router.patch("/{user_id}", response_model=UserOut)
-def update_user(user_id: str, payload: UserUpdate):
+def update_user(user_id: str, payload: UserUpdate, _: dict = Depends(get_admin_user)):
     db = get_db()
-    updates = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
+    updates = payload.model_dump(exclude_unset=True)
     if not updates:
         doc = db["users"].find_one({"_id": oid(user_id)})
     else:
@@ -70,7 +71,7 @@ def update_user(user_id: str, payload: UserUpdate):
 
 
 @router.delete("/{user_id}", status_code=204)
-def delete_user(user_id: str):
+def delete_user(user_id: str, _: dict = Depends(get_current_user)):
     db = get_db()
     result = db["users"].delete_one({"_id": oid(user_id)})
     if result.deleted_count == 0:
