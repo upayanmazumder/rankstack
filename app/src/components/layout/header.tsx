@@ -28,13 +28,10 @@ export function Header() {
   const { setTheme, theme } = useTheme();
   const toggleSidebar = useUiStore.use.toggleSidebar();
   const user = useAuthStore.use.user();
-  const clearAuth = useAuthStore.use.clearAuth();
-  const token = useAuthStore.use.token();
   const logout = useLogout();
 
   function handleLogout() {
-    if (token) logout.mutate(token);
-    clearAuth();
+    logout.mutate(undefined);
   }
 
   return (
