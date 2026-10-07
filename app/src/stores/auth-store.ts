@@ -11,7 +11,7 @@ import { createSelectors } from './create-selectors';
 interface AuthState {
   token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User) => void;
+  setAuth: (token: string, user: User | null) => void;
   clearAuth: () => void;
 }
 

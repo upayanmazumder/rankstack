@@ -9,10 +9,16 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (payload: LoginRequest) => {
       const res = await api.post<Session>('/sessions', payload);
-      const sessionRes = await api.get<{ sessionId: string; user: User }>(
-        `/sessions/${res.data.sessionId}`
-      );
-      return { session: res.data, user: sessionRes.data.user };
+      let user: User | null = null;
+      try {
+        const sessionRes = await api.get<{ sessionId: string; user: User }>(
+          `/sessions/${res.data.sessionId}`
+        );
+        user = sessionRes.data.user;
+      } catch {
+        // Profile request is enrichment; if it fails, session is still valid
+      }
+      return { session: res.data, user };
     },
     onSuccess: ({ session, user }) => {
       setAuth(session.sessionId, user);
@@ -30,7 +36,7 @@ export function useLogout() {
         await api.delete(`/sessions/${id}`);
       }
     },
-    onSettled: () => {
+    onSuccess: () => {
       clearAuth();
     },
   });

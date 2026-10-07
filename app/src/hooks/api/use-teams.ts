@@ -36,7 +36,10 @@ export function useCreateTeam() {
       const res = await api.post<Team>('/teams', payload);
       return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.lists() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
   });
 }
 
@@ -89,6 +92,9 @@ export function useDeleteTeam(id: string) {
     mutationFn: async () => {
       await api.delete(`/teams/${id}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.all() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: teamKeys.all() });
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
   });
 }
