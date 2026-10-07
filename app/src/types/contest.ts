@@ -36,9 +36,7 @@ export interface ContestUpdate {
 }
 
 export interface LeaderboardEntry {
-  participantId: string;
-  participantType: ParticipantRefType;
-  name: string;
+  memberId: string;
   score: number;
   rank: number;
 }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Moon, Sun, Trophy } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { toast } from 'sonner';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -23,16 +24,28 @@ const NAV_LINKS = [
   { href: '/submissions', label: 'Submissions' },
 ] as const;
 
+const ADMIN_LINKS = [
+  { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/contests', label: 'Manage Contests' },
+  { href: '/admin/problems', label: 'Manage Problems' },
+  { href: '/admin/submissions', label: 'Review Submissions' },
+  { href: '/admin/users', label: 'Manage Users' },
+] as const;
+
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
-  const toggleSidebar = useUiStore.use.toggleSidebar();
-  const user = useAuthStore.use.user();
+  const toggleSidebar = useUiStore(state => state.toggleSidebar);
+  const user = useAuthStore(state => state.user);
   const logout = useLogout();
 
   function handleLogout() {
-    logout.mutate(undefined);
+    logout.mutate(undefined, {
+      onError: () =>
+        toast.error('The server could not revoke this session. Local sign-out completed.'),
+      onSettled: () => router.replace('/login'),
+    });
   }
 
   return (
@@ -69,6 +82,26 @@ export function Header() {
             {label}
           </Link>
         ))}
+        {user?.role === 'admin' && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                pathname.startsWith('/admin')
+                  ? 'bg-muted text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Admin
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {ADMIN_LINKS.map(({ href, label }) => (
+                <DropdownMenuItem key={href} onClick={() => router.push(href)}>
+                  {label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </nav>
 
       <div className="ml-auto flex items-center gap-2">

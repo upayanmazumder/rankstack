@@ -7,6 +7,7 @@ from api import redis_ops
 from api.config import settings
 from api.db import get_db
 from api.models.common import oid, serialize_doc
+from api.models.users import UserOut
 from api.security import new_session_token, verify_password
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -23,6 +24,11 @@ class LoginResponse(BaseModel):
     expiresInSeconds: int
 
 
+class SessionDetail(BaseModel):
+    sessionId: str
+    user: UserOut
+
+
 @router.post("", response_model=LoginResponse, status_code=201)
 def login(payload: LoginRequest):
     db = get_db()
@@ -36,7 +42,7 @@ def login(payload: LoginRequest):
     )
 
 
-@router.get("/{session_id}")
+@router.get("/{session_id}", response_model=SessionDetail)
 def get_session(session_id: str):
     user_id = redis_ops.get_session_user(session_id)
     if user_id is None:

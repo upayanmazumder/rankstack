@@ -24,9 +24,9 @@ const ADMIN_LINKS = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const sidebarOpen = useUiStore.use.sidebarOpen();
-  const setSidebarOpen = useUiStore.use.setSidebarOpen();
-  const user = useAuthStore.use.user();
+  const sidebarOpen = useUiStore(state => state.sidebarOpen);
+  const setSidebarOpen = useUiStore(state => state.setSidebarOpen);
+  const user = useAuthStore(state => state.user);
 
   return (
     <Sheet open={sidebarOpen} onOpenChange={open => setSidebarOpen(open)}>

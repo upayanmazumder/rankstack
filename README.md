@@ -94,6 +94,17 @@ directly or exported into Postman.
 
 All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
 
+### Frontend sessions
+
+The login form sends credentials to the Next.js `/api/session` route. That route creates the
+FastAPI session and sets an HttpOnly `rankstack-session` cookie. The Next.js proxy checks that
+cookie against FastAPI before it serves protected routes. Sign-out removes the cookie and
+requests session revocation. The session profile response excludes `passwordHash`.
+
+`GET /contests/{id}/leaderboard` returns `{ contestId, leaderboard }`. Each leaderboard row
+contains `memberId`, `score`, and `rank`. The frontend displays the member ID because this
+response does not contain a participant name or type.
+
 Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.
 
@@ -146,6 +157,6 @@ in-cluster alongside it.
 
 ## Notes on scope
 
-Passwords are hashed with PBKDF2-HMAC-SHA256 at 200k iterations, which is fine here but not what
-you'd use behind a real auth provider. There's no frontend UI for most of this yet beyond the
-`/motion` demo page; the API is meant to be exercised through Swagger, curl, or Postman for now.
+Passwords are hashed with PBKDF2-HMAC-SHA256 at 200k iterations. The frontend has login and
+registration pages, shared display components, and a navigation shell. Domain pages remain
+unimplemented. Use Swagger, curl, or Postman to exercise the remaining API flows.

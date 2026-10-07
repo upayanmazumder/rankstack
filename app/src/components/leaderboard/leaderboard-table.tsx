@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -25,23 +24,17 @@ export function LeaderboardTable({ entries }: { entries: LeaderboardEntry[] }) {
       <TableHeader>
         <TableRow>
           <TableHead className="w-16">#</TableHead>
-          <TableHead>Participant</TableHead>
-          <TableHead>Type</TableHead>
+          <TableHead>Participant ID</TableHead>
           <TableHead className="text-right">Score</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {entries.map(entry => (
-          <TableRow key={entry.participantId}>
+          <TableRow key={entry.memberId}>
             <TableCell className={RANK_STYLES[entry.rank] ?? 'text-muted-foreground'}>
               {entry.rank}
             </TableCell>
-            <TableCell className="font-medium">{entry.name}</TableCell>
-            <TableCell>
-              <Badge variant="outline" className="capitalize">
-                {entry.participantType}
-              </Badge>
-            </TableCell>
+            <TableCell className="font-mono text-sm">{entry.memberId}</TableCell>
             <TableCell className="text-right font-semibold tabular-nums">
               {entry.score.toLocaleString()}
             </TableCell>

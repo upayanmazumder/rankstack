@@ -12,11 +12,21 @@ interface SubmissionRowProps {
 
 export function SubmissionRow({ submission, problemTitle, onSelect }: SubmissionRowProps) {
   return (
-    <TableRow
-      className={onSelect ? 'cursor-pointer' : undefined}
-      onClick={onSelect ? () => onSelect(submission.id) : undefined}
-    >
-      <TableCell className="font-medium">{problemTitle ?? submission.problemId}</TableCell>
+    <TableRow>
+      <TableCell className="font-medium">
+        {onSelect ? (
+          <button
+            type="button"
+            className="cursor-pointer rounded-sm text-left hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+            aria-label={`View submission for ${problemTitle ?? submission.problemId}`}
+            onClick={() => onSelect(submission.id)}
+          >
+            {problemTitle ?? submission.problemId}
+          </button>
+        ) : (
+          (problemTitle ?? submission.problemId)
+        )}
+      </TableCell>
       <TableCell>
         <SubmissionStatusBadge status={submission.status} />
       </TableCell>
