@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Moon, Sun, Trophy } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -25,7 +25,8 @@ const NAV_LINKS = [
 
 export function Header() {
   const pathname = usePathname();
-  const { setTheme, theme } = useTheme();
+  const router = useRouter();
+  const { setTheme, resolvedTheme } = useTheme();
   const toggleSidebar = useUiStore.use.toggleSidebar();
   const user = useAuthStore.use.user();
   const logout = useLogout();
@@ -76,7 +77,7 @@ export function Header() {
           variant="ghost"
           size="icon"
           aria-label="Toggle theme"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
         >
           <Sun className="size-4 dark:hidden" />
           <Moon className="hidden size-4 dark:block" />
@@ -100,16 +101,14 @@ export function Header() {
               <DropdownMenuSeparator />
               {user.role === 'admin' && (
                 <>
-                  <DropdownMenuItem>
-                    <Link href="/admin" className="w-full">
-                      Admin Dashboard
-                    </Link>
+                  <DropdownMenuItem onClick={() => router.push('/admin')}>
+                    Admin Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem
-                onSelect={handleLogout}
+                onClick={handleLogout}
                 className="text-destructive focus:text-destructive"
               >
                 Sign out
