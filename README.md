@@ -49,7 +49,7 @@ Needs Docker, Docker Compose, and Python 3.14 (`python3.14 -m venv` has to work)
 make up        # start MongoDB (replica set) + Redis
 make install   # create a venv, install dependencies
 make init-db   # create collections, $jsonSchema validators, indexes
-make seed      # wipe and reseed all 5 collections
+make seed      # wipe app collections and reseed 5 core collections
 ```
 
 Or all at once from a clean slate: `make reset` (down + up + init-db + seed).

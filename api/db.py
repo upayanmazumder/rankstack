@@ -148,12 +148,27 @@ SUBMISSIONS_SCHEMA = {
     }
 }
 
+DIRTY_LEADERBOARDS_SCHEMA = {
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["_id"],
+        "properties": {
+            "_id": {"bsonType": "objectId"},
+            "dirty": {"bsonType": "bool"},
+            "version": {"bsonType": ["int", "long"]},
+            "reconciledVersion": {"bsonType": ["int", "long", "null"]},
+        },
+    }
+}
+
+
 COLLECTION_VALIDATORS = {
     "users": USERS_SCHEMA,
     "teams": TEAMS_SCHEMA,
     "contests": CONTESTS_SCHEMA,
     "problems": PROBLEMS_SCHEMA,
     "submissions": SUBMISSIONS_SCHEMA,
+    "dirty_leaderboards": DIRTY_LEADERBOARDS_SCHEMA,
 }
 
 
@@ -172,7 +187,7 @@ def get_redis_client() -> redis.Redis:
 
 
 def ensure_collections(db: Database) -> None:
-    """Create the 5 collections with $jsonSchema validators (idempotent)."""
+    """Create collections with $jsonSchema validators (idempotent)."""
     existing = set(db.list_collection_names())
     for name, validator in COLLECTION_VALIDATORS.items():
         if name in existing:

@@ -1,4 +1,4 @@
-"""Wipe and reseed all 5 collections with referentially-consistent sample data.
+"""Wipe application state and reseed the 5 core collections with consistent sample data.
 
 Target distribution (comfortably clears the 50-record minimum):
   users 15, teams 5, contests 5, problems 15, submissions 40-50+  ->  85-95+ total
@@ -48,10 +48,11 @@ def weighted_status() -> str:
 
 
 def wipe(db, redis_client) -> None:
-    for name in ["users", "teams", "contests", "problems", "submissions"]:
+    for name in ["users", "teams", "contests", "problems", "submissions", "dirty_leaderboards"]:
         db[name].delete_many({})
-    for key in redis_client.keys("leaderboard:*"):
-        redis_client.delete(key)
+    for pattern in ("leaderboard:*", "leaderboard_revision:*"):
+        for key in redis_client.keys(pattern):
+            redis_client.delete(key)
 
 
 def seed_users(db, n: int = 15) -> list[dict]:
