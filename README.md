@@ -101,6 +101,9 @@ FastAPI session and sets an HttpOnly `rankstack-session` cookie. The Next.js pro
 cookie against FastAPI before it serves protected routes. Sign-out removes the cookie and
 requests session revocation. The session profile response excludes `passwordHash`.
 
+After login or registration, the frontend opens `/contests`. This page lists contests from
+`GET /contests` and shows loading, empty, and error states. The page requires a valid session cookie.
+
 `GET /contests/{id}/leaderboard` returns `{ contestId, leaderboard }`. Each leaderboard row
 contains `memberId`, `score`, and `rank`. The frontend displays the member ID because this
 response does not contain a participant name or type.
