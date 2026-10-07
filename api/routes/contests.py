@@ -121,19 +121,22 @@ def get_leaderboard(contest_id: str, top: int = 10):
             rows = list(db["submissions"].aggregate(pipeline))
         if pending:
             try:
-                redis_ops.replace_leaderboard(
-                    contest_id, {str(row["_id"]): row["score"] for row in rows}
+                replaced = redis_ops.replace_leaderboard(
+                    contest_id,
+                    {str(row["_id"]): row["score"] for row in rows},
+                    marker.get("version", 0),
                 )
             except RedisError:
                 pass  # Keep the marker pending and serve MongoDB data.
             else:
-                db["dirty_leaderboards"].update_one(
-                    {
-                        "_id": contest_oid,
-                        "version": marker.get("version", {"$exists": False}),
-                    },
-                    {"$set": {"reconciledVersion": marker.get("version")}},
-                )
+                if replaced:
+                    db["dirty_leaderboards"].update_one(
+                        {
+                            "_id": contest_oid,
+                            "version": marker.get("version", {"$exists": False}),
+                        },
+                        {"$set": {"reconciledVersion": marker.get("version")}},
+                    )
         if not exists:
             raise HTTPException(status_code=404, detail="Contest not found")
         leaderboard = [

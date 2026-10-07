@@ -6,6 +6,8 @@ Key layout (matches the Review 1 design):
   rate_limit:<userId>       -> STRING counter, TTL sliding window
 """
 
+from redis.exceptions import WatchError
+
 from api.config import settings
 from api.db import get_redis_client
 
@@ -41,13 +43,26 @@ def get_leaderboard(contest_id: str, top: int = 10) -> list[dict]:
     return [{"memberId": member, "score": score, "rank": i + 1} for i, (member, score) in enumerate(rows)]
 
 
-def replace_leaderboard(contest_id: str, scores: dict[str, float]) -> None:
-    """Replace a contest's cached scores in one Redis transaction."""
-    with get_redis_client().pipeline(transaction=True) as pipe:
-        pipe.delete(leaderboard_key(contest_id))
-        if scores:
-            pipe.zadd(leaderboard_key(contest_id), scores)
-        pipe.execute()
+def replace_leaderboard(contest_id: str, scores: dict[str, float], version: int) -> bool:
+    """Replace cached scores unless Redis already holds a newer revision."""
+    key = leaderboard_key(contest_id)
+    revision_key = f"leaderboard_revision:{contest_id}"
+    with get_redis_client().pipeline() as pipe:
+        while True:
+            try:
+                pipe.watch(revision_key)
+                current = pipe.get(revision_key)
+                if current is not None and int(current) > version:
+                    return False
+                pipe.multi()
+                pipe.delete(key)
+                if scores:
+                    pipe.zadd(key, scores)
+                pipe.set(revision_key, version)
+                pipe.execute()
+                return True
+            except WatchError:
+                continue
 
 
 def session_key(session_id: str) -> str:

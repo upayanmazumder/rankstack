@@ -98,8 +98,8 @@ Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.
 
 Deletion transactions record affected contests in `dirty_leaderboards`. Their leaderboard reads
-use MongoDB scores until the contest is deleted. If Redis cleanup fails, the next leaderboard read
-rebuilds its Redis entry from MongoDB. Later score updates trigger another rebuild.
+use MongoDB scores until the contest is deleted. Pending reads attempt to rebuild Redis from MongoDB
+and retry while Redis is unavailable. Later score updates trigger another attempt.
 The marker keeps MongoDB authoritative during recovery.
 
 
