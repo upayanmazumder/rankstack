@@ -11,10 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { env } from '@/env';
 import { useLogin } from '@/hooks/api';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { useAuthStore } from '@/stores';
 
 const loginSchema = z.object({
   email: z.email('Enter a valid email address'),
@@ -25,7 +23,6 @@ type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const setAuth = useAuthStore.use.setAuth();
   const login = useLogin();
 
   const {
@@ -36,15 +33,7 @@ export default function LoginPage() {
 
   async function onSubmit({ email, password }: LoginValues) {
     try {
-      const session = await login.mutateAsync({ email, password });
-
-      const userRes = await fetch(`${env.NEXT_PUBLIC_API_URL}/users/${session.userId}`, {
-        headers: { Authorization: `Bearer ${session.sessionId}` },
-      });
-      if (!userRes.ok) throw new Error('Failed to load user profile');
-      const user = await userRes.json();
-
-      setAuth(session.sessionId, user);
+      await login.mutateAsync({ email, password });
       toast.success('Welcome back!');
       router.push('/contests');
     } catch (err) {

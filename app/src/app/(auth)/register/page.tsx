@@ -11,10 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { env } from '@/env';
 import { useLogin, useRegister } from '@/hooks/api';
 import { useZodForm } from '@/hooks/use-zod-form';
-import { useAuthStore } from '@/stores';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required').max(120),
@@ -26,7 +24,6 @@ type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const setAuth = useAuthStore.use.setAuth();
   const register = useRegister();
   const login = useLogin();
 
@@ -39,15 +36,7 @@ export default function RegisterPage() {
   async function onSubmit({ name, email, password }: RegisterValues) {
     try {
       await register.mutateAsync({ name, email, password });
-      const session = await login.mutateAsync({ email, password });
-
-      const userRes = await fetch(`${env.NEXT_PUBLIC_API_URL}/users/${session.userId}`, {
-        headers: { Authorization: `Bearer ${session.sessionId}` },
-      });
-      if (!userRes.ok) throw new Error('Failed to load user profile');
-      const user = await userRes.json();
-
-      setAuth(session.sessionId, user);
+      await login.mutateAsync({ email, password });
       toast.success('Account created! Welcome to Rankstack.');
       router.push('/contests');
     } catch (err) {
