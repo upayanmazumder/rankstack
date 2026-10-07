@@ -20,6 +20,21 @@ def update_leaderboard_score(contest_id: str, member_id: str, score_delta: float
     return r.zincrby(leaderboard_key(contest_id), score_delta, member_id)
 
 
+def decrement_existing_leaderboard_score(
+    contest_id: str, member_id: str, score: float
+) -> None:
+    """Reverse a score only when its leaderboard member still exists."""
+    get_redis_client().eval(
+        "if redis.call('ZSCORE', KEYS[1], ARGV[1]) then "
+        "return redis.call('ZINCRBY', KEYS[1], -tonumber(ARGV[2]), ARGV[1]) "
+        "end",
+        1,
+        leaderboard_key(contest_id),
+        member_id,
+        score,
+    )
+
+
 def get_leaderboard(contest_id: str, top: int = 10) -> list[dict]:
     r = get_redis_client()
     rows = r.zrevrange(leaderboard_key(contest_id), 0, top - 1, withscores=True)
@@ -64,3 +79,13 @@ def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int]:
         r.expire(key, settings.rate_limit_window_seconds)
     allowed = count <= settings.rate_limit_max_submissions
     return allowed, count
+
+
+def remove_leaderboard_member(contest_id: str, member_id: str) -> None:
+    """Remove one participant from a contest leaderboard."""
+    get_redis_client().zrem(leaderboard_key(contest_id), member_id)
+
+
+def delete_leaderboard(contest_id: str) -> None:
+    """Remove a contest leaderboard."""
+    get_redis_client().delete(leaderboard_key(contest_id))

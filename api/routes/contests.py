@@ -3,7 +3,7 @@
 from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
 
-from api import redis_ops
+from api import redis_ops, services
 from api.db import get_db
 from api.dependencies import AdminUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -98,13 +98,31 @@ def add_participant(contest_id: str, payload: ContestAddParticipant, _: AdminUse
 
 @router.get("/{contest_id}/leaderboard")
 def get_leaderboard(contest_id: str, top: int = 10):
-    """Fast-path leaderboard read from the Redis sorted set."""
-    return {"contestId": contest_id, "leaderboard": redis_ops.get_leaderboard(contest_id, top)}
+    """Read Redis unless a deletion requires MongoDB as the source of truth."""
+    db = get_db()
+    contest_oid = oid(contest_id)
+    if db["dirty_leaderboards"].find_one({"_id": contest_oid}, {"_id": 1}):
+        if db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is None:
+            raise HTTPException(status_code=404, detail="Contest not found")
+        rows = db["submissions"].aggregate(
+            [
+                {"$match": {"contestId": contest_oid, "score": {"$exists": True, "$ne": 0}}},
+                {"$group": {"_id": "$submittedBy.refId", "score": {"$sum": "$score"}}},
+                {"$sort": {"score": -1, "_id": -1}},
+                {"$limit": max(top, 1)},
+            ]
+        )
+        leaderboard = [
+            {"memberId": str(row["_id"]), "score": row["score"], "rank": rank}
+            for rank, row in enumerate(rows, 1)
+        ][: max(top, 0)]
+    else:
+        leaderboard = redis_ops.get_leaderboard(contest_id, top)
+    return {"contestId": contest_id, "leaderboard": leaderboard}
 
 
 @router.delete("/{contest_id}", status_code=204)
 def delete_contest(contest_id: str, _: AdminUser):
     db = get_db()
-    result = db["contests"].delete_one({"_id": oid(contest_id)})
-    if result.deleted_count == 0:
+    if services.delete_contest_transaction(db, oid(contest_id)) is None:
         raise HTTPException(status_code=404, detail="Contest not found")

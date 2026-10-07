@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
 
+from api import services
 from api.db import get_db
 from api.dependencies import AdminUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -60,9 +61,5 @@ def update_problem(problem_id: str, payload: ProblemUpdate, _: AdminUser):
 @router.delete("/{problem_id}", status_code=204)
 def delete_problem(problem_id: str, _: AdminUser):
     db = get_db()
-    pid = oid(problem_id)
-    doc = db["problems"].find_one({"_id": pid})
-    if doc is None:
+    if services.delete_problem_transaction(db, oid(problem_id)) is None:
         raise HTTPException(status_code=404, detail="Problem not found")
-    db["problems"].delete_one({"_id": pid})
-    db["contests"].update_one({"_id": doc["contestId"]}, {"$pull": {"problemIds": pid}})

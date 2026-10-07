@@ -97,9 +97,24 @@ def update_status(
 
 @router.delete("/{submission_id}", status_code=204)
 def delete_submission(submission_id: str, current: CurrentUser):
-    if current.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin privileges required")
     db = get_db()
-    result = db["submissions"].delete_one({"_id": oid(submission_id)})
-    if result.deleted_count == 0:
+    sub_id = oid(submission_id)
+    submission = db["submissions"].find_one({"_id": sub_id})
+    if submission is None:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    submitted_by = submission["submittedBy"]
+    is_owner = (
+        submitted_by["refType"] == "user"
+        and submitted_by["refId"] == current["_id"]
+    )
+    is_team_member = (
+        submitted_by["refType"] == "team"
+        and db["teams"].find_one(
+            {"_id": submitted_by["refId"], "memberIds": current["_id"]}, {"_id": 1}
+        )
+        is not None
+    )
+    if current.get("role") != "admin" and not is_owner and not is_team_member:
+        raise HTTPException(status_code=403, detail="Cannot delete this submission")
+    if services.delete_submission_transaction(db, sub_id) is None:
         raise HTTPException(status_code=404, detail="Submission not found")

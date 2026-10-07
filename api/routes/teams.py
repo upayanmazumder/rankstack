@@ -5,7 +5,7 @@ from pymongo import ReturnDocument
 
 from api import services
 from api.db import get_db
-from api.dependencies import CurrentUser, TeamMemberOrAdmin
+from api.dependencies import AdminUser, CurrentUser, TeamMemberOrAdmin
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.teams import TeamCreate, TeamMemberOp, TeamOut, TeamUpdate
 
@@ -13,11 +13,17 @@ router = APIRouter(prefix="/teams", tags=["teams"])
 
 
 @router.post("", response_model=TeamOut, status_code=201)
-def create_team(payload: TeamCreate, _: CurrentUser):
+def create_team(payload: TeamCreate, current: CurrentUser):
     db = get_db()
+    requested_members = [oid(member_id) for member_id in payload.memberIds]
+    if current.get("role") != "admin" and any(
+        member_id != current["_id"] for member_id in requested_members
+    ):
+        raise HTTPException(status_code=403, detail="Admin privileges required to add members")
+    member_ids = list(dict.fromkeys([current["_id"], *requested_members]))
     doc = {
         "name": payload.name,
-        "memberIds": [oid(m) for m in payload.memberIds],
+        "memberIds": member_ids,
         "totalScore": 0,
         "createdAt": utcnow(),
     }
@@ -60,7 +66,7 @@ def update_team(team_id: str, payload: TeamUpdate, _: TeamMemberOrAdmin):
 
 
 @router.post("/{team_id}/members", response_model=TeamOut)
-def add_member(team_id: str, payload: TeamMemberOp, _: TeamMemberOrAdmin):
+def add_member(team_id: str, payload: TeamMemberOp, _: AdminUser):
     db = get_db()
     team = services.add_team_member(db, oid(team_id), oid(payload.userId))
     if team is None:
@@ -71,7 +77,10 @@ def add_member(team_id: str, payload: TeamMemberOp, _: TeamMemberOrAdmin):
 @router.delete("/{team_id}/members/{user_id}", response_model=TeamOut)
 def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
     db = get_db()
-    team = services.remove_team_member(db, oid(team_id), oid(user_id))
+    try:
+        team = services.remove_team_member(db, oid(team_id), oid(user_id))
+    except services.LastTeamMemberError:
+        raise HTTPException(status_code=409, detail="A team must have at least one member")
     if team is None:
         raise HTTPException(status_code=404, detail="Team not found")
     return serialize_doc(team)
@@ -80,6 +89,5 @@ def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
 @router.delete("/{team_id}", status_code=204)
 def delete_team(team_id: str, _: TeamMemberOrAdmin):
     db = get_db()
-    result = db["teams"].delete_one({"_id": oid(team_id)})
-    if result.deleted_count == 0:
+    if services.delete_team_transaction(db, oid(team_id)) is None:
         raise HTTPException(status_code=404, detail="Team not found")
