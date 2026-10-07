@@ -4,6 +4,8 @@ import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
 import type { Team, TeamCreate, TeamUpdate } from '@/types';
 
+import { userKeys } from './use-users';
+
 export const teamKeys = createQueryKeys('teams');
 
 export function useTeams() {
@@ -59,7 +61,11 @@ export function useAddTeamMember(teamId: string) {
       const res = await api.post<Team>(`/teams/${teamId}/members`, { userId });
       return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) });
+      queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
   });
 }
 
@@ -69,7 +75,11 @@ export function useRemoveTeamMember(teamId: string) {
     mutationFn: async (userId: string) => {
       await api.delete(`/teams/${teamId}/members/${userId}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) });
+      queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
   });
 }
 
