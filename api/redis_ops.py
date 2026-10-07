@@ -22,9 +22,9 @@ def update_leaderboard_score(contest_id: str, member_id: str, score_delta: float
 
 def decrement_existing_leaderboard_score(
     contest_id: str, member_id: str, score: float
-) -> float | None:
+) -> None:
     """Reverse a score only when its leaderboard member still exists."""
-    return get_redis_client().eval(
+    get_redis_client().eval(
         "if redis.call('ZSCORE', KEYS[1], ARGV[1]) then "
         "return redis.call('ZINCRBY', KEYS[1], -tonumber(ARGV[2]), ARGV[1]) "
         "end",
