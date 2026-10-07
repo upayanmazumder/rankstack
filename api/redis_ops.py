@@ -1,9 +1,10 @@
 """Redis-backed fast paths: live leaderboard, sessions, submission rate limiting.
 
-Key layout (matches the Review 1 design):
-  leaderboard:<contestId>   -> ZSET   member=userId/teamId  score=cumulative points
-  session:<sessionId>       -> STRING userId, TTL on inactivity
-  rate_limit:<userId>       -> STRING counter, TTL sliding window
+Key layout:
+  leaderboard:<contestId>          -> ZSET   member=userId/teamId  score=cumulative points
+  leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version
+  session:<sessionId>              -> STRING userId, TTL on inactivity
+  rate_limit:<userId>              -> STRING counter, TTL sliding window
 """
 
 from redis.exceptions import WatchError
