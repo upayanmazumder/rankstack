@@ -97,9 +97,9 @@ All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
 Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.
 
-After a deletion, MongoDB records the affected contest in `dirty_leaderboards` within the
-transaction. Its leaderboard reads use MongoDB scores, even if Redis cleanup fails.
-These contests no longer use the Redis leaderboard cache.
+Deletion transactions record affected contests in `dirty_leaderboards`. Their leaderboard reads
+use MongoDB scores until the contest is deleted. If Redis cleanup fails, the next leaderboard read
+rebuilds its Redis entry from MongoDB. The marker keeps MongoDB authoritative during recovery.
 
 
 ## Database features worth knowing about

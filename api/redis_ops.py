@@ -41,6 +41,15 @@ def get_leaderboard(contest_id: str, top: int = 10) -> list[dict]:
     return [{"memberId": member, "score": score, "rank": i + 1} for i, (member, score) in enumerate(rows)]
 
 
+def replace_leaderboard(contest_id: str, scores: dict[str, float]) -> None:
+    """Replace a contest's cached scores in one Redis transaction."""
+    with get_redis_client().pipeline(transaction=True) as pipe:
+        pipe.delete(leaderboard_key(contest_id))
+        if scores:
+            pipe.zadd(leaderboard_key(contest_id), scores)
+        pipe.execute()
+
+
 def session_key(session_id: str) -> str:
     return f"session:{session_id}"
 

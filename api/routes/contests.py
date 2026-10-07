@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 from pymongo import ReturnDocument
+from redis.exceptions import RedisError
 
 from api import redis_ops, services
 from api.db import get_db
@@ -98,20 +99,43 @@ def add_participant(contest_id: str, payload: ContestAddParticipant, _: AdminUse
 
 @router.get("/{contest_id}/leaderboard")
 def get_leaderboard(contest_id: str, top: int = 10):
-    """Read Redis unless a deletion requires MongoDB as the source of truth."""
+    """Read MongoDB after deletions and repair Redis when it becomes available."""
     db = get_db()
     contest_oid = oid(contest_id)
-    if db["dirty_leaderboards"].find_one({"_id": contest_oid}, {"_id": 1}):
-        if db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is None:
-            raise HTTPException(status_code=404, detail="Contest not found")
-        rows = db["submissions"].aggregate(
-            [
+    marker = db["dirty_leaderboards"].find_one({"_id": contest_oid})
+    if marker:
+        pending = (
+            "reconciledVersion" not in marker
+            or marker.get("reconciledVersion") != marker.get("version")
+        )
+        exists = db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is not None
+        rows = []
+        if exists:
+            pipeline = [
                 {"$match": {"contestId": contest_oid, "score": {"$exists": True, "$ne": 0}}},
                 {"$group": {"_id": "$submittedBy.refId", "score": {"$sum": "$score"}}},
                 {"$sort": {"score": -1, "_id": -1}},
-                {"$limit": max(top, 1)},
             ]
-        )
+            if not pending:
+                pipeline.append({"$limit": max(top, 1)})
+            rows = list(db["submissions"].aggregate(pipeline))
+        if pending:
+            try:
+                redis_ops.replace_leaderboard(
+                    contest_id, {str(row["_id"]): row["score"] for row in rows}
+                )
+            except RedisError:
+                pass  # Keep the marker pending and serve MongoDB data.
+            else:
+                db["dirty_leaderboards"].update_one(
+                    {
+                        "_id": contest_oid,
+                        "version": marker.get("version", {"$exists": False}),
+                    },
+                    {"$set": {"reconciledVersion": marker.get("version")}},
+                )
+        if not exists:
+            raise HTTPException(status_code=404, detail="Contest not found")
         leaderboard = [
             {"memberId": str(row["_id"]), "score": row["score"], "rank": rank}
             for rank, row in enumerate(rows, 1)

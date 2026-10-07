@@ -150,10 +150,13 @@ def _remove_submission_scores(submissions: list[dict[str, Any]]) -> None:
 
 
 def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) -> None:
-    """Keep deleted contests' leaderboards on the MongoDB read path."""
+    """Record cleanup work in the same transaction as each deletion."""
     for contest_id in contest_ids:
         db["dirty_leaderboards"].update_one(
-            {"_id": contest_id}, {"$set": {"dirty": True}}, upsert=True, session=session
+            {"_id": contest_id},
+            {"$set": {"dirty": True}, "$inc": {"version": 1}},
+            upsert=True,
+            session=session,
         )
 
 def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] | None:
