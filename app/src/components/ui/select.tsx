@@ -71,7 +71,9 @@ function SelectContent({
           )}
         >
           <SelectScrollUpButton />
-          <SelectPrimitive.List className="p-1">{children}</SelectPrimitive.List>
+          <SelectPrimitive.List className="max-h-60 overflow-y-auto p-1">
+            {children}
+          </SelectPrimitive.List>
           <SelectScrollDownButton />
         </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>
@@ -79,12 +81,9 @@ function SelectContent({
   );
 }
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.GroupLabel>) {
+function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
-    <SelectPrimitive.GroupLabel
+    <SelectPrimitive.Label
       className={cn('px-2 py-1.5 text-xs font-semibold text-muted-foreground', className)}
       {...props}
     />

@@ -49,7 +49,7 @@ function SheetContent({
       <SheetOverlay />
       <DialogPrimitive.Popup
         className={cn(
-          'fixed z-50 flex flex-col gap-4 bg-background p-6 shadow-lg transition-transform duration-300 ease-in-out',
+          'fixed z-50 flex max-h-screen flex-col gap-4 overflow-y-auto bg-background p-6 shadow-lg transition-transform duration-300 ease-in-out',
           sheetSideClass[side],
           className
         )}

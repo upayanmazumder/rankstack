@@ -101,9 +101,9 @@ function DropdownMenuLabel({
   className,
   inset,
   ...props
-}: React.ComponentProps<typeof MenuPrimitive.GroupLabel> & { inset?: boolean }) {
+}: React.ComponentProps<'div'> & { inset?: boolean }) {
   return (
-    <MenuPrimitive.GroupLabel
+    <div
       className={cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', className)}
       {...props}
     />
@@ -125,8 +125,8 @@ function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'spa
   );
 }
 
-function DropdownMenuSub({ ...props }: React.ComponentProps<typeof MenuPrimitive.SubmenuTrigger>) {
-  return <MenuPrimitive.SubmenuTrigger {...props} />;
+function DropdownMenuSub({ ...props }: React.ComponentProps<typeof MenuPrimitive.SubmenuRoot>) {
+  return <MenuPrimitive.SubmenuRoot {...props} />;
 }
 
 function DropdownMenuSubTrigger({
