@@ -7,11 +7,52 @@ standalone `mongod` does not support `start_transaction()`.
 from typing import Any
 
 from bson import ObjectId
+from fastapi import HTTPException
 from pymongo.database import Database
 from redis.exceptions import RedisError
 
 from api import redis_ops
 from api.models.common import utcnow
+
+
+def create_problem(
+    db: Database, contest_id: ObjectId, doc: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Insert a problem and its contest reference in one transaction."""
+    with db.client.start_session() as session, session.start_transaction():
+        if db["contests"].find_one({"_id": contest_id}, {"_id": 1}, session=session) is None:
+            return None
+        result = db["problems"].insert_one(doc, session=session)
+        db["contests"].update_one(
+            {"_id": contest_id},
+            {"$addToSet": {"problemIds": result.inserted_id}},
+            session=session,
+        )
+    doc["_id"] = result.inserted_id
+    return doc
+
+
+def validate_submission_problem(
+    db: Database,
+    contest_id: ObjectId,
+    problem_id: ObjectId,
+    answer: Any,
+    session=None,
+) -> None:
+    """Reject missing, unrelated, or invalid MCQ problem references."""
+    problem = db["problems"].find_one(
+        {"_id": problem_id},
+        {"contestId": 1, "type": 1, "options": 1},
+        session=session,
+    )
+    if problem is None:
+        raise HTTPException(status_code=404, detail="Problem not found")
+    if problem["contestId"] != contest_id:
+        raise HTTPException(status_code=400, detail="Problem does not belong to contest")
+    if problem["type"] == "mcq" and (
+        not isinstance(answer, str) or answer not in problem["options"]
+    ):
+        raise HTTPException(status_code=400, detail="Answer must match a problem option")
 
 
 def create_submission(
@@ -37,6 +78,7 @@ def create_submission(
     }
     with client.start_session() as session:
         with session.start_transaction():
+            validate_submission_problem(db, contest_id, problem_id, answer, session=session)
             result = db["submissions"].insert_one(doc, session=session)
             db["problems"].update_one(
                 {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
