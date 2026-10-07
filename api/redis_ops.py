@@ -1,10 +1,13 @@
 """Redis-backed fast paths: live leaderboard, sessions, submission rate limiting.
 
-Key layout (matches the Review 1 design):
-  leaderboard:<contestId>   -> ZSET   member=userId/teamId  score=cumulative points
-  session:<sessionId>       -> STRING userId, TTL on inactivity
-  rate_limit:<userId>       -> STRING counter, TTL sliding window
+Key layout:
+  leaderboard:<contestId>          -> ZSET   member=userId/teamId  score=cumulative points
+  leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version
+  session:<sessionId>              -> STRING userId, TTL on inactivity
+  rate_limit:<userId>              -> STRING counter, TTL sliding window
 """
+
+from redis.exceptions import WatchError
 
 from api.config import settings
 from api.db import get_redis_client
@@ -39,6 +42,28 @@ def get_leaderboard(contest_id: str, top: int = 10) -> list[dict]:
     r = get_redis_client()
     rows = r.zrevrange(leaderboard_key(contest_id), 0, top - 1, withscores=True)
     return [{"memberId": member, "score": score, "rank": i + 1} for i, (member, score) in enumerate(rows)]
+
+
+def replace_leaderboard(contest_id: str, scores: dict[str, float], version: int) -> bool:
+    """Replace cached scores unless Redis already holds a newer revision."""
+    key = leaderboard_key(contest_id)
+    revision_key = f"leaderboard_revision:{contest_id}"
+    with get_redis_client().pipeline() as pipe:
+        while True:
+            try:
+                pipe.watch(revision_key)
+                current = pipe.get(revision_key)
+                if current is not None and int(current) > version:
+                    return False
+                pipe.multi()
+                pipe.delete(key)
+                if scores:
+                    pipe.zadd(key, scores)
+                pipe.set(revision_key, version)
+                pipe.execute()
+                return True
+            except WatchError:
+                continue
 
 
 def session_key(session_id: str) -> str:

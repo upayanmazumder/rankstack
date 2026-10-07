@@ -88,7 +88,9 @@ def update_status(
     old_score = existing.get("score", 0)
     doc = services.update_submission_status(db, sub_id, payload.status, payload.score)
     delta = payload.score - old_score
-    if delta != 0:
+    if delta != 0 and db["dirty_leaderboards"].find_one(
+        {"_id": doc["contestId"]}, {"_id": 1}
+    ) is None:
         redis_ops.update_leaderboard_score(
             str(doc["contestId"]), str(doc["submittedBy"]["refId"]), delta
         )
