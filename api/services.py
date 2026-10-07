@@ -70,6 +70,12 @@ def update_submission_status(
             db[target_collection].update_one(
                 {"_id": submitted_by["refId"]}, {"$inc": {"totalScore": delta}}, session=session
             )
+            if delta != 0:
+                db["dirty_leaderboards"].update_one(
+                    {"_id": existing["contestId"]},
+                    {"$inc": {"version": 1}},
+                    session=session,
+                )
     existing["status"] = status
     existing["score"] = score
     return existing

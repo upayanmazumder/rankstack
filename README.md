@@ -99,7 +99,8 @@ Only administrators can add other members during creation or through the member 
 
 Deletion transactions record affected contests in `dirty_leaderboards`. Their leaderboard reads
 use MongoDB scores until the contest is deleted. If Redis cleanup fails, the next leaderboard read
-rebuilds its Redis entry from MongoDB. The marker keeps MongoDB authoritative during recovery.
+rebuilds its Redis entry from MongoDB. Later score updates trigger another rebuild.
+The marker keeps MongoDB authoritative during recovery.
 
 
 ## Database features worth knowing about
