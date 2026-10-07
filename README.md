@@ -94,6 +94,11 @@ directly or exported into Postman.
 
 All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
 
+After a deletion, MongoDB records the affected contest in `dirty_leaderboards` within the
+transaction. Its leaderboard reads use MongoDB scores, even if Redis cleanup fails.
+These contests no longer use the Redis leaderboard cache.
+
+
 ## Database features worth knowing about
 
 Aggregation pipelines live in `api/aggregations/pipelines.py`: contest leaderboard, average score
@@ -101,8 +106,9 @@ per problem by difficulty, submission count by status per contest, distinct prob
 user, and team performance, which uses `$lookup` from `teams` to `submissions` on `memberIds`.
 
 Indexes, all defined in `api/db.py`: a unique index on `users.email`, an index on
-`problems.contestId`, a compound index on `submissions (contestId, submittedBy.refId)`, an index on
-`submissions.problemId`, an index on `teams.memberIds`, and an index on `contests.status`.
+`problems.contestId`, compound indexes on `submissions (contestId, submittedBy.refId)`
+and `(submittedBy.refType, submittedBy.refId)`, an index on `submissions.problemId`,
+an index on `teams.memberIds`, and an index on `contests.status`.
 
 Transactions live in `api/services.py` and are used by both the API and the seed script. Creating a
 submission inserts it and bumps `problems.attemptCount` in the same transaction, so the two writes

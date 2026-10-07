@@ -8,6 +8,7 @@ from typing import Any
 
 from bson import ObjectId
 from pymongo.database import Database
+from redis.exceptions import RedisError
 
 from api import redis_ops
 from api.models.common import utcnow
@@ -94,6 +95,10 @@ def add_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> dict[
     return db["teams"].find_one({"_id": team_id})
 
 
+class LastTeamMemberError(Exception):
+    """Raised when a removal would leave a team without members."""
+
+
 def remove_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> dict[str, Any] | None:
     """Remove a member from a team and atomically drop the back-reference."""
     client = db.client
@@ -102,6 +107,9 @@ def remove_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> di
             team = db["teams"].find_one({"_id": team_id}, session=session)
             if team is None:
                 return None
+            member_ids = team.get("memberIds", [])
+            if user_id in member_ids and len(member_ids) == 1:
+                raise LastTeamMemberError
             db["teams"].update_one(
                 {"_id": team_id}, {"$pull": {"memberIds": user_id}}, session=session
             )
@@ -133,12 +141,20 @@ def _remove_submission_scores(submissions: list[dict[str, Any]]) -> None:
         if score == 0:
             continue
         submitter = submission["submittedBy"]
-        redis_ops.update_leaderboard_score(
+        redis_ops.decrement_existing_leaderboard_score(
             str(submission["contestId"]),
             str(submitter["refId"]),
-            -score,
+            score,
         )
 
+
+
+def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) -> None:
+    """Keep deleted contests' leaderboards on the MongoDB read path."""
+    for contest_id in contest_ids:
+        db["dirty_leaderboards"].update_one(
+            {"_id": contest_id}, {"$set": {"dirty": True}}, upsert=True, session=session
+        )
 
 def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] | None:
     """Delete a team and its submissions and references atomically."""
@@ -180,10 +196,14 @@ def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] |
                 session=session,
             )
             db["teams"].delete_one({"_id": team_id}, session=session)
-    contest_ids = {doc["_id"] for doc in contest_docs}
-    contest_ids.update(submission["contestId"] for submission in submissions)
-    for contest_id in contest_ids:
-        redis_ops.remove_leaderboard_member(str(contest_id), str(team_id))
+            contest_ids = {doc["_id"] for doc in contest_docs}
+            contest_ids.update(submission["contestId"] for submission in submissions)
+            _mark_leaderboards_dirty(db, contest_ids, session)
+    try:
+        for contest_id in contest_ids:
+            redis_ops.remove_leaderboard_member(str(contest_id), str(team_id))
+    except RedisError:
+        pass  # MongoDB serves this leaderboard until Redis is available again.
     return team
 
 def delete_contest_transaction(
@@ -202,7 +222,11 @@ def delete_contest_transaction(
             db["submissions"].delete_many({"contestId": contest_id}, session=session)
             db["problems"].delete_many({"contestId": contest_id}, session=session)
             db["contests"].delete_one({"_id": contest_id}, session=session)
-    redis_ops.delete_leaderboard(str(contest_id))
+            _mark_leaderboards_dirty(db, {contest_id}, session)
+    try:
+        redis_ops.delete_leaderboard(str(contest_id))
+    except RedisError:
+        pass
     return contest
 
 
@@ -226,7 +250,11 @@ def delete_problem_transaction(
                 session=session,
             )
             db["problems"].delete_one({"_id": problem_id}, session=session)
-    _remove_submission_scores(submissions)
+            _mark_leaderboards_dirty(db, {problem["contestId"]}, session)
+    try:
+        _remove_submission_scores(submissions)
+    except RedisError:
+        pass
     return problem
 
 
@@ -246,7 +274,11 @@ def delete_submission_transaction(
             )
             _reverse_submission_scores(db, [submission], session)
             db["submissions"].delete_one({"_id": submission_id}, session=session)
-    _remove_submission_scores([submission])
+            _mark_leaderboards_dirty(db, {submission["contestId"]}, session)
+    try:
+        _remove_submission_scores([submission])
+    except RedisError:
+        pass
     return submission
 
 

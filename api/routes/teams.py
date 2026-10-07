@@ -13,11 +13,12 @@ router = APIRouter(prefix="/teams", tags=["teams"])
 
 
 @router.post("", response_model=TeamOut, status_code=201)
-def create_team(payload: TeamCreate, _: CurrentUser):
+def create_team(payload: TeamCreate, current: CurrentUser):
     db = get_db()
+    member_ids = list(dict.fromkeys([current["_id"], *(oid(m) for m in payload.memberIds)]))
     doc = {
         "name": payload.name,
-        "memberIds": [oid(m) for m in payload.memberIds],
+        "memberIds": member_ids,
         "totalScore": 0,
         "createdAt": utcnow(),
     }
@@ -71,7 +72,10 @@ def add_member(team_id: str, payload: TeamMemberOp, _: TeamMemberOrAdmin):
 @router.delete("/{team_id}/members/{user_id}", response_model=TeamOut)
 def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
     db = get_db()
-    team = services.remove_team_member(db, oid(team_id), oid(user_id))
+    try:
+        team = services.remove_team_member(db, oid(team_id), oid(user_id))
+    except services.LastTeamMemberError:
+        raise HTTPException(status_code=409, detail="A team must have at least one member")
     if team is None:
         raise HTTPException(status_code=404, detail="Team not found")
     return serialize_doc(team)
