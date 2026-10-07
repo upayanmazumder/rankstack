@@ -22,13 +22,16 @@ router = APIRouter(prefix="/contests", tags=["contests"])
 @router.post("", response_model=ContestOut, status_code=201)
 def create_contest(payload: ContestCreate, _: AdminUser):
     db = get_db()
+    creator_id = oid(payload.createdBy)
+    if db["users"].find_one({"_id": creator_id}, {"_id": 1}) is None:
+        raise HTTPException(status_code=404, detail="Contest creator not found")
     doc = {
         "title": payload.title,
         "description": payload.description,
         "startTime": payload.startTime,
         "endTime": payload.endTime,
         "status": "upcoming",
-        "createdBy": oid(payload.createdBy),
+        "createdBy": creator_id,
         "problemIds": [oid(p) for p in payload.problemIds],
         "participants": [],
         "createdAt": utcnow(),
@@ -58,14 +61,24 @@ def get_contest(contest_id: str):
 @router.patch("/{contest_id}", response_model=ContestOut)
 def update_contest(contest_id: str, payload: ContestUpdate, _: AdminUser):
     db = get_db()
-    updates = payload.model_dump(exclude_unset=True)
+    contest_oid = oid(contest_id)
+    updates = payload.model_dump(exclude_unset=True, exclude_none=True)
     if not updates:
-        doc = db["contests"].find_one({"_id": oid(contest_id)})
+        doc = db["contests"].find_one({"_id": contest_oid})
     else:
+        query = {"_id": contest_oid}
+        if "startTime" in updates and "endTime" not in updates:
+            query["endTime"] = {"$gt": updates["startTime"]}
+        elif "endTime" in updates and "startTime" not in updates:
+            query["startTime"] = {"$lt": updates["endTime"]}
         doc = db["contests"].find_one_and_update(
-            {"_id": oid(contest_id)}, {"$set": updates}, return_document=ReturnDocument.AFTER
+            query, {"$set": updates}, return_document=ReturnDocument.AFTER
         )
     if doc is None:
+        if ("startTime" in updates or "endTime" in updates) and db["contests"].find_one(
+            {"_id": contest_oid}, {"_id": 1}
+        ):
+            raise HTTPException(status_code=400, detail="startTime must be before endTime")
         raise HTTPException(status_code=404, detail="Contest not found")
     return serialize_doc(doc)
 

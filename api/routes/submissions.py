@@ -19,6 +19,8 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 @router.post("", response_model=SubmissionOut, status_code=201)
 def create_submission(payload: SubmissionCreate, current: CurrentUser):
     db = get_db()
+    contest_id = oid(payload.contestId)
+    problem_id = oid(payload.problemId)
     submitter_id = oid(payload.submittedBy.refId)
     if payload.submittedBy.refType == "user":
         if submitter_id != current["_id"]:
@@ -28,6 +30,7 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
     ) is None:
         raise HTTPException(status_code=403, detail="Team membership required")
 
+    services.validate_submission_problem(db, contest_id, problem_id, payload.answer)
     allowed, count = redis_ops.check_and_increment_rate_limit(str(current["_id"]))
     if not allowed:
         raise HTTPException(
@@ -36,8 +39,8 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
         )
     doc = services.create_submission(
         db,
-        oid(payload.contestId),
-        oid(payload.problemId),
+        contest_id,
+        problem_id,
         {"refType": payload.submittedBy.refType, "refId": submitter_id},
         payload.answer,
     )

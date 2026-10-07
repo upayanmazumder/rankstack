@@ -97,6 +97,10 @@ All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
 Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.
 
+Contest dates must satisfy `startTime < endTime`, including partial updates.
+Contest creators and problem contests must exist. Submissions must reference a problem in the
+specified contest. MCQ answers must match one of that problem's options.
+
 Deletion transactions record affected contests in `dirty_leaderboards`. Their leaderboard reads
 use MongoDB scores until the contest is deleted. Pending reads attempt to rebuild Redis from MongoDB
 and retry while Redis is unavailable. Later score updates trigger another attempt.

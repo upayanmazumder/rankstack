@@ -18,10 +18,10 @@ def create_problem(payload: ProblemCreate, _: AdminUser):
     body = payload.model_dump()
     contest_id = oid(body.pop("contestId"))
     doc = {**body, "contestId": contest_id, "attemptCount": 0, "createdAt": utcnow()}
-    result = db["problems"].insert_one(doc)
-    doc["_id"] = result.inserted_id
-    db["contests"].update_one({"_id": contest_id}, {"$addToSet": {"problemIds": doc["_id"]}})
-    return serialize_doc(doc)
+    created = services.create_problem(db, contest_id, doc)
+    if created is None:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    return serialize_doc(created)
 
 
 @router.get("", response_model=list[ProblemOut])
