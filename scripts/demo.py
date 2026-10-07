@@ -87,8 +87,9 @@ def main() -> None:
     problem = db["problems"].find_one({"contestId": any_contest["_id"]})
     before = db["problems"].find_one({"_id": problem["_id"]})["attemptCount"]
     demo_user = db["users"].find_one({"role": "participant"})
+    answer = problem["options"][0] if problem["type"] == "mcq" else "demo-answer"
     sub = services.create_submission(
-        db, any_contest["_id"], problem["_id"], {"refType": "user", "refId": demo_user["_id"]}, "demo-answer"
+        db, any_contest["_id"], problem["_id"], {"refType": "user", "refId": demo_user["_id"]}, answer
     )
     after = db["problems"].find_one({"_id": problem["_id"]})["attemptCount"]
     print(f"problem.attemptCount before={before} after={after} (submission {sub['_id']} inserted atomically)")
