@@ -36,8 +36,10 @@ export function useLeaderboard(contestId: string) {
   return useQuery({
     queryKey: leaderboardKeys.detail(contestId),
     queryFn: async () => {
-      const res = await api.get<LeaderboardEntry[]>(`/contests/${contestId}/leaderboard`);
-      return res.data;
+      const res = await api.get<{ contestId: string; leaderboard: LeaderboardEntry[] }>(
+        `/contests/${contestId}/leaderboard`
+      );
+      return res.data.leaderboard;
     },
     enabled: !!contestId,
     refetchInterval: 5_000,

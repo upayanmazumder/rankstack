@@ -1,43 +1,40 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
-import { api } from '@/api';
+import { api, toApiError } from '@/api';
 import { useAuthStore } from '@/stores';
 import type { LoginRequest, Session, User } from '@/types';
 
 export function useLogin() {
-  const setAuth = useAuthStore.use.setAuth();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: LoginRequest) => {
-      const res = await api.post<Session>('/sessions', payload);
-      let user: User | null = null;
       try {
-        const sessionRes = await api.get<{ sessionId: string; user: User }>(
-          `/sessions/${res.data.sessionId}`
+        const response = await axios.post<{ session: Session; user: User | null }>(
+          '/api/session',
+          payload
         );
-        user = sessionRes.data.user;
-      } catch {
-        // Profile request is enrichment; if it fails, session is still valid
+        return response.data;
+      } catch (error) {
+        throw toApiError(error);
       }
-      return { session: res.data, user };
     },
     onSuccess: ({ session, user }) => {
-      setAuth(session.sessionId, user);
+      queryClient.clear();
+      useAuthStore.getState().setAuth(session.sessionId, user);
     },
   });
 }
 
 export function useLogout() {
-  const clearAuth = useAuthStore.use.clearAuth();
-  const token = useAuthStore.use.token();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (sessionId?: string) => {
-      const id = sessionId ?? token;
-      if (id) {
-        await api.delete(`/sessions/${id}`);
-      }
+    mutationFn: async () => {
+      await axios.delete('/api/session');
     },
-    onSuccess: () => {
-      clearAuth();
+    onSettled: () => {
+      useAuthStore.getState().clearAuth();
+      queryClient.clear();
     },
   });
 }

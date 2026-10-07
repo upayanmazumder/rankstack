@@ -35,7 +35,10 @@ export default function LoginPage() {
     try {
       await login.mutateAsync({ email, password });
       toast.success('Welcome back!');
-      router.push('/contests');
+      const from = new URLSearchParams(window.location.search).get('from');
+      router.replace(
+        from?.startsWith('/') && !from.startsWith('//') && !from.includes('\\') ? from : '/contests'
+      );
     } catch (err) {
       toast.error(isApiError(err) ? err.message : 'Sign in failed. Please try again.');
     }
