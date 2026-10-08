@@ -5,7 +5,7 @@ right shape (mcq / coding / subjective) directly from the request body.
 """
 
 from datetime import datetime
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -46,7 +46,7 @@ class SubjectiveProblemCreate(ProblemBase):
 
 
 ProblemCreate = Annotated[
-    Union[MCQProblemCreate, CodingProblemCreate, SubjectiveProblemCreate],
+    MCQProblemCreate | CodingProblemCreate | SubjectiveProblemCreate,
     Field(discriminator="type"),
 ]
 

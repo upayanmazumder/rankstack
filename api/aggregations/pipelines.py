@@ -16,7 +16,10 @@ def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
         {"$match": {"contestId": contest_id}},
         {
             "$group": {
-                "_id": {"refId": "$submittedBy.refId", "refType": "$submittedBy.refType"},
+                "_id": {
+                    "refId": "$submittedBy.refId",
+                    "refType": "$submittedBy.refType",
+                },
                 "totalScore": {"$sum": "$score"},
                 "submissionCount": {"$sum": 1},
             }
@@ -40,7 +43,14 @@ def avg_score_per_problem_by_difficulty(db) -> list[dict]:
     """2. Average submission score per problem, grouped by problem difficulty."""
     pipeline = [
         {"$group": {"_id": "$problemId", "avgScore": {"$avg": "$score"}}},
-        {"$lookup": {"from": "problems", "localField": "_id", "foreignField": "_id", "as": "problem"}},
+        {
+            "$lookup": {
+                "from": "problems",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "problem",
+            }
+        },
         {"$unwind": "$problem"},
         {
             "$group": {
@@ -50,7 +60,14 @@ def avg_score_per_problem_by_difficulty(db) -> list[dict]:
             }
         },
         {"$sort": {"_id": 1}},
-        {"$project": {"_id": 0, "difficulty": "$_id", "avgScorePerProblem": 1, "problemCount": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "difficulty": "$_id",
+                "avgScorePerProblem": 1,
+                "problemCount": 1,
+            }
+        },
     ]
     return list(db["submissions"].aggregate(pipeline))
 
@@ -70,9 +87,23 @@ def submission_count_by_status_per_contest(db) -> list[dict]:
                 "statusCounts": {"$push": {"status": "$_id.status", "count": "$count"}},
             }
         },
-        {"$lookup": {"from": "contests", "localField": "_id", "foreignField": "_id", "as": "contest"}},
+        {
+            "$lookup": {
+                "from": "contests",
+                "localField": "_id",
+                "foreignField": "_id",
+                "as": "contest",
+            }
+        },
         {"$unwind": "$contest"},
-        {"$project": {"_id": 0, "contestId": "$_id", "title": "$contest.title", "statusCounts": 1}},
+        {
+            "$project": {
+                "_id": 0,
+                "contestId": "$_id",
+                "title": "$contest.title",
+                "statusCounts": 1,
+            }
+        },
         {"$sort": {"title": 1}},
     ]
     return list(db["submissions"].aggregate(pipeline))
@@ -82,7 +113,12 @@ def distinct_problems_solved_per_user(db) -> list[dict]:
     """4. Number of distinct problems solved (status=correct) per user, across all contests."""
     pipeline = [
         {"$match": {"status": "correct", "submittedBy.refType": "user"}},
-        {"$group": {"_id": "$submittedBy.refId", "problemsSolved": {"$addToSet": "$problemId"}}},
+        {
+            "$group": {
+                "_id": "$submittedBy.refId",
+                "problemsSolved": {"$addToSet": "$problemId"},
+            }
+        },
         {
             "$project": {
                 "_id": 0,
@@ -90,7 +126,14 @@ def distinct_problems_solved_per_user(db) -> list[dict]:
                 "distinctProblemsSolved": {"$size": "$problemsSolved"},
             }
         },
-        {"$lookup": {"from": "users", "localField": "userId", "foreignField": "_id", "as": "user"}},
+        {
+            "$lookup": {
+                "from": "users",
+                "localField": "userId",
+                "foreignField": "_id",
+                "as": "user",
+            }
+        },
         {"$unwind": "$user"},
         {"$project": {"userId": 1, "name": "$user.name", "distinctProblemsSolved": 1}},
         {"$sort": {"distinctProblemsSolved": -1}},
@@ -127,7 +170,14 @@ def team_performance(db) -> list[dict]:
                 "memberCount": {"$size": "$memberIds"},
             }
         },
-        {"$project": {"name": 1, "memberCount": 1, "totalScore": 1, "submissionCount": 1}},
+        {
+            "$project": {
+                "name": 1,
+                "memberCount": 1,
+                "totalScore": 1,
+                "submissionCount": 1,
+            }
+        },
         {"$sort": {"totalScore": -1}},
     ]
     return list(db["teams"].aggregate(pipeline))

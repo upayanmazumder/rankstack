@@ -15,11 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from api import redis_ops, services  # noqa: E402
-from api.aggregations import pipelines as agg  # noqa: E402
-from api.db import get_db, get_redis_client  # noqa: E402
-from api.models.common import utcnow  # noqa: E402
-from api.security import hash_password  # noqa: E402
+from api import redis_ops, services
+from api.aggregations import pipelines as agg
+from api.db import get_db, get_redis_client
+from api.models.common import utcnow
+from api.security import hash_password
 
 
 def section(title: str) -> None:
@@ -56,7 +56,9 @@ def main() -> None:
     print("CREATE  ->", created.inserted_id)
     fetched = db["users"].find_one({"_id": created.inserted_id})
     print("READ    ->", {k: v for k, v in fetched.items() if k != "passwordHash"})
-    db["users"].update_one({"_id": created.inserted_id}, {"$set": {"name": "Demo Reviewer (Updated)"}})
+    db["users"].update_one(
+        {"_id": created.inserted_id}, {"$set": {"name": "Demo Reviewer (Updated)"}}
+    )
     updated = db["users"].find_one({"_id": created.inserted_id})
     print("UPDATE  ->", updated["name"])
     result = db["users"].delete_one({"_id": created.inserted_id})
@@ -69,40 +71,63 @@ def main() -> None:
     plan = cursor.explain()
     winning_stage = plan["queryPlanner"]["winningPlan"]
     print("Query:", {"contestId": any_contest["_id"]})
-    print("Winning plan stage:", winning_stage.get("stage"), "->", winning_stage.get("inputStage", {}).get("stage"))
+    print(
+        "Winning plan stage:",
+        winning_stage.get("stage"),
+        "->",
+        winning_stage.get("inputStage", {}).get("stage"),
+    )
     print("Index used:", winning_stage.get("inputStage", {}).get("indexName"))
-    print("Documents returned:", db["problems"].count_documents({"contestId": any_contest["_id"]}))
+    print(
+        "Documents returned:",
+        db["problems"].count_documents({"contestId": any_contest["_id"]}),
+    )
 
     section("2b. Compound-indexed query: submissions by contest+submitter")
     any_submission = db["submissions"].find_one()
     cursor2 = db["submissions"].find(
-        {"contestId": any_submission["contestId"], "submittedBy.refId": any_submission["submittedBy"]["refId"]}
+        {
+            "contestId": any_submission["contestId"],
+            "submittedBy.refId": any_submission["submittedBy"]["refId"],
+        }
     )
     plan2 = cursor2.explain()
     winning2 = plan2["queryPlanner"]["winningPlan"]
     print("Index used:", winning2.get("inputStage", {}).get("indexName"))
 
     # -- 3. Transaction ---------------------------------------------------
-    section("3. Multi-document transaction: create submission + bump problem.attemptCount")
+    section(
+        "3. Multi-document transaction: create submission + bump problem.attemptCount"
+    )
     problem = db["problems"].find_one({"contestId": any_contest["_id"]})
     before = db["problems"].find_one({"_id": problem["_id"]})["attemptCount"]
     demo_user = db["users"].find_one({"role": "participant"})
     answer = problem["options"][0] if problem["type"] == "mcq" else "demo-answer"
     sub = services.create_submission(
-        db, any_contest["_id"], problem["_id"], {"refType": "user", "refId": demo_user["_id"]}, answer
+        db,
+        any_contest["_id"],
+        problem["_id"],
+        {"refType": "user", "refId": demo_user["_id"]},
+        answer,
     )
     after = db["problems"].find_one({"_id": problem["_id"]})["attemptCount"]
-    print(f"problem.attemptCount before={before} after={after} (submission {sub['_id']} inserted atomically)")
+    print(
+        f"problem.attemptCount before={before} after={after} (submission {sub['_id']} inserted atomically)"
+    )
 
     before_score = db["users"].find_one({"_id": demo_user["_id"]})["totalScore"]
     services.update_submission_status(db, sub["_id"], "correct", problem["points"])
     after_score = db["users"].find_one({"_id": demo_user["_id"]})["totalScore"]
-    print(f"user.totalScore before={before_score} after={after_score} (submission status+score updated atomically)")
+    print(
+        f"user.totalScore before={before_score} after={after_score} (submission status+score updated atomically)"
+    )
 
     # cleanup demo submission so re-running this script stays idempotent
     db["submissions"].delete_one({"_id": sub["_id"]})
     db["problems"].update_one({"_id": problem["_id"]}, {"$inc": {"attemptCount": -1}})
-    db["users"].update_one({"_id": demo_user["_id"]}, {"$inc": {"totalScore": -problem["points"]}})
+    db["users"].update_one(
+        {"_id": demo_user["_id"]}, {"$inc": {"totalScore": -problem["points"]}}
+    )
 
     # -- 4. Aggregations ----------------------------------------------
     section("4. Aggregation pipelines")
@@ -131,7 +156,7 @@ def main() -> None:
     # -- 5. Redis fast paths -----------------------------------------
     section("5. Redis: leaderboard sorted set, session TTL, rate-limit counter")
     lb = redis_ops.get_leaderboard(str(live_or_ended["_id"]), top=5)
-    print("ZSET leaderboard:%s top 5:" % live_or_ended["_id"], lb)
+    print(f"ZSET leaderboard:{live_or_ended['_id']} top 5:", lb)
 
     token = "demo-session-token"
     redis_ops.create_session(token, str(demo_user["_id"]))
@@ -143,7 +168,9 @@ def main() -> None:
     redis_client.delete(redis_ops.rate_limit_key(rl_user))
     for _ in range(3):
         allowed, count = redis_ops.check_and_increment_rate_limit(rl_user)
-    print(f"rate_limit:{rl_user} -> count={count}, allowed={allowed}, ttl={redis_client.ttl(redis_ops.rate_limit_key(rl_user))}s")
+    print(
+        f"rate_limit:{rl_user} -> count={count}, allowed={allowed}, ttl={redis_client.ttl(redis_ops.rate_limit_key(rl_user))}s"
+    )
     redis_client.delete(redis_ops.rate_limit_key(rl_user))
 
     section("Demo complete.")

@@ -9,8 +9,11 @@ from pydantic import BaseModel, Field, model_validator
 Status = Literal["upcoming", "live", "ended"]
 RefType = Literal["user", "team"]
 
+
 def _validate_date_range(start: datetime, end: datetime) -> None:
-    start_utc = start.replace(tzinfo=timezone.utc) if start.utcoffset() is None else start
+    start_utc = (
+        start.replace(tzinfo=timezone.utc) if start.utcoffset() is None else start
+    )
     end_utc = end.replace(tzinfo=timezone.utc) if end.utcoffset() is None else end
     if start_utc >= end_utc:
         raise HTTPException(status_code=400, detail="startTime must be before endTime")

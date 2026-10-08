@@ -19,7 +19,9 @@ def create_team(payload: TeamCreate, current: CurrentUser):
     if current.get("role") != "admin" and any(
         member_id != current["_id"] for member_id in requested_members
     ):
-        raise HTTPException(status_code=403, detail="Admin privileges required to add members")
+        raise HTTPException(
+            status_code=403, detail="Admin privileges required to add members"
+        )
     member_ids = list(dict.fromkeys([current["_id"], *requested_members]))
     doc = {
         "name": payload.name,
@@ -30,7 +32,9 @@ def create_team(payload: TeamCreate, current: CurrentUser):
     result = db["teams"].insert_one(doc)
     doc["_id"] = result.inserted_id
     for member_id in doc["memberIds"]:
-        db["users"].update_one({"_id": member_id}, {"$addToSet": {"teamIds": doc["_id"]}})
+        db["users"].update_one(
+            {"_id": member_id}, {"$addToSet": {"teamIds": doc["_id"]}}
+        )
     return serialize_doc(doc)
 
 
@@ -58,7 +62,9 @@ def update_team(team_id: str, payload: TeamUpdate, _: TeamMemberOrAdmin):
         doc = db["teams"].find_one({"_id": oid(team_id)})
     else:
         doc = db["teams"].find_one_and_update(
-            {"_id": oid(team_id)}, {"$set": updates}, return_document=ReturnDocument.AFTER
+            {"_id": oid(team_id)},
+            {"$set": updates},
+            return_document=ReturnDocument.AFTER,
         )
     if doc is None:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -80,7 +86,9 @@ def remove_member(team_id: str, user_id: str, _: TeamMemberOrAdmin):
     try:
         team = services.remove_team_member(db, oid(team_id), oid(user_id))
     except services.LastTeamMemberError:
-        raise HTTPException(status_code=409, detail="A team must have at least one member")
+        raise HTTPException(
+            status_code=409, detail="A team must have at least one member"
+        )
     if team is None:
         raise HTTPException(status_code=404, detail="Team not found")
     return serialize_doc(team)

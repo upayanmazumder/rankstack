@@ -46,12 +46,17 @@ def update_problem(problem_id: str, payload: ProblemUpdate, _: AdminUser):
     db = get_db()
     updates = payload.model_dump(exclude_unset=True, exclude_none=True)
     if "testCases" in updates:
-        updates["testCases"] = [tc if isinstance(tc, dict) else tc.model_dump() for tc in updates["testCases"]]
+        updates["testCases"] = [
+            tc if isinstance(tc, dict) else tc.model_dump()
+            for tc in updates["testCases"]
+        ]
     if not updates:
         doc = db["problems"].find_one({"_id": oid(problem_id)})
     else:
         doc = db["problems"].find_one_and_update(
-            {"_id": oid(problem_id)}, {"$set": updates}, return_document=ReturnDocument.AFTER
+            {"_id": oid(problem_id)},
+            {"$set": updates},
+            return_document=ReturnDocument.AFTER,
         )
     if doc is None:
         raise HTTPException(status_code=404, detail="Problem not found")

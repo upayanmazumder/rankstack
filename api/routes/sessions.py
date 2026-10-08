@@ -38,7 +38,9 @@ def login(payload: LoginRequest):
     token = new_session_token()
     redis_ops.create_session(token, str(user["_id"]))
     return LoginResponse(
-        sessionId=token, userId=str(user["_id"]), expiresInSeconds=settings.session_ttl_seconds
+        sessionId=token,
+        userId=str(user["_id"]),
+        expiresInSeconds=settings.session_ttl_seconds,
     )
 
 

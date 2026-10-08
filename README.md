@@ -57,6 +57,11 @@ Or all at once from a clean slate: `make reset` (down + up + init-db + seed).
 Copy `.env.example` to `.env` if you want to change any connection settings. The defaults already
 match `docker-compose.yml`.
 
+## Backend lint
+
+Run `make lint` after `make install`. Ruff checks `api/` and `scripts/` for lint and
+format errors. CI runs the same checks before backend database smoke tests.
+
 ## Running the demo
 
 ```bash

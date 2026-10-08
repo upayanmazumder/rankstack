@@ -78,7 +78,9 @@ def update_contest(contest_id: str, payload: ContestUpdate, _: AdminUser):
         if ("startTime" in updates or "endTime" in updates) and db["contests"].find_one(
             {"_id": contest_oid}, {"_id": 1}
         ):
-            raise HTTPException(status_code=400, detail="startTime must be before endTime")
+            raise HTTPException(
+                status_code=400, detail="startTime must be before endTime"
+            )
         raise HTTPException(status_code=404, detail="Contest not found")
     return serialize_doc(doc)
 
@@ -117,15 +119,19 @@ def get_leaderboard(contest_id: str, top: int = 10):
     contest_oid = oid(contest_id)
     marker = db["dirty_leaderboards"].find_one({"_id": contest_oid})
     if marker:
-        pending = (
-            "reconciledVersion" not in marker
-            or marker.get("reconciledVersion") != marker.get("version")
-        )
+        pending = "reconciledVersion" not in marker or marker.get(
+            "reconciledVersion"
+        ) != marker.get("version")
         exists = db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is not None
         rows = []
         if exists:
             pipeline = [
-                {"$match": {"contestId": contest_oid, "score": {"$exists": True, "$ne": 0}}},
+                {
+                    "$match": {
+                        "contestId": contest_oid,
+                        "score": {"$exists": True, "$ne": 0},
+                    }
+                },
                 {"$group": {"_id": "$submittedBy.refId", "score": {"$sum": "$score"}}},
                 {"$sort": {"score": -1, "_id": -1}},
             ]
