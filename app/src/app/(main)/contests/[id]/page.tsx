@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, CalendarDays, Clock3, Users } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,13 +18,47 @@ import { useProblems } from '@/hooks/api/use-problems';
 import { useAuthStore } from '@/stores';
 import { formatDateTime } from '@/utils';
 
-export default function ContestOverviewPage({ params }: { params: Promise<{ id: string }> }) {
+interface ContestRouteParams {
+  id: string;
+}
+
+interface ContestOverviewPageProps {
+  params: Promise<ContestRouteParams>;
+}
+
+function formatCountdown(milliseconds: number) {
+  const seconds = Math.max(0, Math.floor(milliseconds / 1_000));
+  const days = Math.floor(seconds / 86_400);
+  const hours = Math.floor((seconds % 86_400) / 3_600);
+  const minutes = Math.floor((seconds % 3_600) / 60);
+  const remainder = seconds % 60;
+  return `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(remainder).padStart(2, '0')}s`;
+}
+
+export default function ContestOverviewPage({ params }: ContestOverviewPageProps) {
   const { id } = use(params);
+  const [now, setNow] = useState<number | null>(null);
   const user = useAuthStore(state => state.user);
   const contestQuery = useContest(id);
   const problemsQuery = useProblems(id);
   const leaderboardQuery = useLeaderboard(id, false);
   const join = useAddParticipant(id);
+  const contestStatus = contestQuery.data?.status;
+  const startTime = contestQuery.data ? new Date(contestQuery.data.startTime).getTime() : NaN;
+
+  useEffect(() => {
+    if (contestStatus !== 'upcoming' || !Number.isFinite(startTime)) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      const currentTime = Date.now();
+      setNow(currentTime);
+      if (currentTime >= startTime) window.clearInterval(timer);
+    }, 1_000);
+
+    return () => window.clearInterval(timer);
+  }, [contestStatus, startTime]);
 
   if (contestQuery.isPending) {
     return (
@@ -48,12 +82,14 @@ export default function ContestOverviewPage({ params }: { params: Promise<{ id: 
   }
 
   const contest = contestQuery.data;
+  const isBeforeStart = now === null || now < startTime;
+  const isUpcoming = contest.status === 'upcoming' && isBeforeStart;
   const joined =
     !!user &&
     contest.participants.some(
       participant => participant.refType === 'user' && participant.refId === user.id
     );
-  const problemLinksDisabled = contest.status === 'upcoming';
+  const problemLinksDisabled = isUpcoming;
 
   async function joinContest() {
     if (!user) {
@@ -116,10 +152,15 @@ export default function ContestOverviewPage({ params }: { params: Promise<{ id: 
         </div>
       </header>
 
-      {contest.status === 'upcoming' && (
+      {isUpcoming && (
         <div className="border-l-2 border-amber-500 bg-amber-500/5 px-4 py-3 text-sm">
           <span className="font-medium">Problems unlock when the contest goes live.</span> The
           schedule begins {formatDateTime(contest.startTime)}.
+          {now !== null && (
+            <p role="timer" className="mt-1 font-mono tabular-nums">
+              Starts in {formatCountdown(startTime - now)}
+            </p>
+          )}
         </div>
       )}
 
@@ -206,7 +247,7 @@ export default function ContestOverviewPage({ params }: { params: Promise<{ id: 
                         <span className="mr-4 font-mono text-muted-foreground">
                           {String(entry.rank).padStart(2, '0')}
                         </span>
-                        {entry.memberId}
+                        {entry.participantName ?? entry.memberId}
                       </span>
                       <span className="font-semibold tabular-nums">
                         {entry.score.toLocaleString()}

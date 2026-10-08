@@ -12,7 +12,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useContest, useLeaderboard } from '@/hooks/api/use-contests';
 import { useAuthStore } from '@/stores';
 
-export default function ContestLeaderboardPage({ params }: { params: Promise<{ id: string }> }) {
+interface ContestLeaderboardRouteParams {
+  id: string;
+}
+
+interface ContestLeaderboardPageProps {
+  params: Promise<ContestLeaderboardRouteParams>;
+}
+
+export default function ContestLeaderboardPage({ params }: ContestLeaderboardPageProps) {
   const { id } = use(params);
   const contest = useContest(id);
   const leaderboard = useLeaderboard(id, 5_000);

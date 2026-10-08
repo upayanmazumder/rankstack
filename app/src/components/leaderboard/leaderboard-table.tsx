@@ -16,13 +16,12 @@ const RANK_STYLES: Record<number, string> = {
   3: 'text-amber-700 font-bold',
 };
 
-export function LeaderboardTable({
-  entries,
-  currentUserId,
-}: {
+interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
   currentUserId?: string;
-}) {
+}
+
+export function LeaderboardTable({ entries, currentUserId }: LeaderboardTableProps) {
   if (entries.length === 0) {
     return <p className="py-12 text-center text-sm text-muted-foreground">No participants yet.</p>;
   }

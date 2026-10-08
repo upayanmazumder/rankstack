@@ -19,13 +19,12 @@ const TYPE_LABEL: Record<Problem['type'], string> = {
   subjective: 'Subjective',
 };
 
-export function ProblemCard({
-  problem,
-  disabled = false,
-}: {
+interface ProblemCardProps {
   problem: Problem;
   disabled?: boolean;
-}) {
+}
+
+export function ProblemCard({ problem, disabled = false }: ProblemCardProps) {
   const Icon = TYPE_ICON[problem.type];
   const content = (
     <Card className="h-full transition-colors hover:border-ring/50">

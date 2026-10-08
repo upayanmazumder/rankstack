@@ -18,7 +18,16 @@ export const leaderboardKeys = {
   detail: (contestId: string) => ['leaderboard', contestId] as const,
 };
 
-export function useContests(filters?: { status?: ContestStatus }) {
+interface ContestFilters extends Record<string, unknown> {
+  status?: ContestStatus;
+}
+
+interface AddParticipantInput {
+  refType: ParticipantRefType;
+  refId: string;
+}
+
+export function useContests(filters?: ContestFilters) {
   return useQuery({
     queryKey: contestKeys.list(filters),
     queryFn: async () => {
@@ -36,6 +45,7 @@ export function useContest(id: string) {
       return res.data;
     },
     enabled: !!id,
+    refetchInterval: query => (query.state.data?.status === 'upcoming' ? 5_000 : false),
   });
 }
 
@@ -56,7 +66,7 @@ export function useLeaderboard(contestId: string, refetchInterval: number | fals
 export function useAddParticipant(contestId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (participant: { refType: ParticipantRefType; refId: string }) => {
+    mutationFn: async (participant: AddParticipantInput) => {
       const res = await api.post<Contest>(`/contests/${contestId}/participants`, participant);
       return res.data;
     },

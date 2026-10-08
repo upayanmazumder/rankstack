@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { env } from '@/env';
 
-const PROTECTED_PREFIXES = ['/contests', '/submissions', '/teams', '/admin'];
+const PROTECTED_PREFIXES = ['/submissions', '/teams', '/admin'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -35,5 +35,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/contests/:path*', '/submissions/:path*', '/teams/:path*', '/admin/:path*'],
+  matcher: ['/submissions/:path*', '/teams/:path*', '/admin/:path*'],
 };
