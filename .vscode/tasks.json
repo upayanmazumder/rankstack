@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Rankstack: Setup development environment",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\setup_dev.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Rankstack: Reset and seed demo data",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\setup_dev.ps1",
+        "-Seed"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Rankstack: Start infrastructure",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\start_infrastructure.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Rankstack: Stop infrastructure",
+      "type": "process",
+      "command": "docker",
+      "args": ["compose", "down"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Rankstack: Frontend type check",
+      "type": "process",
+      "command": "pnpm",
+      "args": ["--dir", "${workspaceFolder}/app", "run", "type-check"],
+      "problemMatcher": ["$tsc"]
+    }
+  ]
+}
