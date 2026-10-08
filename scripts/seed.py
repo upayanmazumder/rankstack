@@ -19,12 +19,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from faker import Faker  # noqa: E402
+from faker import Faker
 
-from api import redis_ops, services  # noqa: E402
-from api.db import get_redis_client, init_db  # noqa: E402
-from api.models.common import utcnow  # noqa: E402
-from api.security import hash_password  # noqa: E402
+from api import redis_ops, services
+from api.db import get_redis_client, init_db
+from api.models.common import utcnow
+from api.security import hash_password
 
 fake = Faker()
 Faker.seed(42)
@@ -34,7 +34,12 @@ DEMO_PASSWORD = "Passw0rd!"
 DIFFICULTY_POINTS = {"easy": 10, "medium": 20, "hard": 30}
 PROBLEM_TYPES = ["mcq", "coding", "subjective"]
 DIFFICULTIES = ["easy", "medium", "hard"]
-STATUS_WEIGHTS = [("correct", 0.45), ("incorrect", 0.30), ("partial", 0.15), ("pending", 0.10)]
+STATUS_WEIGHTS = [
+    ("correct", 0.45),
+    ("incorrect", 0.30),
+    ("partial", 0.15),
+    ("pending", 0.10),
+]
 
 
 def weighted_status() -> str:
@@ -48,7 +53,14 @@ def weighted_status() -> str:
 
 
 def wipe(db, redis_client) -> None:
-    for name in ["users", "teams", "contests", "problems", "submissions", "dirty_leaderboards"]:
+    for name in [
+        "users",
+        "teams",
+        "contests",
+        "problems",
+        "submissions",
+        "dirty_leaderboards",
+    ]:
         db[name].delete_many({})
     for pattern in ("leaderboard:*", "leaderboard_revision:*"):
         for key in redis_client.keys(pattern):
@@ -121,7 +133,9 @@ def seed_contests(db, admins: list[dict], n: int = 5) -> list[dict]:
     return contests
 
 
-def assign_participants(db, contests: list[dict], users: list[dict], teams: list[dict]) -> None:
+def assign_participants(
+    db, contests: list[dict], users: list[dict], teams: list[dict]
+) -> None:
     for idx, c in enumerate(contests):
         rot_u = users[idx % len(users) :] + users[: idx % len(users)]
         rot_t = teams[idx % len(teams) :] + teams[: idx % len(teams)]
@@ -129,7 +143,9 @@ def assign_participants(db, contests: list[dict], users: list[dict], teams: list
         chosen_teams = rot_t[:2]
         participants = [{"refType": "user", "refId": u["_id"]} for u in chosen_users]
         participants += [{"refType": "team", "refId": t["_id"]} for t in chosen_teams]
-        db["contests"].update_one({"_id": c["_id"]}, {"$set": {"participants": participants}})
+        db["contests"].update_one(
+            {"_id": c["_id"]}, {"$set": {"participants": participants}}
+        )
         c["participants"] = participants
 
 
@@ -157,7 +173,9 @@ def seed_problems(db, contests: list[dict], per_contest: int = 3) -> None:
             elif ptype == "coding":
                 base["inputFormat"] = "A single integer n on one line."
                 base["constraints"] = "1 <= n <= 10^5"
-                base["testCases"] = [{"input": str(k), "output": str(k * 2)} for k in range(1, 3)]
+                base["testCases"] = [
+                    {"input": str(k), "output": str(k * 2)} for k in range(1, 3)
+                ]
             else:
                 base["wordLimit"] = 300
                 base["evaluationRubric"] = fake.sentence(nb_words=10)
@@ -165,7 +183,9 @@ def seed_problems(db, contests: list[dict], per_contest: int = 3) -> None:
             base["_id"] = pid
             problem_ids.append(pid)
             problems.append(base)
-        db["contests"].update_one({"_id": c["_id"]}, {"$set": {"problemIds": problem_ids}})
+        db["contests"].update_one(
+            {"_id": c["_id"]}, {"$set": {"problemIds": problem_ids}}
+        )
         c["problemIds"] = problem_ids
         c["problems"] = problems
 
@@ -219,7 +239,7 @@ def main() -> None:
     contests = seed_contests(db, admins=[u for u in users if u["role"] == "admin"])
     assign_participants(db, contests, users, teams)
     seed_problems(db, contests)
-    submission_count = seed_submissions(db, redis_client, contests)
+    seed_submissions(db, redis_client, contests)
 
     counts = {
         "users": db["users"].count_documents({}),
