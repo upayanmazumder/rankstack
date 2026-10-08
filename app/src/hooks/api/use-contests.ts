@@ -2,7 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
-import type { Contest, ContestCreate, ContestUpdate, LeaderboardEntry } from '@/types';
+import type {
+  Contest,
+  ContestCreate,
+  ContestStatus,
+  ContestUpdate,
+  LeaderboardEntry,
+  ParticipantRefType,
+} from '@/types';
 
 export const contestKeys = createQueryKeys('contests');
 
@@ -11,11 +18,11 @@ export const leaderboardKeys = {
   detail: (contestId: string) => ['leaderboard', contestId] as const,
 };
 
-export function useContests() {
+export function useContests(filters?: { status?: ContestStatus }) {
   return useQuery({
-    queryKey: contestKeys.lists(),
+    queryKey: contestKeys.list(filters),
     queryFn: async () => {
-      const res = await api.get<Contest[]>('/contests');
+      const res = await api.get<Contest[]>('/contests', { params: filters });
       return res.data;
     },
   });
@@ -32,7 +39,7 @@ export function useContest(id: string) {
   });
 }
 
-export function useLeaderboard(contestId: string) {
+export function useLeaderboard(contestId: string, refetchInterval: number | false = 5_000) {
   return useQuery({
     queryKey: leaderboardKeys.detail(contestId),
     queryFn: async () => {
@@ -42,7 +49,21 @@ export function useLeaderboard(contestId: string) {
       return res.data.leaderboard;
     },
     enabled: !!contestId,
-    refetchInterval: 5_000,
+    refetchInterval,
+  });
+}
+
+export function useAddParticipant(contestId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (participant: { refType: ParticipantRefType; refId: string }) => {
+      const res = await api.post<Contest>(`/contests/${contestId}/participants`, participant);
+      return res.data;
+    },
+    onSuccess: contest => {
+      queryClient.setQueryData(contestKeys.detail(contestId), contest);
+      queryClient.invalidateQueries({ queryKey: contestKeys.lists() });
+    },
   });
 }
 

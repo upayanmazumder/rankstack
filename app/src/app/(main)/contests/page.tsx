@@ -1,48 +1,104 @@
 'use client';
 
+import { useDeferredValue, useState } from 'react';
+import { Search } from 'lucide-react';
+
 import { EmptyState } from '@/components/common/empty-state';
-import { ContestStatusBadge } from '@/components/contests/contest-status-badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ContestCard } from '@/components/contests/contest-card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useContests } from '@/hooks/api/use-contests';
-import { formatDate } from '@/utils';
+import type { ContestStatus } from '@/types';
+
+const FILTERS = [
+  { label: 'All', value: 'all' },
+  { label: 'Live', value: 'live' },
+  { label: 'Upcoming', value: 'upcoming' },
+  { label: 'Ended', value: 'ended' },
+] as const;
 
 export default function ContestsPage() {
-  const { data: contests, isPending, isError } = useContests();
+  const [status, setStatus] = useState<(typeof FILTERS)[number]['value']>('all');
+  const [search, setSearch] = useState('');
+  const deferredSearch = useDeferredValue(search.trim().toLowerCase());
+  const {
+    data: contests = [],
+    isPending,
+    isError,
+  } = useContests(status === 'all' ? undefined : { status: status as ContestStatus });
+  const visibleContests = contests.filter(contest =>
+    `${contest.title} ${contest.description}`.toLowerCase().includes(deferredSearch)
+  );
 
   return (
-    <section className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Contests</h1>
-        <p className="text-sm text-muted-foreground">Browse upcoming, live, and ended contests.</p>
+    <section className="mx-auto w-full max-w-6xl flex-1 space-y-7 px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold tracking-widest text-primary uppercase">
+            Competition desk
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold">Contest calendar</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Find your next challenge and follow the field.
+          </p>
+        </div>
+        <label className="relative w-full sm:max-w-xs">
+          <span className="sr-only">Search contests</span>
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={event => setSearch(event.target.value)}
+            placeholder="Search contests"
+            className="pl-9"
+          />
+        </label>
       </div>
+
+      <Tabs
+        value={status}
+        onValueChange={value => setStatus(value as (typeof FILTERS)[number]['value'])}
+      >
+        <TabsList className="h-auto max-w-full justify-start overflow-x-auto">
+          {FILTERS.map(filter => (
+            <TabsTrigger key={filter.value} value={filter.value}>
+              {filter.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       {isPending ? (
-        <p role="status">Loading contests…</p>
+        <div
+          role="status"
+          aria-label="Loading contests"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {Array.from({ length: 6 }, (_, index) => (
+            <Skeleton key={index} className="h-40" />
+          ))}
+        </div>
       ) : isError ? (
-        <p role="alert">Contests could not be loaded. Please try again later.</p>
-      ) : contests.length === 0 ? (
+        <div role="alert" className="space-y-3 py-12 text-center">
+          <p>Contests could not be loaded. Please try again.</p>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      ) : visibleContests.length === 0 ? (
         <EmptyState
-          title="No contests yet"
-          description="Contests will appear here when available."
+          title={deferredSearch ? 'No matching contests' : 'No contests in this view'}
+          description={
+            deferredSearch
+              ? 'Try another search term.'
+              : 'Contests will appear here when available.'
+          }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {contests.map(contest => (
-            <Card key={contest.id}>
-              <CardHeader className="flex flex-row items-start justify-between gap-3">
-                <h2 className="font-semibold">{contest.title}</h2>
-                <ContestStatusBadge status={contest.status} />
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                {contest.description && <p>{contest.description}</p>}
-                <p>
-                  {formatDate(contest.startTime)} – {formatDate(contest.endTime)}
-                </p>
-                <p>
-                  {contest.participants.length} participant
-                  {contest.participants.length === 1 ? '' : 's'}
-                </p>
-              </CardContent>
-            </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleContests.map(contest => (
+            <ContestCard key={contest.id} contest={contest} />
           ))}
         </div>
       )}

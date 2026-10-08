@@ -6,7 +6,7 @@ from redis.exceptions import RedisError
 
 from api import redis_ops, services
 from api.db import get_db
-from api.dependencies import AdminUser
+from api.dependencies import AdminUser, CurrentUser
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.contests import (
     ContestAddParticipant,
@@ -99,9 +99,16 @@ def update_status(contest_id: str, payload: ContestStatusUpdate, _: AdminUser):
 
 
 @router.post("/{contest_id}/participants", response_model=ContestOut)
-def add_participant(contest_id: str, payload: ContestAddParticipant, _: AdminUser):
+def add_participant(contest_id: str, payload: ContestAddParticipant, user: CurrentUser):
     db = get_db()
-    entry = {"refType": payload.refType, "refId": oid(payload.refId)}
+    if user.get("role") == "admin":
+        entry = {"refType": payload.refType, "refId": oid(payload.refId)}
+    else:
+        if payload.refType != "user":
+            raise HTTPException(
+                status_code=403, detail="Only administrators can add teams"
+            )
+        entry = {"refType": "user", "refId": user["_id"]}
     doc = db["contests"].find_one_and_update(
         {"_id": oid(contest_id)},
         {"$addToSet": {"participants": entry}},
@@ -164,6 +171,54 @@ def get_leaderboard(contest_id: str, top: int = 10):
         ][: max(top, 0)]
     else:
         leaderboard = redis_ops.get_leaderboard(contest_id, top)
+    member_ids = [row["memberId"] for row in leaderboard]
+    counts = (
+        {
+            str(row["_id"]): row["count"]
+            for row in db["submissions"].aggregate(
+                [
+                    {
+                        "$match": {
+                            "contestId": contest_oid,
+                            "submittedBy.refId": {
+                                "$in": [oid(member_id) for member_id in member_ids]
+                            },
+                        }
+                    },
+                    {"$group": {"_id": "$submittedBy.refId", "count": {"$sum": 1}}},
+                ]
+            )
+        }
+        if member_ids
+        else {}
+    )
+    names = (
+        {
+            str(user["_id"]): user["name"]
+            for user in db["users"].find(
+                {"_id": {"$in": [oid(member_id) for member_id in member_ids]}},
+                {"name": 1},
+            )
+        }
+        if member_ids
+        else {}
+    )
+    team_names = (
+        {
+            str(team["_id"]): team["name"]
+            for team in db["teams"].find(
+                {"_id": {"$in": [oid(member_id) for member_id in member_ids]}},
+                {"name": 1},
+            )
+        }
+        if member_ids
+        else {}
+    )
+    for row in leaderboard:
+        row["participantName"] = names.get(
+            row["memberId"], team_names.get(row["memberId"], row["memberId"])
+        )
+        row["submissionCount"] = counts.get(row["memberId"], 0)
     return {"contestId": contest_id, "leaderboard": leaderboard}
 
 
