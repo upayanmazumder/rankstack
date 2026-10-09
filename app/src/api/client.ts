@@ -8,8 +8,6 @@ import { useAuthStore } from '@/stores/auth-store';
 
 import { toApiError } from './errors';
 
-let sessionExpiryRedirectStarted = false;
-
 export function createApiClient(baseURL: string) {
   const client = axios.create({
     baseURL,
@@ -29,21 +27,20 @@ export function createApiClient(baseURL: string) {
   });
 
   client.interceptors.response.use(
-    response => {
-      sessionExpiryRedirectStarted = false;
-      return response;
-    },
+    response => response,
     error => {
       if (
         axios.isAxiosError(error) &&
         error.response?.status === 401 &&
         typeof window !== 'undefined'
       ) {
-        useAuthStore.getState().clearAuth();
-        if (!sessionExpiryRedirectStarted && window.location.pathname !== '/login') {
-          sessionExpiryRedirectStarted = true;
-          toast.error('Session expired. Please log in again.');
-          window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+        const token = useAuthStore.getState().token;
+        if (token && error.config?.headers.get('Authorization') === `Bearer ${token}`) {
+          useAuthStore.getState().clearAuth();
+          if (window.location.pathname !== '/login') {
+            toast.error('Session expired. Please log in again.');
+            window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+          }
         }
       }
       return Promise.reject(toApiError(error));

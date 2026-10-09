@@ -41,4 +41,35 @@ describe('API client session expiration', () => {
     expect(toastError).toHaveBeenCalledWith('Session expired. Please log in again.');
     expect(replace).toHaveBeenCalledWith('/login');
   });
+
+  it('keeps a replacement session when an older request fails', async () => {
+    useAuthStore.getState().setAuth('token-A', null);
+    render(<SessionExpiredRedirect />);
+
+    const gate = Promise.withResolvers<void>();
+    let requestStarted = false;
+    const client = createApiClient('https://api.example.test');
+    client.defaults.adapter = async config => {
+      requestStarted = true;
+      await gate.promise;
+      const response: AxiosResponse = {
+        config,
+        data: { detail: 'Session expired' },
+        headers: {},
+        status: 401,
+        statusText: 'Unauthorized',
+      };
+      throw new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', config, undefined, response);
+    };
+
+    const pending = client.get('/contests');
+    await vi.waitFor(() => expect(requestStarted).toBe(true));
+    useAuthStore.getState().setAuth('token-B', null);
+    gate.resolve();
+    await expect(pending).rejects.toMatchObject({ status: 401 });
+
+    expect(useAuthStore.getState().token).toBe('token-B');
+    expect(toastError).not.toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+  });
 });
