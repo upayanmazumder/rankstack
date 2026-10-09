@@ -5,7 +5,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 
 import { MotionProvider } from '@/components/motion';
-import { QueryProvider, ThemeProvider } from '@/components/providers';
+import { QueryProvider, SessionExpiredRedirect, ThemeProvider } from '@/components/providers';
 import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 
@@ -53,6 +53,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <QueryProvider>
+            <SessionExpiredRedirect />
             <NuqsAdapter>
               <MotionProvider>{children}</MotionProvider>
             </NuqsAdapter>

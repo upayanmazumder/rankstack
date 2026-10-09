@@ -1,10 +1,14 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 import { API_TIMEOUT_MS } from '@/constants';
+import { SESSION_EXPIRED_EVENT } from '@/constants/session';
 import { env } from '@/env';
 import { useAuthStore } from '@/stores/auth-store';
 
 import { toApiError } from './errors';
+
+let sessionExpiryRedirectStarted = false;
 
 export function createApiClient(baseURL: string) {
   const client = axios.create({
@@ -25,8 +29,25 @@ export function createApiClient(baseURL: string) {
   });
 
   client.interceptors.response.use(
-    response => response,
-    error => Promise.reject(toApiError(error))
+    response => {
+      sessionExpiryRedirectStarted = false;
+      return response;
+    },
+    error => {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === 401 &&
+        typeof window !== 'undefined'
+      ) {
+        useAuthStore.getState().clearAuth();
+        if (!sessionExpiryRedirectStarted && window.location.pathname !== '/login') {
+          sessionExpiryRedirectStarted = true;
+          toast.error('Session expired. Please log in again.');
+          window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+        }
+      }
+      return Promise.reject(toApiError(error));
+    }
   );
 
   return client;
