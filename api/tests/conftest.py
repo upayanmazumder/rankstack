@@ -18,8 +18,9 @@ from api.security import hash_password
 def db(monkeypatch):
     name = f"rankstack_test_{uuid4().hex}"
     monkeypatch.setattr(settings, "mongo_db", name)
-    database = init_db()
+    database = get_mongo_client()[name]
     try:
+        init_db()
         yield database
     finally:
         try:
