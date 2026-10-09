@@ -89,7 +89,7 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
     contest.participants.some(
       participant => participant.refType === 'user' && participant.refId === user.id
     );
-  const problemLinksDisabled = isUpcoming;
+  const problemLinksDisabled = contest.status === 'upcoming';
 
   async function joinContest() {
     if (!user) {

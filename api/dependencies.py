@@ -33,6 +33,20 @@ def get_current_user(
 CurrentUser = Annotated[dict[str, Any], Depends(get_current_user)]
 
 
+def get_optional_user(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+) -> dict[str, Any] | None:
+    if credentials is None:
+        return None
+    try:
+        return get_current_user(credentials)
+    except HTTPException:
+        return None
+
+
+OptionalUser = Annotated[dict[str, Any] | None, Depends(get_optional_user)]
+
+
 def get_admin_user(user: CurrentUser) -> dict[str, Any]:
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin privileges required")

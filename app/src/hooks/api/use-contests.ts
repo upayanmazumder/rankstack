@@ -15,7 +15,7 @@ export const contestKeys = createQueryKeys('contests');
 
 export const leaderboardKeys = {
   all: () => ['leaderboard'] as const,
-  detail: (contestId: string) => ['leaderboard', contestId] as const,
+  detail: (contestId: string, top: number) => ['leaderboard', contestId, top] as const,
 };
 
 interface ContestFilters extends Record<string, unknown> {
@@ -45,16 +45,21 @@ export function useContest(id: string) {
       return res.data;
     },
     enabled: !!id,
-    refetchInterval: query => (query.state.data?.status === 'upcoming' ? 5_000 : false),
+    refetchInterval: query => (query.state.data?.status === 'ended' ? false : 5_000),
   });
 }
 
-export function useLeaderboard(contestId: string, refetchInterval: number | false = 5_000) {
+export function useLeaderboard(
+  contestId: string,
+  refetchInterval: number | false = 5_000,
+  top = 10
+) {
   return useQuery({
-    queryKey: leaderboardKeys.detail(contestId),
+    queryKey: leaderboardKeys.detail(contestId, top),
     queryFn: async () => {
       const res = await api.get<{ contestId: string; leaderboard: LeaderboardEntry[] }>(
-        `/contests/${contestId}/leaderboard`
+        `/contests/${contestId}/leaderboard`,
+        { params: { top } }
       );
       return res.data.leaderboard;
     },
