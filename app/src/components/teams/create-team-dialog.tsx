@@ -32,8 +32,9 @@ export function CreateTeamDialog() {
   const currentUser = useAuthStore(state => state.user);
   const usersQuery = useUsers();
   const createTeam = useCreateTeam();
+  const defaultMemberEmail = currentUser?.role === 'admin' ? '' : (currentUser?.email ?? '');
   const form = useZodForm(createTeamSchema, {
-    defaultValues: { name: '', memberEmail: currentUser?.email ?? '' },
+    defaultValues: { name: '', memberEmail: defaultMemberEmail },
   });
   const isAdmin = currentUser?.role === 'admin';
   const selectableUsers = useMemo(
@@ -46,8 +47,8 @@ export function CreateTeamDialog() {
   const memberEmail = form.watch('memberEmail');
 
   useEffect(() => {
-    if (!open) form.reset({ name: '', memberEmail: currentUser?.email ?? '' });
-  }, [currentUser?.email, form, open]);
+    if (!open) form.reset({ name: '', memberEmail: defaultMemberEmail });
+  }, [defaultMemberEmail, form, open]);
 
   async function submit(values: CreateTeamFormValues) {
     const email = values.memberEmail.trim().toLowerCase();

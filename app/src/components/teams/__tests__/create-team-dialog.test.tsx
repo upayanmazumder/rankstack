@@ -16,6 +16,14 @@ const participant: User = {
   createdAt: '2026-10-01T00:00:00.000Z',
 };
 
+const admin: User = {
+  ...participant,
+  id: 'admin-1',
+  name: 'Admin User',
+  email: 'admin@rankstack.io',
+  role: 'admin',
+};
+
 const createdTeam: Team = {
   id: 'team-1',
   name: 'Binary Brigade',
@@ -84,5 +92,15 @@ describe('CreateTeamDialog', () => {
       'Team name must be at least 2 characters.'
     );
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
+  });
+
+  it('leaves the optional member search empty for administrators', async () => {
+    mocks.currentUser = admin;
+    const user = userEvent.setup();
+    render(<CreateTeamDialog />);
+
+    await user.click(screen.getByRole('button', { name: 'Create Team' }));
+
+    expect(screen.getByLabelText('Initial member email (optional)')).toHaveValue('');
   });
 });

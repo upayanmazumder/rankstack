@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { ArrowLeft, Trophy, Users } from 'lucide-react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTeam, useUsers } from '@/hooks/api';
+import { useAuthStore } from '@/stores';
+
+import { TeamDangerZone } from './team-danger-zone';
+import { TeamRoster } from './team-roster';
 
 interface TeamProfileProps {
   teamId: string;
@@ -16,6 +18,7 @@ interface TeamProfileProps {
 export function TeamProfile({ teamId }: TeamProfileProps) {
   const teamQuery = useTeam(teamId);
   const usersQuery = useUsers();
+  const currentUser = useAuthStore(state => state.user);
   const team = teamQuery.data;
 
   if (teamQuery.isPending || usersQuery.isPending) {
@@ -35,6 +38,11 @@ export function TeamProfile({ teamId }: TeamProfileProps) {
   }
 
   const members = (usersQuery.data ?? []).filter(user => team.memberIds.includes(user.id));
+  const candidates = (usersQuery.data ?? []).filter(user => !team.memberIds.includes(user.id));
+  const canManage = Boolean(
+    currentUser && (currentUser.role === 'admin' || team.memberIds.includes(currentUser.id))
+  );
+  const canAddMembers = currentUser?.role === 'admin';
 
   return (
     <section className="mx-auto w-full max-w-4xl flex-1 space-y-6 px-4 py-8 sm:px-6">
@@ -58,27 +66,16 @@ export function TeamProfile({ teamId }: TeamProfileProps) {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Roster</CardTitle>
-        </CardHeader>
-        <CardContent className="divide-y">
-          {members.map(member => (
-            <div key={member.id} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0">
-              <Avatar>
-                <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{member.name}</p>
-                <p className="truncate text-xs text-muted-foreground">{member.email}</p>
-              </div>
-              <span className="ml-auto font-mono text-sm">
-                {member.totalScore.toLocaleString()} pts
-              </span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <TeamRoster
+        teamId={team.id}
+        members={members}
+        candidates={candidates}
+        currentUserId={currentUser?.id}
+        canManage={canManage}
+        canAddMembers={canAddMembers}
+      />
+
+      {canManage && <TeamDangerZone teamId={team.id} teamName={team.name} />}
     </section>
   );
 }

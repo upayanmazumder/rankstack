@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Check, Search } from 'lucide-react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
@@ -11,6 +12,9 @@ interface MemberEmailFieldProps {
   value: string;
   error?: string;
   readOnly: boolean;
+  label?: string;
+  helpText?: string;
+  placeholder?: string;
   onChange: (value: string) => void;
   onSelect: (user: User) => void;
 }
@@ -21,10 +25,15 @@ export function MemberEmailField({
   value,
   error,
   readOnly,
+  label,
+  helpText,
+  placeholder = 'Search by member email',
   onChange,
   onSelect,
 }: MemberEmailFieldProps) {
-  const normalizedValue = value.trim().toLowerCase();
+  const [inputValue, setInputValue] = useState(value);
+
+  const normalizedValue = inputValue.trim().toLowerCase();
   const matches = normalizedValue
     ? users
         .filter(user => `${user.email} ${user.name}`.toLowerCase().includes(normalizedValue))
@@ -35,7 +44,7 @@ export function MemberEmailField({
   return (
     <div className="space-y-2">
       <Label htmlFor="member-email">
-        {readOnly ? 'Founding member' : 'Initial member email (optional)'}
+        {label ?? (readOnly ? 'Founding member' : 'Initial member email (optional)')}
       </Label>
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -47,9 +56,14 @@ export function MemberEmailField({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? 'member-email-error' : 'member-email-help'}
           readOnly={readOnly}
-          value={value}
-          onChange={event => onChange(event.target.value)}
-          placeholder="Search by member email"
+          value={inputValue}
+          onChange={event => {
+            const nextValue = event.target.value;
+            setInputValue(nextValue);
+            void registration.onChange(event);
+            onChange(nextValue);
+          }}
+          placeholder={placeholder}
           className="pl-9"
         />
         {exactMatch && (
@@ -74,7 +88,10 @@ export function MemberEmailField({
               role="option"
               aria-selected="false"
               className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
-              onClick={() => onSelect(user)}
+              onClick={() => {
+                setInputValue(user.email);
+                onSelect(user);
+              }}
             >
               <span className="font-medium">{user.name}</span>
               <span className="truncate text-xs text-muted-foreground">{user.email}</span>
@@ -89,9 +106,10 @@ export function MemberEmailField({
         </p>
       ) : (
         <p id="member-email-help" className="text-xs text-muted-foreground">
-          {readOnly
-            ? 'You will be added automatically as the team founder.'
-            : 'Search for a participant to add alongside your admin account.'}
+          {helpText ??
+            (readOnly
+              ? 'You will be added automatically as the team founder.'
+              : 'Search for a participant to add alongside your admin account.')}
         </p>
       )}
     </div>
