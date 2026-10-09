@@ -39,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "Ensuring the MongoDB rs0 replica set is initialized..."
-docker compose up mongo-rs-init
+docker compose run --rm mongo-rs-init
 if ($LASTEXITCODE -ne 0) {
     throw "MongoDB replica-set initialization failed."
 }

@@ -20,6 +20,7 @@ export function McqSolution({ options, value, onChange }: McqSolutionProps) {
             key={`${option}-${index}`}
             className={cn(
               'flex cursor-pointer items-start gap-3 rounded-lg border bg-background p-4 transition-colors hover:border-ring/60 hover:bg-muted/30',
+              'focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/40 focus-within:outline-none',
               selected && 'border-ring bg-muted/50 ring-2 ring-ring/15'
             )}
           >

@@ -31,6 +31,21 @@ describe('SolutionPanel', () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('Second answer'));
   });
+  it('supports keyboard focus and selection for MCQ options', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const problem: Problem = { ...baseProblem, options: ['Option A', 'Option B'] };
+
+    render(<SolutionPanel problem={problem} isSubmitting={false} onSubmit={onSubmit} />);
+
+    const firstRadio = screen.getByRole('radio', { name: /Option A/i });
+    firstRadio.focus();
+    expect(firstRadio).toHaveFocus();
+    expect(firstRadio.closest('label')).toHaveClass('focus-within:ring-2');
+
+    await user.keyboard(' ');
+    expect(firstRadio).toBeChecked();
+  });
 
   it('submits code together with its language', async () => {
     const user = userEvent.setup();
