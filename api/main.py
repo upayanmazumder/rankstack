@@ -5,6 +5,7 @@ Run with: uvicorn api.main:app --reload
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from api.aggregations.pipelines import router as aggregations_router
 from api.config import settings
@@ -39,6 +40,11 @@ def on_startup() -> None:
 @app.get("/health", tags=["meta"])
 def health():
     return {"status": "ok"}
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
 
 
 app.include_router(users_router)

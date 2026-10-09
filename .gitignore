@@ -36,7 +36,11 @@ redis_data/
 # editors / OS
 .DS_Store
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
 
 # husky internals
 .husky/_/

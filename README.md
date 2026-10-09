@@ -57,6 +57,24 @@ Or all at once from a clean slate: `make reset` (down + up + init-db + seed).
 Copy `.env.example` to `.env` if you want to change any connection settings. The defaults already
 match `docker-compose.yml`.
 
+### Run from VS Code on Windows
+
+The repository includes shared tasks and a full-stack debug profile under `.vscode/`.
+
+1. Install Docker Desktop, Python 3.14 (Python 3.12+ also works for local development), Node.js 22,
+   pnpm, and the VS Code extensions recommended by the workspace.
+2. Open the repository root in VS Code.
+3. Run **Tasks: Run Task** -> **Rankstack: Setup development environment**. This creates `.venv`,
+   installs backend and frontend dependencies, creates local environment files, starts MongoDB and
+   Redis, and initializes the database. Use **Rankstack: Reset and seed demo data** when sample data
+   is wanted; that task replaces records in the application collections.
+4. Open **Run and Debug**, choose **Rankstack: Full Stack**, and press `F5`.
+
+The frontend is served at `http://localhost:3000`, the API at `http://localhost:8000`, and Swagger
+at `http://localhost:8000/docs`. The full-stack profile starts Docker services automatically and
+launches both development servers in VS Code terminals. Use **Rankstack: Stop infrastructure** when
+finished. If another project already uses Redis port 6379, set `REDIS_HOST_PORT` and the port in
+`REDIS_URI` to the same free value in `.env` (for example, 6380).
 ## Backend lint
 
 Run `make lint` after `make install`. Ruff checks `api/` and `scripts/` for lint and
