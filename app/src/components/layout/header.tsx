@@ -7,7 +7,7 @@ import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/hooks/api';
+import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore, useUiStore } from '@/stores';
 
 const NAV_LINKS = [
@@ -35,7 +36,9 @@ const ADMIN_LINKS = [
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
+  const mounted = useMounted();
+  const activeTheme = mounted ? (theme ?? 'system') : 'system';
   const toggleSidebar = useUiStore(state => state.toggleSidebar);
   const user = useAuthStore(state => state.user);
   const logout = useLogout();
@@ -62,7 +65,7 @@ export function Header() {
       </Button>
 
       {/* Brand */}
-      <Link href="/" className="flex items-center gap-2 font-semibold">
+      <Link href="/" aria-label="Rankstack home" className="flex items-center gap-2 font-semibold">
         <Trophy className="size-5 text-primary" />
         <span className="hidden sm:inline">Rankstack</span>
       </Link>
@@ -109,8 +112,13 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Toggle theme"
-          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+          aria-label={`Theme: ${activeTheme}. Change theme`}
+          title={`Theme: ${activeTheme}`}
+          onClick={() =>
+            setTheme(
+              activeTheme === 'system' ? 'light' : activeTheme === 'light' ? 'dark' : 'system'
+            )
+          }
         >
           <Sun className="size-4 dark:hidden" />
           <Moon className="hidden size-4 dark:block" />
@@ -149,9 +157,9 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button size="sm" render={<Link href="/login" />}>
+          <Link href="/login" className={buttonVariants({ size: 'sm' })}>
             Sign in
-          </Button>
+          </Link>
         )}
       </div>
     </header>

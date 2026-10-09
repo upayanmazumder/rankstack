@@ -117,6 +117,11 @@ After login or registration, the frontend opens `/contests`. Guests can also bro
 catalog and its contest pages. Joining requires a valid session. Participants can join
 upcoming and live contests, but only administrators can add teams or change ended contests.
 
+An expired API session clears client authentication and redirects to `/login`.
+The user sees a session-expired notice. Unknown URLs show a custom 404 page,
+and route errors show a retry action. The header theme control cycles through
+system, light, and dark preferences.
+
 `GET /contests/{id}/leaderboard?top=` accepts 1–100 results. Each entry includes a
 participant name, score, rank, and submission count. The full leaderboard shows the top 100.
 

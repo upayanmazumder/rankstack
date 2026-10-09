@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 import { API_TIMEOUT_MS } from '@/constants';
+import { SESSION_EXPIRED_EVENT } from '@/constants/session';
 import { env } from '@/env';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -26,7 +28,23 @@ export function createApiClient(baseURL: string) {
 
   client.interceptors.response.use(
     response => response,
-    error => Promise.reject(toApiError(error))
+    error => {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === 401 &&
+        typeof window !== 'undefined'
+      ) {
+        const token = useAuthStore.getState().token;
+        if (token && error.config?.headers.get('Authorization') === `Bearer ${token}`) {
+          useAuthStore.getState().clearAuth();
+          if (window.location.pathname !== '/login') {
+            toast.error('Session expired. Please log in again.');
+            window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+          }
+        }
+      }
+      return Promise.reject(toApiError(error));
+    }
   );
 
   return client;

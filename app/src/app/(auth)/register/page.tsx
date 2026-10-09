@@ -8,7 +8,7 @@ import * as z from 'zod';
 
 import { isApiError } from '@/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin, useRegister } from '@/hooks/api';
@@ -54,7 +54,7 @@ export default function RegisterPage() {
         <div className="mb-2 flex justify-center">
           <Trophy className="size-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl">Create account</CardTitle>
+        <h1 className="text-2xl font-semibold tracking-tight">Create account</h1>
         <CardDescription>Join Rankstack and start competing</CardDescription>
       </CardHeader>
       <CardContent>
@@ -67,9 +67,14 @@ export default function RegisterPage() {
               autoComplete="name"
               placeholder="Jane Smith"
               aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'register-name-error' : undefined}
               {...field('name')}
             />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+            {errors.name && (
+              <p id="register-name-error" className="text-xs text-destructive">
+                {errors.name.message}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -80,9 +85,14 @@ export default function RegisterPage() {
               autoComplete="email"
               placeholder="you@example.com"
               aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'register-email-error' : undefined}
               {...field('email')}
             />
-            {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            {errors.email && (
+              <p id="register-email-error" className="text-xs text-destructive">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -93,10 +103,13 @@ export default function RegisterPage() {
               autoComplete="new-password"
               placeholder="••••••••"
               aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'register-password-error' : undefined}
               {...field('password')}
             />
             {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
+              <p id="register-password-error" className="text-xs text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
