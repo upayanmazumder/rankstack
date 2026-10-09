@@ -1,6 +1,10 @@
 import { TeamProfile } from '@/components/teams';
 
-export default async function TeamPage({ params }: PageProps<'/teams/[id]'>) {
+interface TeamPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function TeamPage({ params }: TeamPageProps) {
   const { id } = await params;
   return <TeamProfile teamId={id} />;
 }
