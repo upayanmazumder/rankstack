@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FileText, LayoutDashboard, ListOrdered, Shield, Trophy, Users } from 'lucide-react';
@@ -27,6 +28,12 @@ export function Sidebar() {
   const sidebarOpen = useUiStore(state => state.sidebarOpen);
   const setSidebarOpen = useUiStore(state => state.setSidebarOpen);
   const user = useAuthStore(state => state.user);
+  const focusFirstLink = useCallback(
+    (node: HTMLAnchorElement | null) => {
+      if (sidebarOpen) node?.focus();
+    },
+    [sidebarOpen]
+  );
 
   return (
     <Sheet open={sidebarOpen} onOpenChange={open => setSidebarOpen(open)}>
@@ -39,9 +46,10 @@ export function Sidebar() {
         </SheetHeader>
 
         <nav className="flex flex-col gap-1 p-3">
-          {MAIN_LINKS.map(({ href, label, icon: Icon }) => (
+          {MAIN_LINKS.map(({ href, label, icon: Icon }, index) => (
             <Link
               key={href}
+              ref={index === 0 ? focusFirstLink : undefined}
               href={href}
               onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${

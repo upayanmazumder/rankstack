@@ -5,7 +5,7 @@ from pymongo import ReturnDocument
 
 from api import services
 from api.db import get_db
-from api.dependencies import AdminUser
+from api.dependencies import AdminUser, OptionalUser
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.problems import ProblemCreate, ProblemOut, ProblemUpdate
 
@@ -24,20 +24,46 @@ def create_problem(payload: ProblemCreate, _: AdminUser):
     return serialize_doc(created)
 
 
-@router.get("", response_model=list[ProblemOut])
-def list_problems(contestId: str | None = None, limit: int = 100):
+@router.get("", response_model=list[ProblemOut], response_model_exclude_none=True)
+def list_problems(user: OptionalUser, contestId: str | None = None, limit: int = 100):
     db = get_db()
     query = {"contestId": oid(contestId)} if contestId else {}
-    docs = db["problems"].find(query).limit(min(limit, 300))
+    admin = user is not None and user.get("role") == "admin"
+    projection = (
+        None
+        if admin
+        else {
+            "contestId": 1,
+            "type": 1,
+            "title": 1,
+            "difficulty": 1,
+            "points": 1,
+            "attemptCount": 1,
+            "createdAt": 1,
+        }
+    )
+    docs = db["problems"].find(query, projection).limit(min(limit, 300))
     return [serialize_doc(d) for d in docs]
 
 
-@router.get("/{problem_id}", response_model=ProblemOut)
-def get_problem(problem_id: str):
+@router.get(
+    "/{problem_id}", response_model=ProblemOut, response_model_exclude_none=True
+)
+def get_problem(problem_id: str, user: OptionalUser):
     db = get_db()
     doc = db["problems"].find_one({"_id": oid(problem_id)})
     if doc is None:
         raise HTTPException(status_code=404, detail="Problem not found")
+    if user is None or user.get("role") != "admin":
+        contest = db["contests"].find_one({"_id": doc["contestId"]}, {"status": 1})
+        if contest is None:
+            raise HTTPException(status_code=404, detail="Contest not found")
+        if contest["status"] == "upcoming":
+            raise HTTPException(
+                status_code=403, detail="Problems unlock when the contest is live"
+            )
+        for field in ("correctAnswer", "testCases", "evaluationRubric"):
+            doc.pop(field, None)
     return serialize_doc(doc)
 
 
@@ -46,12 +72,17 @@ def update_problem(problem_id: str, payload: ProblemUpdate, _: AdminUser):
     db = get_db()
     updates = payload.model_dump(exclude_unset=True, exclude_none=True)
     if "testCases" in updates:
-        updates["testCases"] = [tc if isinstance(tc, dict) else tc.model_dump() for tc in updates["testCases"]]
+        updates["testCases"] = [
+            tc if isinstance(tc, dict) else tc.model_dump()
+            for tc in updates["testCases"]
+        ]
     if not updates:
         doc = db["problems"].find_one({"_id": oid(problem_id)})
     else:
         doc = db["problems"].find_one_and_update(
-            {"_id": oid(problem_id)}, {"$set": updates}, return_document=ReturnDocument.AFTER
+            {"_id": oid(problem_id)},
+            {"$set": updates},
+            return_document=ReturnDocument.AFTER,
         )
     if doc is None:
         raise HTTPException(status_code=404, detail="Problem not found")

@@ -46,7 +46,14 @@ TEAMS_SCHEMA = {
 CONTESTS_SCHEMA = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["title", "startTime", "endTime", "status", "createdBy", "createdAt"],
+        "required": [
+            "title",
+            "startTime",
+            "endTime",
+            "status",
+            "createdBy",
+            "createdAt",
+        ],
         "properties": {
             "title": {"bsonType": "string"},
             "description": {"bsonType": "string"},
@@ -194,7 +201,9 @@ def ensure_collections(db: Database) -> None:
             db.command("collMod", name, validator=validator, validationLevel="moderate")
         else:
             try:
-                db.create_collection(name, validator=validator, validationLevel="moderate")
+                db.create_collection(
+                    name, validator=validator, validationLevel="moderate"
+                )
             except CollectionInvalid:
                 pass
 

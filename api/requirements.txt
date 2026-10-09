@@ -8,3 +8,5 @@ python-dotenv==1.2.4
 email-validator==2.3.0
 Faker==40.40.0
 httpx==0.28.1
+pytest==9.0.2
+ruff==0.16.10

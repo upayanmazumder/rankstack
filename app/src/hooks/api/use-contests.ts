@@ -2,20 +2,36 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
-import type { Contest, ContestCreate, ContestUpdate, LeaderboardEntry } from '@/types';
+import type {
+  Contest,
+  ContestCreate,
+  ContestStatus,
+  ContestUpdate,
+  LeaderboardEntry,
+  ParticipantRefType,
+} from '@/types';
 
 export const contestKeys = createQueryKeys('contests');
 
 export const leaderboardKeys = {
   all: () => ['leaderboard'] as const,
-  detail: (contestId: string) => ['leaderboard', contestId] as const,
+  detail: (contestId: string, top: number) => ['leaderboard', contestId, top] as const,
 };
 
-export function useContests() {
+interface ContestFilters extends Record<string, unknown> {
+  status?: ContestStatus;
+}
+
+interface AddParticipantInput {
+  refType: ParticipantRefType;
+  refId: string;
+}
+
+export function useContests(filters?: ContestFilters) {
   return useQuery({
-    queryKey: contestKeys.lists(),
+    queryKey: contestKeys.list(filters),
     queryFn: async () => {
-      const res = await api.get<Contest[]>('/contests');
+      const res = await api.get<Contest[]>('/contests', { params: filters });
       return res.data;
     },
   });
@@ -29,20 +45,40 @@ export function useContest(id: string) {
       return res.data;
     },
     enabled: !!id,
+    refetchInterval: query => (query.state.data?.status === 'ended' ? false : 5_000),
   });
 }
 
-export function useLeaderboard(contestId: string) {
+export function useLeaderboard(
+  contestId: string,
+  refetchInterval: number | false = 5_000,
+  top = 10
+) {
   return useQuery({
-    queryKey: leaderboardKeys.detail(contestId),
+    queryKey: leaderboardKeys.detail(contestId, top),
     queryFn: async () => {
       const res = await api.get<{ contestId: string; leaderboard: LeaderboardEntry[] }>(
-        `/contests/${contestId}/leaderboard`
+        `/contests/${contestId}/leaderboard`,
+        { params: { top } }
       );
       return res.data.leaderboard;
     },
     enabled: !!contestId,
-    refetchInterval: 5_000,
+    refetchInterval,
+  });
+}
+
+export function useAddParticipant(contestId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (participant: AddParticipantInput) => {
+      const res = await api.post<Contest>(`/contests/${contestId}/participants`, participant);
+      return res.data;
+    },
+    onSuccess: contest => {
+      queryClient.setQueryData(contestKeys.detail(contestId), contest);
+      queryClient.invalidateQueries({ queryKey: contestKeys.lists() });
+    },
   });
 }
 

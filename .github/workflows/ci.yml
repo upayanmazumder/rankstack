@@ -121,8 +121,16 @@ jobs:
 
       - run: pip install -r api/requirements.txt
 
+      - name: Lint backend with Ruff
+        run: |
+          ruff check api scripts
+          ruff format --check api scripts
+
       - name: Create collections, validators and indexes
         run: python scripts/init_db.py
+
+      - name: Run isolated backend integration tests
+        run: python -m pytest api/tests
 
       - name: Load sample data
         run: python scripts/seed.py

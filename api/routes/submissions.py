@@ -24,10 +24,15 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
     submitter_id = oid(payload.submittedBy.refId)
     if payload.submittedBy.refType == "user":
         if submitter_id != current["_id"]:
-            raise HTTPException(status_code=403, detail="Cannot submit for another user")
-    elif db["teams"].find_one(
-        {"_id": submitter_id, "memberIds": current["_id"]}, {"_id": 1}
-    ) is None:
+            raise HTTPException(
+                status_code=403, detail="Cannot submit for another user"
+            )
+    elif (
+        db["teams"].find_one(
+            {"_id": submitter_id, "memberIds": current["_id"]}, {"_id": 1}
+        )
+        is None
+    ):
         raise HTTPException(status_code=403, detail="Team membership required")
 
     services.validate_submission_problem(db, contest_id, problem_id, payload.answer)
@@ -91,9 +96,11 @@ def update_status(
     old_score = existing.get("score", 0)
     doc = services.update_submission_status(db, sub_id, payload.status, payload.score)
     delta = payload.score - old_score
-    if delta != 0 and db["dirty_leaderboards"].find_one(
-        {"_id": doc["contestId"]}, {"_id": 1}
-    ) is None:
+    if (
+        delta != 0
+        and db["dirty_leaderboards"].find_one({"_id": doc["contestId"]}, {"_id": 1})
+        is None
+    ):
         redis_ops.update_leaderboard_score(
             str(doc["contestId"]), str(doc["submittedBy"]["refId"]), delta
         )
@@ -109,8 +116,7 @@ def delete_submission(submission_id: str, current: CurrentUser):
         raise HTTPException(status_code=404, detail="Submission not found")
     submitted_by = submission["submittedBy"]
     is_owner = (
-        submitted_by["refType"] == "user"
-        and submitted_by["refId"] == current["_id"]
+        submitted_by["refType"] == "user" and submitted_by["refId"] == current["_id"]
     )
     is_team_member = (
         submitted_by["refType"] == "team"

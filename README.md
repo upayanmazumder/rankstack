@@ -38,7 +38,7 @@ scripts/
   demo.py                 Walks through CRUD, indexing, transactions, aggregations, Redis
 api/Dockerfile          Backend image, published to ghcr.io/upayanmazumder/rankstack/api
 docker-compose.yml      Mongo (replica set) + Redis
-Makefile                up/down/seed/demo/api/reset targets
+Makefile                up/down/test/seed/demo/api/reset targets
 ```
 
 ## Setup
@@ -75,6 +75,17 @@ at `http://localhost:8000/docs`. The full-stack profile starts Docker services a
 launches both development servers in VS Code terminals. Use **Rankstack: Stop infrastructure** when
 finished. If another project already uses Redis port 6379, set `REDIS_HOST_PORT` and the port in
 `REDIS_URI` to the same free value in `.env` (for example, 6380).
+## Backend lint
+
+Run `make lint` after `make install`. Ruff checks `api/` and `scripts/` for lint and
+format errors. CI runs the same checks before backend database smoke tests.
+
+## Backend integration tests
+
+Run `make test` with MongoDB replica set `rs0` and Redis available. The suite
+creates a unique MongoDB database for each test and deletes only its own
+Redis sessions, rate limits, and leaderboard keys. It does not modify seeded
+application data. CI runs the same pytest suite against its service containers.
 
 ## Running the demo
 
@@ -120,9 +131,22 @@ FastAPI session and sets an HttpOnly `rankstack-session` cookie. The Next.js pro
 cookie against FastAPI before it serves protected routes. Sign-out removes the cookie and
 requests session revocation. The session profile response excludes `passwordHash`.
 
-`GET /contests/{id}/leaderboard` returns `{ contestId, leaderboard }`. Each leaderboard row
-contains `memberId`, `score`, and `rank`. The frontend displays the member ID because this
-response does not contain a participant name or type.
+After login or registration, the frontend opens `/contests`. Guests can also browse this
+catalog and its contest pages. Joining requires a valid session. Participants can join
+upcoming and live contests, but only administrators can add teams or change ended contests.
+
+An expired API session clears client authentication and redirects to `/login`.
+The user sees a session-expired notice. Unknown URLs show a custom 404 page,
+and route errors show a retry action. The header theme control cycles through
+system, light, and dark preferences.
+
+`GET /contests/{id}/leaderboard?top=` accepts 1–100 results. Each entry includes a
+participant name, score, rank, and submission count. The full leaderboard shows the top 100.
+
+Public `GET /problems` returns problem metadata without statements, answers, test cases,
+or rubrics. Public problem details stay locked while the contest is upcoming. After the
+contest becomes live, details include statements but omit grading data. Administrators
+with a valid session can access the complete problem records.
 
 Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.

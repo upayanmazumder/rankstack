@@ -17,7 +17,9 @@ def leaderboard_key(contest_id: str) -> str:
     return f"leaderboard:{contest_id}"
 
 
-def update_leaderboard_score(contest_id: str, member_id: str, score_delta: float) -> float:
+def update_leaderboard_score(
+    contest_id: str, member_id: str, score_delta: float
+) -> float:
     """Atomically apply a score delta to a contestant's leaderboard entry."""
     r = get_redis_client()
     return r.zincrby(leaderboard_key(contest_id), score_delta, member_id)
@@ -41,10 +43,15 @@ def decrement_existing_leaderboard_score(
 def get_leaderboard(contest_id: str, top: int = 10) -> list[dict]:
     r = get_redis_client()
     rows = r.zrevrange(leaderboard_key(contest_id), 0, top - 1, withscores=True)
-    return [{"memberId": member, "score": score, "rank": i + 1} for i, (member, score) in enumerate(rows)]
+    return [
+        {"memberId": member, "score": score, "rank": i + 1}
+        for i, (member, score) in enumerate(rows)
+    ]
 
 
-def replace_leaderboard(contest_id: str, scores: dict[str, float], version: int) -> bool:
+def replace_leaderboard(
+    contest_id: str, scores: dict[str, float], version: int
+) -> bool:
     """Replace cached scores unless Redis already holds a newer revision."""
     key = leaderboard_key(contest_id)
     revision_key = f"leaderboard_revision:{contest_id}"

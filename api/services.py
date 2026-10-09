@@ -20,7 +20,10 @@ def create_problem(
 ) -> dict[str, Any] | None:
     """Insert a problem and its contest reference in one transaction."""
     with db.client.start_session() as session, session.start_transaction():
-        if db["contests"].find_one({"_id": contest_id}, {"_id": 1}, session=session) is None:
+        if (
+            db["contests"].find_one({"_id": contest_id}, {"_id": 1}, session=session)
+            is None
+        ):
             return None
         result = db["problems"].insert_one(doc, session=session)
         db["contests"].update_one(
@@ -48,11 +51,15 @@ def validate_submission_problem(
     if problem is None:
         raise HTTPException(status_code=404, detail="Problem not found")
     if problem["contestId"] != contest_id:
-        raise HTTPException(status_code=400, detail="Problem does not belong to contest")
+        raise HTTPException(
+            status_code=400, detail="Problem does not belong to contest"
+        )
     if problem["type"] == "mcq" and (
         not isinstance(answer, str) or answer not in problem["options"]
     ):
-        raise HTTPException(status_code=400, detail="Answer must match a problem option")
+        raise HTTPException(
+            status_code=400, detail="Answer must match a problem option"
+        )
 
 
 def create_submission(
@@ -76,13 +83,12 @@ def create_submission(
         "score": 0,
         "submittedAt": utcnow(),
     }
-    with client.start_session() as session:
-        with session.start_transaction():
-            validate_submission_problem(db, contest_id, problem_id, answer, session=session)
-            result = db["submissions"].insert_one(doc, session=session)
-            db["problems"].update_one(
-                {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
-            )
+    with client.start_session() as session, session.start_transaction():
+        validate_submission_problem(db, contest_id, problem_id, answer, session=session)
+        result = db["submissions"].insert_one(doc, session=session)
+        db["problems"].update_one(
+            {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
+        )
     doc["_id"] = result.inserted_id
     return doc
 
@@ -96,50 +102,52 @@ def update_submission_status(
     Transaction #2: `submissions.update_one` + `{users|teams}.update_one($inc)`.
     """
     client = db.client
-    with client.start_session() as session:
-        with session.start_transaction():
-            existing = db["submissions"].find_one({"_id": submission_id}, session=session)
-            if existing is None:
-                return None
-            delta = score - existing.get("score", 0)
-            db["submissions"].update_one(
-                {"_id": submission_id},
-                {"$set": {"status": status, "score": score}},
+    with client.start_session() as session, session.start_transaction():
+        existing = db["submissions"].find_one({"_id": submission_id}, session=session)
+        if existing is None:
+            return None
+        delta = score - existing.get("score", 0)
+        db["submissions"].update_one(
+            {"_id": submission_id},
+            {"$set": {"status": status, "score": score}},
+            session=session,
+        )
+        submitted_by = existing["submittedBy"]
+        target_collection = "users" if submitted_by["refType"] == "user" else "teams"
+        db[target_collection].update_one(
+            {"_id": submitted_by["refId"]},
+            {"$inc": {"totalScore": delta}},
+            session=session,
+        )
+        if delta != 0:
+            db["dirty_leaderboards"].update_one(
+                {"_id": existing["contestId"]},
+                {"$inc": {"version": 1}},
                 session=session,
             )
-            submitted_by = existing["submittedBy"]
-            target_collection = "users" if submitted_by["refType"] == "user" else "teams"
-            db[target_collection].update_one(
-                {"_id": submitted_by["refId"]}, {"$inc": {"totalScore": delta}}, session=session
-            )
-            if delta != 0:
-                db["dirty_leaderboards"].update_one(
-                    {"_id": existing["contestId"]},
-                    {"$inc": {"version": 1}},
-                    session=session,
-                )
     existing["status"] = status
     existing["score"] = score
     return existing
 
 
-def add_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> dict[str, Any] | None:
+def add_team_member(
+    db: Database, team_id: ObjectId, user_id: ObjectId
+) -> dict[str, Any] | None:
     """Add a member to a team and atomically add the back-reference on the user.
 
     Transaction #3: `teams.update_one($addToSet)` + `users.update_one($addToSet)`.
     """
     client = db.client
-    with client.start_session() as session:
-        with session.start_transaction():
-            team = db["teams"].find_one({"_id": team_id}, session=session)
-            if team is None:
-                return None
-            db["teams"].update_one(
-                {"_id": team_id}, {"$addToSet": {"memberIds": user_id}}, session=session
-            )
-            db["users"].update_one(
-                {"_id": user_id}, {"$addToSet": {"teamIds": team_id}}, session=session
-            )
+    with client.start_session() as session, session.start_transaction():
+        team = db["teams"].find_one({"_id": team_id}, session=session)
+        if team is None:
+            return None
+        db["teams"].update_one(
+            {"_id": team_id}, {"$addToSet": {"memberIds": user_id}}, session=session
+        )
+        db["users"].update_one(
+            {"_id": user_id}, {"$addToSet": {"teamIds": team_id}}, session=session
+        )
     return db["teams"].find_one({"_id": team_id})
 
 
@@ -147,23 +155,24 @@ class LastTeamMemberError(Exception):
     """Raised when a removal would leave a team without members."""
 
 
-def remove_team_member(db: Database, team_id: ObjectId, user_id: ObjectId) -> dict[str, Any] | None:
+def remove_team_member(
+    db: Database, team_id: ObjectId, user_id: ObjectId
+) -> dict[str, Any] | None:
     """Remove a member from a team and atomically drop the back-reference."""
     client = db.client
-    with client.start_session() as session:
-        with session.start_transaction():
-            team = db["teams"].find_one({"_id": team_id}, session=session)
-            if team is None:
-                return None
-            member_ids = team.get("memberIds", [])
-            if user_id in member_ids and len(member_ids) == 1:
-                raise LastTeamMemberError
-            db["teams"].update_one(
-                {"_id": team_id}, {"$pull": {"memberIds": user_id}}, session=session
-            )
-            db["users"].update_one(
-                {"_id": user_id}, {"$pull": {"teamIds": team_id}}, session=session
-            )
+    with client.start_session() as session, session.start_transaction():
+        team = db["teams"].find_one({"_id": team_id}, session=session)
+        if team is None:
+            return None
+        member_ids = team.get("memberIds", [])
+        if user_id in member_ids and len(member_ids) == 1:
+            raise LastTeamMemberError
+        db["teams"].update_one(
+            {"_id": team_id}, {"$pull": {"memberIds": user_id}}, session=session
+        )
+        db["users"].update_one(
+            {"_id": user_id}, {"$pull": {"teamIds": team_id}}, session=session
+        )
     return db["teams"].find_one({"_id": team_id})
 
 
@@ -196,7 +205,6 @@ def _remove_submission_scores(submissions: list[dict[str, Any]]) -> None:
         )
 
 
-
 def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) -> None:
     """Record cleanup work in the same transaction as each deletion."""
     for contest_id in contest_ids:
@@ -206,6 +214,7 @@ def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) 
             upsert=True,
             session=session,
         )
+
 
 def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] | None:
     """Delete a team and its submissions and references atomically."""
@@ -256,6 +265,7 @@ def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] |
     except RedisError:
         pass  # MongoDB serves this leaderboard until Redis is available again.
     return team
+
 
 def delete_contest_transaction(
     db: Database, contest_id: ObjectId
@@ -315,7 +325,9 @@ def delete_submission_transaction(
     """Delete a submission and reverse its score and attempt count atomically."""
     with db.client.start_session() as session:  # noqa: SIM117
         with session.start_transaction():
-            submission = db["submissions"].find_one({"_id": submission_id}, session=session)
+            submission = db["submissions"].find_one(
+                {"_id": submission_id}, session=session
+            )
             if submission is None:
                 return None
             db["problems"].update_one(
@@ -331,5 +343,3 @@ def delete_submission_transaction(
     except RedisError:
         pass
     return submission
-
-

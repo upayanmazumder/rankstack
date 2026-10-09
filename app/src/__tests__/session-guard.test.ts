@@ -25,10 +25,22 @@ describe('protected route guard', () => {
     expect(verify).toHaveBeenCalledOnce();
   });
 
-  it('allows a session only when the backend verifies it', async () => {
+  it('allows guests to browse the public contest catalog', async () => {
+    const verify = vi.fn();
+    vi.stubGlobal('fetch', verify);
+    const request = new NextRequest(`${endpoint}/contests`);
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
+    expect(verify).not.toHaveBeenCalled();
+  });
+
+  it('allows a protected route only when the backend verifies the session', async () => {
     const verify = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
     vi.stubGlobal('fetch', verify);
-    const request = new NextRequest(`${endpoint}/contests`, {
+    const request = new NextRequest(`${endpoint}/admin`, {
       headers: { cookie: 'rankstack-session=valid-token' },
     });
 

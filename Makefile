@@ -1,4 +1,4 @@
-.PHONY: help venv install up down logs init-db seed demo api web web-install web-build clean reset
+.PHONY: help venv install lint test up down logs init-db seed demo api web web-install web-build clean reset
 
 PYTHON ?= python3.14
 VENV := .venv
@@ -8,6 +8,8 @@ UVICORN := $(VENV)/bin/uvicorn
 
 help:
 	@echo "Targets:"
+	@echo "  make lint      - check backend code style with Ruff"
+	@echo "  make test      - run isolated backend integration tests"
 	@echo "  make up        - start MongoDB (replica set) + Redis via docker compose"
 	@echo "  make down      - stop and remove the mongo/redis containers"
 	@echo "  make logs      - tail docker compose logs"
@@ -30,6 +32,13 @@ venv: $(VENV)/bin/python
 install: venv
 	$(PIP) install -q --upgrade pip
 	$(PIP) install -q -r api/requirements.txt
+
+lint: venv
+	$(VENV)/bin/ruff check api scripts
+	$(VENV)/bin/ruff format --check api scripts
+
+test: install
+	$(PY) -m pytest api/tests
 
 up:
 	docker compose up -d mongo redis
