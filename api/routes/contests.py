@@ -1,12 +1,12 @@
 """CRUD routes for `contests`, plus status transitions and participant adds."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pymongo import ReturnDocument
 from redis.exceptions import RedisError
 
 from api import redis_ops, services
 from api.db import get_db
-from api.dependencies import AdminUser
+from api.dependencies import AdminUser, CurrentUser
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.contests import (
     ContestAddParticipant,
@@ -99,21 +99,36 @@ def update_status(contest_id: str, payload: ContestStatusUpdate, _: AdminUser):
 
 
 @router.post("/{contest_id}/participants", response_model=ContestOut)
-def add_participant(contest_id: str, payload: ContestAddParticipant, _: AdminUser):
+def add_participant(contest_id: str, payload: ContestAddParticipant, user: CurrentUser):
     db = get_db()
-    entry = {"refType": payload.refType, "refId": oid(payload.refId)}
+    if user.get("role") == "admin":
+        entry = {"refType": payload.refType, "refId": oid(payload.refId)}
+    else:
+        if payload.refType != "user":
+            raise HTTPException(
+                status_code=403, detail="Only administrators can add teams"
+            )
+        entry = {"refType": "user", "refId": user["_id"]}
+    contest_oid = oid(contest_id)
+    query = {"_id": contest_oid}
+    if user.get("role") != "admin":
+        query["status"] = {"$in": ["upcoming", "live"]}
     doc = db["contests"].find_one_and_update(
-        {"_id": oid(contest_id)},
+        query,
         {"$addToSet": {"participants": entry}},
         return_document=ReturnDocument.AFTER,
     )
     if doc is None:
+        if user.get("role") != "admin" and db["contests"].find_one(
+            {"_id": contest_oid}, {"_id": 1}
+        ):
+            raise HTTPException(status_code=409, detail="Contest has ended")
         raise HTTPException(status_code=404, detail="Contest not found")
     return serialize_doc(doc)
 
 
 @router.get("/{contest_id}/leaderboard")
-def get_leaderboard(contest_id: str, top: int = 10):
+def get_leaderboard(contest_id: str, top: int = Query(default=10, ge=1, le=100)):
     """Read MongoDB after deletions and repair Redis when it becomes available."""
     db = get_db()
     contest_oid = oid(contest_id)
@@ -164,6 +179,54 @@ def get_leaderboard(contest_id: str, top: int = 10):
         ][: max(top, 0)]
     else:
         leaderboard = redis_ops.get_leaderboard(contest_id, top)
+    member_ids = [row["memberId"] for row in leaderboard]
+    counts = (
+        {
+            str(row["_id"]): row["count"]
+            for row in db["submissions"].aggregate(
+                [
+                    {
+                        "$match": {
+                            "contestId": contest_oid,
+                            "submittedBy.refId": {
+                                "$in": [oid(member_id) for member_id in member_ids]
+                            },
+                        }
+                    },
+                    {"$group": {"_id": "$submittedBy.refId", "count": {"$sum": 1}}},
+                ]
+            )
+        }
+        if member_ids
+        else {}
+    )
+    names = (
+        {
+            str(user["_id"]): user["name"]
+            for user in db["users"].find(
+                {"_id": {"$in": [oid(member_id) for member_id in member_ids]}},
+                {"name": 1},
+            )
+        }
+        if member_ids
+        else {}
+    )
+    team_names = (
+        {
+            str(team["_id"]): team["name"]
+            for team in db["teams"].find(
+                {"_id": {"$in": [oid(member_id) for member_id in member_ids]}},
+                {"name": 1},
+            )
+        }
+        if member_ids
+        else {}
+    )
+    for row in leaderboard:
+        row["participantName"] = names.get(
+            row["memberId"], team_names.get(row["memberId"], row["memberId"])
+        )
+        row["submissionCount"] = counts.get(row["memberId"], 0)
     return {"contestId": contest_id, "leaderboard": leaderboard}
 
 
