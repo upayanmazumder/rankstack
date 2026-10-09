@@ -22,22 +22,29 @@ def db(monkeypatch):
     try:
         yield database
     finally:
-        redis = get_redis_client()
-        user_ids = {str(user["_id"]) for user in database.users.find({}, {"_id": 1})}
-        contest_ids = {
-            str(contest["_id"]) for contest in database.contests.find({}, {"_id": 1})
-        }
-        keys = [rate_limit_key(user_id) for user_id in user_ids]
-        for contest_id in contest_ids:
+        try:
+            redis = get_redis_client()
+            user_ids = {
+                str(user["_id"]) for user in database.users.find({}, {"_id": 1})
+            }
+            contest_ids = {
+                str(contest["_id"])
+                for contest in database.contests.find({}, {"_id": 1})
+            }
+            keys = [rate_limit_key(user_id) for user_id in user_ids]
+            for contest_id in contest_ids:
+                keys.extend(
+                    (leaderboard_key(contest_id), f"leaderboard_revision:{contest_id}")
+                )
             keys.extend(
-                (leaderboard_key(contest_id), f"leaderboard_revision:{contest_id}")
+                key
+                for key in redis.scan_iter("session:*")
+                if redis.get(key) in user_ids
             )
-        keys.extend(
-            key for key in redis.scan_iter("session:*") if redis.get(key) in user_ids
-        )
-        if keys:
-            redis.delete(*keys)
-        get_mongo_client().drop_database(name)
+            if keys:
+                redis.delete(*keys)
+        finally:
+            get_mongo_client().drop_database(name)
 
 
 @pytest.fixture
