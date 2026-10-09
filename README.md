@@ -38,7 +38,7 @@ scripts/
   demo.py                 Walks through CRUD, indexing, transactions, aggregations, Redis
 api/Dockerfile          Backend image, published to ghcr.io/upayanmazumder/rankstack/api
 docker-compose.yml      Mongo (replica set) + Redis
-Makefile                up/down/seed/demo/api/reset targets
+Makefile                up/down/test/seed/demo/api/reset targets
 ```
 
 ## Setup
@@ -61,6 +61,13 @@ match `docker-compose.yml`.
 
 Run `make lint` after `make install`. Ruff checks `api/` and `scripts/` for lint and
 format errors. CI runs the same checks before backend database smoke tests.
+
+## Backend integration tests
+
+Run `make test` with MongoDB replica set `rs0` and Redis available. The suite
+creates a unique MongoDB database for each test and deletes only its own
+Redis sessions, rate limits, and leaderboard keys. It does not modify seeded
+application data. CI runs the same pytest suite against its service containers.
 
 ## Running the demo
 
