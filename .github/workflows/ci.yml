@@ -129,6 +129,9 @@ jobs:
       - name: Create collections, validators and indexes
         run: python scripts/init_db.py
 
+      - name: Run isolated backend integration tests
+        run: python -m pytest api/tests
+
       - name: Load sample data
         run: python scripts/seed.py
 
