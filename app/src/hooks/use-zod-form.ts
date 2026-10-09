@@ -5,11 +5,11 @@ import type { FieldValues, UseFormProps, UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import type { ZodType } from 'zod';
 
-export function useZodForm<TValues extends FieldValues>(
-  schema: ZodType<TValues>,
-  options?: Omit<UseFormProps<TValues>, 'resolver'>
-): UseFormReturn<TValues> {
-  return useForm<TValues>({
+export function useZodForm<TInput extends FieldValues, TOutput extends FieldValues = TInput>(
+  schema: ZodType<TOutput, TInput>,
+  options?: Omit<UseFormProps<TInput, unknown, TOutput>, 'resolver'>
+): UseFormReturn<TInput, unknown, TOutput> {
+  return useForm<TInput, unknown, TOutput>({
     ...options,
     resolver: zodResolver(schema),
   });
