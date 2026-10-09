@@ -8,7 +8,7 @@ import * as z from 'zod';
 
 import { isApiError } from '@/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin, useRegister } from '@/hooks/api';
@@ -54,7 +54,7 @@ export default function RegisterPage() {
         <div className="mb-2 flex justify-center">
           <Trophy className="size-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl">Create account</CardTitle>
+        <h1 className="text-2xl font-semibold tracking-tight">Create account</h1>
         <CardDescription>Join Rankstack and start competing</CardDescription>
       </CardHeader>
       <CardContent>

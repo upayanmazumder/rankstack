@@ -65,7 +65,7 @@ export function Header() {
       </Button>
 
       {/* Brand */}
-      <Link href="/" className="flex items-center gap-2 font-semibold">
+      <Link href="/" aria-label="Rankstack home" className="flex items-center gap-2 font-semibold">
         <Trophy className="size-5 text-primary" />
         <span className="hidden sm:inline">Rankstack</span>
       </Link>

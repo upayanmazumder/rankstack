@@ -8,7 +8,7 @@ import * as z from 'zod';
 
 import { isApiError } from '@/api';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/api';
@@ -50,7 +50,7 @@ export default function LoginPage() {
         <div className="mb-2 flex justify-center">
           <Trophy className="size-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl">Sign in</CardTitle>
+        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
         <CardDescription>Enter your credentials to access Rankstack</CardDescription>
       </CardHeader>
       <CardContent>
