@@ -106,12 +106,17 @@ FastAPI session and sets an HttpOnly `rankstack-session` cookie. The Next.js pro
 cookie against FastAPI before it serves protected routes. Sign-out removes the cookie and
 requests session revocation. The session profile response excludes `passwordHash`.
 
-After login or registration, the frontend opens `/contests`. This page lists contests from
-`GET /contests` and shows loading, empty, and error states. The page requires a valid session cookie.
+After login or registration, the frontend opens `/contests`. Guests can also browse this
+catalog and its contest pages. Joining requires a valid session. Participants can join
+upcoming and live contests, but only administrators can add teams or change ended contests.
 
-`GET /contests/{id}/leaderboard` returns `{ contestId, leaderboard }`. Each leaderboard row
-contains `memberId`, `score`, and `rank`. The frontend displays the member ID because this
-response does not contain a participant name or type.
+`GET /contests/{id}/leaderboard?top=` accepts 1–100 results. Each entry includes a
+participant name, score, rank, and submission count. The full leaderboard shows the top 100.
+
+Public `GET /problems` returns problem metadata without statements, answers, test cases,
+or rubrics. Public problem details stay locked while the contest is upcoming. After the
+contest becomes live, details include statements but omit grading data. Administrators
+with a valid session can access the complete problem records.
 
 Participants can create a team with themselves as its only initial member.
 Only administrators can add other members during creation or through the member route.
