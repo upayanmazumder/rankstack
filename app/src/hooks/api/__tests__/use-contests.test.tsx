@@ -37,28 +37,45 @@ function createWrapper() {
 describe('contest query hooks', () => {
   beforeEach(() => apiMocks.get.mockReset());
 
-  it('loads contests with the selected status filter', async () => {
-    apiMocks.get.mockResolvedValue({ data: [contest] });
+  it('uses separate results when the selected status changes', async () => {
+    const ended = { ...contest, id: 'contest-2', status: 'ended' as const };
+    apiMocks.get.mockImplementation((_url, config) =>
+      Promise.resolve({ data: config?.params?.status === 'live' ? [contest] : [ended] })
+    );
 
-    const { result } = renderHook(() => useContests({ status: 'live' }), {
+    const { result, rerender } = renderHook(({ status }) => useContests({ status }), {
+      initialProps: { status: 'live' as 'live' | 'ended' },
       wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.data).toEqual([contest]));
-    expect(apiMocks.get).toHaveBeenCalledWith('/contests', { params: { status: 'live' } });
+    rerender({ status: 'ended' });
+    await waitFor(() => expect(result.current.data).toEqual([ended]));
+    rerender({ status: 'live' });
+    await waitFor(() => expect(result.current.data).toEqual([contest]));
   });
 
-  it('returns leaderboard entries for the selected contest', async () => {
-    const entries: LeaderboardEntry[] = [
+  it('keeps the preview and full leaderboard results separate', async () => {
+    const preview: LeaderboardEntry[] = [
       { memberId: 'user-1', participantName: 'Ada Lovelace', score: 120, rank: 1 },
     ];
-    apiMocks.get.mockResolvedValue({ data: { contestId: 'contest-1', leaderboard: entries } });
+    const full: LeaderboardEntry[] = [
+      ...preview,
+      { memberId: 'user-2', participantName: 'Grace Hopper', score: 80, rank: 2 },
+    ];
+    apiMocks.get.mockImplementation((_url, config) =>
+      Promise.resolve({ data: { leaderboard: config?.params?.top === 10 ? preview : full } })
+    );
 
-    const { result } = renderHook(() => useLeaderboard('contest-1'), {
+    const { result, rerender } = renderHook(({ top }) => useLeaderboard('contest-1', false, top), {
+      initialProps: { top: 10 },
       wrapper: createWrapper(),
     });
 
-    await waitFor(() => expect(result.current.data).toEqual(entries));
-    expect(apiMocks.get).toHaveBeenCalledWith('/contests/contest-1/leaderboard');
+    await waitFor(() => expect(result.current.data).toEqual(preview));
+    rerender({ top: 100 });
+    await waitFor(() => expect(result.current.data).toEqual(full));
+    rerender({ top: 10 });
+    await waitFor(() => expect(result.current.data).toEqual(preview));
   });
 });
