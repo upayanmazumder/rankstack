@@ -1,6 +1,6 @@
 """CRUD routes for `contests`, plus status transitions and participant adds."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pymongo import ReturnDocument
 from redis.exceptions import RedisError
 
@@ -109,18 +109,26 @@ def add_participant(contest_id: str, payload: ContestAddParticipant, user: Curre
                 status_code=403, detail="Only administrators can add teams"
             )
         entry = {"refType": "user", "refId": user["_id"]}
+    contest_oid = oid(contest_id)
+    query = {"_id": contest_oid}
+    if user.get("role") != "admin":
+        query["status"] = {"$in": ["upcoming", "live"]}
     doc = db["contests"].find_one_and_update(
-        {"_id": oid(contest_id)},
+        query,
         {"$addToSet": {"participants": entry}},
         return_document=ReturnDocument.AFTER,
     )
     if doc is None:
+        if user.get("role") != "admin" and db["contests"].find_one(
+            {"_id": contest_oid}, {"_id": 1}
+        ):
+            raise HTTPException(status_code=409, detail="Contest has ended")
         raise HTTPException(status_code=404, detail="Contest not found")
     return serialize_doc(doc)
 
 
 @router.get("/{contest_id}/leaderboard")
-def get_leaderboard(contest_id: str, top: int = 10):
+def get_leaderboard(contest_id: str, top: int = Query(default=10, ge=1, le=100)):
     """Read MongoDB after deletions and repair Redis when it becomes available."""
     db = get_db()
     contest_oid = oid(contest_id)
