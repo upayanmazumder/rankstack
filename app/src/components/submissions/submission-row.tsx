@@ -7,10 +7,16 @@ import { SubmissionStatusBadge } from './submission-status-badge';
 interface SubmissionRowProps {
   submission: Submission;
   problemTitle?: string;
+  contestTitle?: string;
   onSelect?: (id: string) => void;
 }
 
-export function SubmissionRow({ submission, problemTitle, onSelect }: SubmissionRowProps) {
+export function SubmissionRow({
+  submission,
+  problemTitle,
+  contestTitle,
+  onSelect,
+}: SubmissionRowProps) {
   return (
     <TableRow>
       <TableCell className="font-medium">
@@ -26,6 +32,9 @@ export function SubmissionRow({ submission, problemTitle, onSelect }: Submission
         ) : (
           (problemTitle ?? submission.problemId)
         )}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {contestTitle ?? submission.contestId}
       </TableCell>
       <TableCell>
         <SubmissionStatusBadge status={submission.status} />
