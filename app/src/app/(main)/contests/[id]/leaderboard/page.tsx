@@ -23,7 +23,7 @@ interface ContestLeaderboardPageProps {
 export default function ContestLeaderboardPage({ params }: ContestLeaderboardPageProps) {
   const { id } = use(params);
   const contest = useContest(id);
-  const leaderboard = useLeaderboard(id, 5_000);
+  const leaderboard = useLeaderboard(id, 5_000, 100);
   const user = useAuthStore(state => state.user);
 
   if (contest.isPending || leaderboard.isPending) {
@@ -62,10 +62,12 @@ export default function ContestLeaderboardPage({ params }: ContestLeaderboardPag
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-3">
             <ContestStatusBadge status={contest.data.status} />
-            <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-emerald-700 uppercase dark:text-emerald-400">
-              <Radio className="size-3.5" />
-              Live updates
-            </span>
+            {contest.data.status === 'live' && (
+              <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-emerald-700 uppercase dark:text-emerald-400">
+                <Radio className="size-3.5 animate-pulse" />
+                Live updates
+              </span>
+            )}
           </div>
           <h1 className="text-3xl font-semibold">Leaderboard</h1>
           <p className="text-sm text-muted-foreground">{contest.data.title}</p>

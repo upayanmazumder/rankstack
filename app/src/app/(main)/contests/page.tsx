@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 
 import { EmptyState } from '@/components/common/empty-state';
@@ -22,14 +22,18 @@ const FILTERS = [
 export default function ContestsPage() {
   const [status, setStatus] = useState<(typeof FILTERS)[number]['value']>('all');
   const [search, setSearch] = useState('');
-  const deferredSearch = useDeferredValue(search.trim().toLowerCase());
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search.trim().toLowerCase()), 250);
+    return () => window.clearTimeout(timer);
+  }, [search]);
   const {
     data: contests = [],
     isPending,
     isError,
   } = useContests(status === 'all' ? undefined : { status: status as ContestStatus });
   const visibleContests = contests.filter(contest =>
-    `${contest.title} ${contest.description}`.toLowerCase().includes(deferredSearch)
+    `${contest.title} ${contest.description}`.toLowerCase().includes(debouncedSearch)
   );
 
   return (
@@ -88,9 +92,9 @@ export default function ContestsPage() {
         </div>
       ) : visibleContests.length === 0 ? (
         <EmptyState
-          title={deferredSearch ? 'No matching contests' : 'No contests in this view'}
+          title={debouncedSearch ? 'No matching contests' : 'No contests in this view'}
           description={
-            deferredSearch
+            debouncedSearch
               ? 'Try another search term.'
               : 'Contests will appear here when available.'
           }

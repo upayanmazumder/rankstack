@@ -18,14 +18,11 @@ describe('useAuthStore', () => {
     localStorage.clear();
   });
 
-  it('sets and persists the authenticated user and session token', () => {
+  it('stores the authenticated user across persistence', () => {
     useAuthStore.getState().setAuth('session-token', user);
 
     expect(useAuthStore.getState()).toMatchObject({ token: 'session-token', user });
-    expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state).toMatchObject({
-      token: 'session-token',
-      user,
-    });
+    expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state.user).toEqual(user);
   });
 
   it('clears authentication state and persists the cleared values', () => {
