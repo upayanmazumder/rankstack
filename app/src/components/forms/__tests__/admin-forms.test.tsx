@@ -55,6 +55,27 @@ describe('administrative forms', () => {
     expect(screen.getByText('Choose the correct option.')).toBeInTheDocument();
     expect(submit).not.toHaveBeenCalled();
   });
+  it('validates coding problems without failing on MCQ options', async () => {
+    const submit = vi.fn();
+    render(
+      <ProblemForm
+        contests={[contest]}
+        defaultValues={{
+          type: 'coding',
+          contestId: 'contest-1',
+          title: 'Binary Search',
+          points: 20,
+        }}
+        onSubmit={submit}
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Create problem' }));
+
+    expect(await screen.findByText('Expected output is required.')).toBeInTheDocument();
+    expect(screen.queryByText('Choose the correct option.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Option cannot be empty.')).not.toBeInTheDocument();
+  });
 
   it('prevents an adjudicated score from exceeding the problem points', async () => {
     const submit = vi.fn();

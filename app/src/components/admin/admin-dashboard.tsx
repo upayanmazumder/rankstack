@@ -140,6 +140,15 @@ export function AdminDashboard() {
   );
 }
 
+interface MetricCardProps {
+  title: string;
+  value: number;
+  detail: string;
+  icon: typeof Users;
+  loading: boolean;
+  accent?: boolean;
+}
+
 function MetricCard({
   title,
   value,
@@ -147,14 +156,7 @@ function MetricCard({
   icon: Icon,
   loading,
   accent = false,
-}: {
-  title: string;
-  value: number;
-  detail: string;
-  icon: typeof Users;
-  loading: boolean;
-  accent?: boolean;
-}) {
+}: MetricCardProps) {
   return (
     <Card className={accent ? 'border-amber-500/40' : undefined}>
       <CardContent className="p-5">

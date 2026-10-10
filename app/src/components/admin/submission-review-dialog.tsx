@@ -71,6 +71,7 @@ export function SubmissionReviewDialog({
           </section>
         </div>
         <SubmissionReviewForm
+          key={`${submission.id}-${problem?.points ?? 'loading'}`}
           maxPoints={maxPoints}
           defaultValues={{ status: submission.status, score: submission.score }}
           isSubmitting={updateStatus.isPending}

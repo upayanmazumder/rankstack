@@ -7,7 +7,11 @@ import { ShieldCheck } from 'lucide-react';
 import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore } from '@/stores';
 
-export function AdminGuard({ children }: { children: React.ReactNode }) {
+interface AdminGuardProps {
+  children: React.ReactNode;
+}
+
+export function AdminGuard({ children }: AdminGuardProps) {
   const mounted = useMounted();
   const router = useRouter();
   const user = useAuthStore(state => state.user);

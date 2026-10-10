@@ -18,29 +18,36 @@ export function ProblemVariantFields({ form }: { form: UseFormReturn<ProblemForm
       <fieldset className="space-y-3 rounded-lg border p-4">
         <legend className="px-1 text-sm font-medium">Answer options</legend>
         {options.fields.map((field, index) => (
-          <div key={field.id} className="flex items-start gap-2">
-            <input
-              className="mt-3 size-4 accent-primary"
-              type="radio"
-              aria-label={`Mark option ${index + 1} correct`}
-              value={form.watch(`options.${index}.value`)}
-              {...form.register('correctAnswer')}
-            />
-            <Input
-              aria-label={`Option ${index + 1}`}
-              placeholder={`Option ${index + 1}`}
-              {...form.register(`options.${index}.value`)}
-            />
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              aria-label={`Remove option ${index + 1}`}
-              disabled={options.fields.length <= 2}
-              onClick={() => options.remove(index)}
-            >
-              <Trash2 />
-            </Button>
+          <div key={field.id} className="space-y-1">
+            <div className="flex items-start gap-2">
+              <input
+                className="mt-3 size-4 accent-primary"
+                type="radio"
+                aria-label={`Mark option ${index + 1} correct`}
+                value={form.watch(`options.${index}.value`)}
+                {...form.register('correctAnswer')}
+              />
+              <Input
+                aria-label={`Option ${index + 1}`}
+                placeholder={`Option ${index + 1}`}
+                {...form.register(`options.${index}.value`)}
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label={`Remove option ${index + 1}`}
+                disabled={options.fields.length <= 2}
+                onClick={() => options.remove(index)}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+            {form.formState.errors.options?.[index]?.value?.message && (
+              <p role="alert" className="text-xs text-destructive">
+                {form.formState.errors.options[index]?.value?.message}
+              </p>
+            )}
           </div>
         ))}
         <Button
@@ -51,6 +58,11 @@ export function ProblemVariantFields({ form }: { form: UseFormReturn<ProblemForm
         >
           <Plus /> Add option
         </Button>
+        {form.formState.errors.options?.root?.message && (
+          <p role="alert" className="text-xs text-destructive">
+            {form.formState.errors.options.root.message}
+          </p>
+        )}
         {form.formState.errors.correctAnswer?.message && (
           <p role="alert" className="text-xs text-destructive">
             {form.formState.errors.correctAnswer.message}
@@ -74,29 +86,36 @@ export function ProblemVariantFields({ form }: { form: UseFormReturn<ProblemForm
         <fieldset className="space-y-3 rounded-lg border p-4">
           <legend className="px-1 text-sm font-medium">Test cases</legend>
           {testCases.fields.map((field, index) => (
-            <div key={field.id} className="grid gap-2 rounded-md bg-muted/40 p-3 sm:grid-cols-2">
-              <Textarea
-                aria-label={`Test case ${index + 1} input`}
-                placeholder="Input"
-                {...form.register(`testCases.${index}.input`)}
-              />
-              <div className="flex gap-2">
+            <div key={field.id} className="space-y-1">
+              <div className="grid gap-2 rounded-md bg-muted/40 p-3 sm:grid-cols-2">
                 <Textarea
-                  aria-label={`Test case ${index + 1} output`}
-                  placeholder="Expected output"
-                  {...form.register(`testCases.${index}.output`)}
+                  aria-label={`Test case ${index + 1} input`}
+                  placeholder="Input"
+                  {...form.register(`testCases.${index}.input`)}
                 />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  aria-label={`Remove test case ${index + 1}`}
-                  disabled={testCases.fields.length <= 1}
-                  onClick={() => testCases.remove(index)}
-                >
-                  <Trash2 />
-                </Button>
+                <div className="flex gap-2">
+                  <Textarea
+                    aria-label={`Test case ${index + 1} output`}
+                    placeholder="Expected output"
+                    {...form.register(`testCases.${index}.output`)}
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    aria-label={`Remove test case ${index + 1}`}
+                    disabled={testCases.fields.length <= 1}
+                    onClick={() => testCases.remove(index)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
               </div>
+              {form.formState.errors.testCases?.[index]?.output?.message && (
+                <p role="alert" className="text-xs text-destructive">
+                  {form.formState.errors.testCases[index]?.output?.message}
+                </p>
+              )}
             </div>
           ))}
           <Button
@@ -122,6 +141,11 @@ export function ProblemVariantFields({ form }: { form: UseFormReturn<ProblemForm
       <label className="space-y-2">
         <Label>Word limit</Label>
         <Input type="number" min={1} {...form.register('wordLimit', { valueAsNumber: true })} />
+        {form.formState.errors.wordLimit?.message && (
+          <p role="alert" className="text-xs text-destructive">
+            {form.formState.errors.wordLimit.message}
+          </p>
+        )}
       </label>
       <label className="space-y-2">
         <Label>Evaluation rubric</Label>

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-const optionSchema = z.object({ value: z.string().trim().min(1, 'Option cannot be empty.') });
+const optionSchema = z.object({ value: z.string() });
 const testCaseSchema = z.object({
   input: z.string(),
-  output: z.string().min(1, 'Expected output is required.'),
+  output: z.string(),
 });
 
 export const problemFormSchema = z
@@ -19,7 +19,7 @@ export const problemFormSchema = z
     inputFormat: z.string(),
     constraints: z.string(),
     testCases: z.array(testCaseSchema),
-    wordLimit: z.number().int().positive('Word limit must be greater than zero.'),
+    wordLimit: z.number().int(),
     evaluationRubric: z.string(),
   })
   .superRefine((values, context) => {
@@ -31,6 +31,15 @@ export const problemFormSchema = z
           message: 'Add at least two options.',
         });
       }
+      values.options.forEach((option, index) => {
+        if (!option.value.trim()) {
+          context.addIssue({
+            code: 'custom',
+            path: ['options', index, 'value'],
+            message: 'Option cannot be empty.',
+          });
+        }
+      });
       if (
         !values.correctAnswer ||
         !values.options.some(option => option.value === values.correctAnswer)
@@ -42,22 +51,41 @@ export const problemFormSchema = z
         });
       }
     }
-    if (values.type === 'coding' && values.testCases.length < 1) {
-      context.addIssue({
-        code: 'custom',
-        path: ['testCases'],
-        message: 'Add at least one test case.',
+    if (values.type === 'coding') {
+      if (values.testCases.length < 1) {
+        context.addIssue({
+          code: 'custom',
+          path: ['testCases'],
+          message: 'Add at least one test case.',
+        });
+      }
+      values.testCases.forEach((tc, index) => {
+        if (!tc.output.trim()) {
+          context.addIssue({
+            code: 'custom',
+            path: ['testCases', index, 'output'],
+            message: 'Expected output is required.',
+          });
+        }
       });
     }
-    if (values.type === 'subjective' && !values.evaluationRubric.trim()) {
-      context.addIssue({
-        code: 'custom',
-        path: ['evaluationRubric'],
-        message: 'An evaluation rubric is required.',
-      });
+    if (values.type === 'subjective') {
+      if (values.wordLimit <= 0) {
+        context.addIssue({
+          code: 'custom',
+          path: ['wordLimit'],
+          message: 'Word limit must be greater than zero.',
+        });
+      }
+      if (!values.evaluationRubric.trim()) {
+        context.addIssue({
+          code: 'custom',
+          path: ['evaluationRubric'],
+          message: 'An evaluation rubric is required.',
+        });
+      }
     }
   });
-
 export type ProblemFormValues = z.infer<typeof problemFormSchema>;
 
 export const defaultProblemFormValues: ProblemFormValues = {

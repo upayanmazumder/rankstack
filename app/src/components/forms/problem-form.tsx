@@ -22,6 +22,7 @@ import { ProblemVariantFields } from './problem-variant-fields';
 
 interface ProblemFormProps {
   contests: Contest[];
+  defaultValues?: Partial<ProblemFormValues>;
   isSubmitting?: boolean;
   onCancel?: () => void;
   onSubmit: (values: ProblemFormValues) => void | Promise<void>;
@@ -29,12 +30,14 @@ interface ProblemFormProps {
 
 export function ProblemForm({
   contests,
+  defaultValues,
   isSubmitting = false,
   onCancel,
   onSubmit,
 }: ProblemFormProps) {
-  const form = useZodForm(problemFormSchema, { defaultValues: defaultProblemFormValues });
-
+  const form = useZodForm(problemFormSchema, {
+    defaultValues: { ...defaultProblemFormValues, ...defaultValues },
+  });
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
