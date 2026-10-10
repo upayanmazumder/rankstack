@@ -1,7 +1,8 @@
 """Team CRUD and bidirectional membership transactions."""
 
-from api.models.common import utcnow
 from bson import ObjectId
+
+from api.models.common import utcnow
 
 
 def test_team_membership_and_back_references(client, db, users, headers_for):

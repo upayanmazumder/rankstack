@@ -2,8 +2,9 @@
 
 from datetime import timedelta
 
-from api.models.common import utcnow
 from bson import ObjectId
+
+from api.models.common import utcnow
 
 
 def test_submission_scoring_and_rate_limit(
