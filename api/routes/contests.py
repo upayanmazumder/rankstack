@@ -1,6 +1,8 @@
 """CRUD routes for `contests`, plus status transitions and participant adds."""
 
-from fastapi import APIRouter, HTTPException, Query
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, Path, Query
 from pymongo import ReturnDocument
 from redis.exceptions import RedisError
 
@@ -19,8 +21,15 @@ from api.models.contests import (
 router = APIRouter(prefix="/contests", tags=["contests"])
 
 
-@router.post("", response_model=ContestOut, status_code=201)
+@router.post(
+    "",
+    response_model=ContestOut,
+    status_code=201,
+    summary="Create a contest",
+    description="Create a contest with its schedule and problem IDs. Requires an administrator Bearer token. Returns 201; errors: 400 for invalid IDs or dates, 401/403 for authentication or authorization, and 404 if the creator does not exist.",
+)
 def create_contest(payload: ContestCreate, _: AdminUser):
+    """Create a contest; returns 201 or a documented validation, auth, or not-found error."""
     db = get_db()
     creator_id = oid(payload.createdBy)
     if db["users"].find_one({"_id": creator_id}, {"_id": 1}) is None:
@@ -41,16 +50,37 @@ def create_contest(payload: ContestCreate, _: AdminUser):
     return serialize_doc(doc)
 
 
-@router.get("", response_model=list[ContestOut])
-def list_contests(status: str | None = None, limit: int = 50):
+@router.get(
+    "",
+    response_model=list[ContestOut],
+    summary="List contests",
+    description="List contests, optionally filtered by status. `limit` defaults to 50 and is capped at 200. Returns 200.",
+)
+def list_contests(
+    status: str | None = Query(default=None, description="Filter by contest status."),
+    limit: int = Query(
+        default=50, description="Maximum results to return; capped at 200."
+    ),
+):
+    """List contests with optional status filtering and a bounded result limit."""
     db = get_db()
     query = {"status": status} if status else {}
     docs = db["contests"].find(query).limit(min(limit, 200))
     return [serialize_doc(d) for d in docs]
 
 
-@router.get("/{contest_id}", response_model=ContestOut)
-def get_contest(contest_id: str):
+@router.get(
+    "/{contest_id}",
+    response_model=ContestOut,
+    summary="Get a contest",
+    description="Return the contest identified by `contest_id`. Returns 200; errors: 400 for an invalid ID and 404 when no contest exists.",
+)
+def get_contest(
+    contest_id: Annotated[
+        str, Path(description="Unique ID of the contest to retrieve.")
+    ],
+):
+    """Fetch one contest by ID; returns 404 when it does not exist."""
     db = get_db()
     doc = db["contests"].find_one({"_id": oid(contest_id)})
     if doc is None:
@@ -58,8 +88,18 @@ def get_contest(contest_id: str):
     return serialize_doc(doc)
 
 
-@router.patch("/{contest_id}", response_model=ContestOut)
-def update_contest(contest_id: str, payload: ContestUpdate, _: AdminUser):
+@router.patch(
+    "/{contest_id}",
+    response_model=ContestOut,
+    summary="Update a contest",
+    description="Partially update a contest's title, description, or schedule. Requires an administrator Bearer token. Returns 200; errors: 400 for an invalid ID or schedule, 401/403 for authentication or authorization, and 404 when no contest exists.",
+)
+def update_contest(
+    contest_id: Annotated[str, Path(description="Unique ID of the contest to update.")],
+    payload: ContestUpdate,
+    _: AdminUser,
+):
+    """Apply supplied contest fields; schedule end time must remain after start time."""
     db = get_db()
     contest_oid = oid(contest_id)
     updates = payload.model_dump(exclude_unset=True, exclude_none=True)
@@ -85,8 +125,18 @@ def update_contest(contest_id: str, payload: ContestUpdate, _: AdminUser):
     return serialize_doc(doc)
 
 
-@router.patch("/{contest_id}/status", response_model=ContestOut)
-def update_status(contest_id: str, payload: ContestStatusUpdate, _: AdminUser):
+@router.patch(
+    "/{contest_id}/status",
+    response_model=ContestOut,
+    summary="Change contest status",
+    description="Set a contest to `upcoming`, `live`, or `ended`. Requires an administrator Bearer token. Returns 200; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no contest exists.",
+)
+def update_status(
+    contest_id: Annotated[str, Path(description="Unique ID of the contest to update.")],
+    payload: ContestStatusUpdate,
+    _: AdminUser,
+):
+    """Set a contest status; only administrators may perform this transition."""
     db = get_db()
     doc = db["contests"].find_one_and_update(
         {"_id": oid(contest_id)},
@@ -98,8 +148,18 @@ def update_status(contest_id: str, payload: ContestStatusUpdate, _: AdminUser):
     return serialize_doc(doc)
 
 
-@router.post("/{contest_id}/participants", response_model=ContestOut)
-def add_participant(contest_id: str, payload: ContestAddParticipant, user: CurrentUser):
+@router.post(
+    "/{contest_id}/participants",
+    response_model=ContestOut,
+    summary="Join a contest",
+    description="Add the authenticated user to a contest, or let an administrator add a user or team. Requires a Bearer token. Returns 200; errors: 400 for an invalid ID, 401 for an invalid session, 403 for a disallowed team operation, 404 when no contest exists, and 409 when a participant tries to join an ended contest.",
+)
+def add_participant(
+    contest_id: Annotated[str, Path(description="Unique ID of the contest to join.")],
+    payload: ContestAddParticipant,
+    user: CurrentUser,
+):
+    """Add the current user or an administrator-selected participant to a contest."""
     db = get_db()
     if user.get("role") == "admin":
         entry = {"refType": payload.refType, "refId": oid(payload.refId)}
@@ -127,8 +187,40 @@ def add_participant(contest_id: str, payload: ContestAddParticipant, user: Curre
     return serialize_doc(doc)
 
 
-@router.get("/{contest_id}/leaderboard")
-def get_leaderboard(contest_id: str, top: int = Query(default=10, ge=1, le=100)):
+@router.get(
+    "/{contest_id}/leaderboard",
+    summary="Get a contest leaderboard",
+    description="Return ranked participant scores and submission counts. `top` defaults to 10 and must be between 1 and 100. Returns 200; errors: 400 for an invalid ID and 404 when no contest exists.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "contestId": "507f1f77bcf86cd799439013",
+                        "leaderboard": [
+                            {
+                                "memberId": "507f1f77bcf86cd799439011",
+                                "participantName": "Ada Lovelace",
+                                "score": 250,
+                                "rank": 1,
+                                "submissionCount": 4,
+                            }
+                        ],
+                    }
+                }
+            }
+        }
+    },
+)
+def get_leaderboard(
+    contest_id: Annotated[str, Path(description="Unique ID of the contest.")],
+    top: int = Query(
+        default=10,
+        ge=1,
+        le=100,
+        description="Maximum number of ranked participants to return.",
+    ),
+):
     """Read MongoDB after deletions and repair Redis when it becomes available."""
     db = get_db()
     contest_oid = oid(contest_id)
@@ -230,8 +322,17 @@ def get_leaderboard(contest_id: str, top: int = Query(default=10, ge=1, le=100))
     return {"contestId": contest_id, "leaderboard": leaderboard}
 
 
-@router.delete("/{contest_id}", status_code=204)
-def delete_contest(contest_id: str, _: AdminUser):
+@router.delete(
+    "/{contest_id}",
+    status_code=204,
+    summary="Delete a contest",
+    description="Delete a contest and its dependent data. Requires an administrator Bearer token. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no contest exists.",
+)
+def delete_contest(
+    contest_id: Annotated[str, Path(description="Unique ID of the contest to delete.")],
+    _: AdminUser,
+):
+    """Delete a contest and related records; successful deletion has no response body."""
     db = get_db()
     if services.delete_contest_transaction(db, oid(contest_id)) is None:
         raise HTTPException(status_code=404, detail="Contest not found")

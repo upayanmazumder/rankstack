@@ -37,8 +37,15 @@ def on_startup() -> None:
     init_db()
 
 
-@app.get("/health", tags=["meta"])
+@app.get(
+    "/health",
+    tags=["meta"],
+    summary="Check API health",
+    description="Return a basic liveness status for the API process. Returns 200 when the process is responding.",
+    responses={200: {"content": {"application/json": {"example": {"status": "ok"}}}}},
+)
 def health():
+    """Report that the API process is responding."""
     return {"status": "ok"}
 
 

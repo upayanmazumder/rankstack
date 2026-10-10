@@ -2,7 +2,9 @@
 router exposing each as a GET endpoint with visible JSON output.
 """
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Path, Query
 
 from api.db import get_db
 from api.models.common import oid, serialize_value
@@ -187,31 +189,144 @@ def _serialize_rows(rows: list[dict]) -> list[dict]:
     return [serialize_value(r) for r in rows]
 
 
-@router.get("/leaderboard/{contest_id}")
-def api_leaderboard(contest_id: str, limit: int = 10):
+@router.get(
+    "/leaderboard/{contest_id}",
+    summary="Aggregate a contest leaderboard",
+    description="Group submissions by user or team, sum scores, and return the top-ranked participants. `limit` defaults to 10. Returns 200; errors: 400 for an invalid contest ID.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "refId": "507f1f77bcf86cd799439011",
+                            "refType": "user",
+                            "totalScore": 250,
+                            "submissionCount": 4,
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
+def api_leaderboard(
+    contest_id: Annotated[
+        str, Path(description="Unique ID of the contest to aggregate.")
+    ],
+    limit: int = Query(
+        default=10, description="Maximum ranked participants to return."
+    ),
+):
+    """Aggregate scored submissions into a ranked contest leaderboard."""
     db = get_db()
     return _serialize_rows(leaderboard_for_contest(db, oid(contest_id), limit))
 
 
-@router.get("/avg-score-by-difficulty")
+@router.get(
+    "/avg-score-by-difficulty",
+    summary="Get average score by difficulty",
+    description="Return average awarded score grouped by problem difficulty. Returns 200.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "difficulty": "easy",
+                            "avgScorePerProblem": 85.0,
+                            "problemCount": 12,
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
 def api_avg_score_by_difficulty():
+    """Aggregate average submission scores by problem difficulty."""
     db = get_db()
     return _serialize_rows(avg_score_per_problem_by_difficulty(db))
 
 
-@router.get("/submission-status-by-contest")
+@router.get(
+    "/submission-status-by-contest",
+    summary="Get submission statuses by contest",
+    description="Return submission counts grouped by contest and evaluation status. Returns 200.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "contestId": "507f1f77bcf86cd799439013",
+                            "title": "Spring Code Challenge",
+                            "statusCounts": [
+                                {"status": "correct", "count": 18},
+                                {"status": "pending", "count": 2},
+                            ],
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
 def api_submission_status_by_contest():
+    """Aggregate submission counts by contest and status."""
     db = get_db()
     return _serialize_rows(submission_count_by_status_per_contest(db))
 
 
-@router.get("/problems-solved-per-user")
+@router.get(
+    "/problems-solved-per-user",
+    summary="Get solved problem counts by user",
+    description="Return the number of distinct problems solved by each user. Returns 200.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "userId": "507f1f77bcf86cd799439011",
+                            "name": "Ada Lovelace",
+                            "distinctProblemsSolved": 7,
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
 def api_problems_solved_per_user():
+    """Aggregate distinct solved-problem counts for each user."""
     db = get_db()
     return _serialize_rows(distinct_problems_solved_per_user(db))
 
 
-@router.get("/team-performance")
+@router.get(
+    "/team-performance",
+    summary="Get team performance",
+    description="Return team scores and submission performance metrics. Returns 200.",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "_id": "507f1f77bcf86cd799439015",
+                            "name": "Runtime Terrors",
+                            "memberCount": 3,
+                            "totalScore": 340,
+                            "submissionCount": 9,
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
 def api_team_performance():
+    """Aggregate team score and submission performance metrics."""
     db = get_db()
     return _serialize_rows(team_performance(db))
