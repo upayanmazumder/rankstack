@@ -1,9 +1,9 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
-import { defaultTransition, pageVariants } from '@/lib/motion';
+import { DURATION, EASE, pageVariants } from '@/lib/motion';
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -11,13 +11,15 @@ interface PageTransitionProps {
 }
 
 export function PageTransition({ children, className }: PageTransitionProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <m.div
       className={className}
       variants={pageVariants}
-      initial="hidden"
+      initial={reduceMotion ? false : 'hidden'}
       animate="enter"
-      transition={defaultTransition}
+      transition={{ duration: DURATION.fast, ease: EASE.out }}
     >
       {children}
     </m.div>

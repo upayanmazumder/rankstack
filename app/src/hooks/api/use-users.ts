@@ -4,6 +4,8 @@ import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
 import type { User, UserCreate, UserUpdate } from '@/types';
 
+import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
+
 export const userKeys = createQueryKeys('users');
 
 export function useUsers() {
@@ -58,6 +60,11 @@ export function useDeleteUser(id: string) {
     mutationFn: async () => {
       await api.delete(`/users/${id}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all() }),
+    onMutate: () => removeFromCachedLists<User>(queryClient, userKeys.lists(), id),
+    onError: (_error, _variables, snapshots) => {
+      if (snapshots) restoreCachedLists(queryClient, snapshots, id);
+    },
+    onSuccess: () => queryClient.removeQueries({ queryKey: userKeys.detail(id) }),
+    onSettled: () => void queryClient.invalidateQueries({ queryKey: userKeys.all() }),
   });
 }

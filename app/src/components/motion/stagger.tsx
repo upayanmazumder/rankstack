@@ -1,6 +1,6 @@
 'use client';
 
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 import { staggerContainer, staggerItemVariants } from '@/lib/motion';
 
@@ -19,10 +19,12 @@ export function Stagger({
   once = true,
   ...props
 }: StaggerProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <m.div
       variants={staggerContainer(stagger, delayChildren)}
-      {...resolveTrigger(inView, once)}
+      {...(reduceMotion ? { initial: false, animate: 'visible' } : resolveTrigger(inView, once))}
       {...props}
     >
       {children}

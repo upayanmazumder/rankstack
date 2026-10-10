@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 
 import { EmptyState } from '@/components/common/empty-state';
 import { ContestCard } from '@/components/contests/contest-card';
+import { Stagger, StaggerItem } from '@/components/motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -100,11 +101,16 @@ export default function ContestsPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          stagger={Math.min(0.035, 0.2 / visibleContests.length)}
+        >
           {visibleContests.map(contest => (
-            <ContestCard key={contest.id} contest={contest} />
+            <StaggerItem key={contest.id} duration={0.18}>
+              <ContestCard contest={contest} />
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       )}
     </section>
   );
