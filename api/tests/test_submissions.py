@@ -1,6 +1,10 @@
-"""Submission transactions, score deltas, and Redis rate limits."""
+"""Submission transactions, score deltas, pagination, and Redis rate limits."""
+
+from datetime import timedelta
 
 from bson import ObjectId
+
+from api.models.common import utcnow
 
 
 def test_submission_scoring_and_rate_limit(
@@ -62,3 +66,33 @@ def test_submission_scoring_and_rate_limit(
     assert blocked.status_code == 429
     assert db.problems.find_one({"_id": ObjectId(problem_id)})["attemptCount"] == 10
     assert db.submissions.count_documents({"problemId": ObjectId(problem_id)}) == 10
+
+
+def test_submission_list_is_newest_first_and_offset_paginated(client, db, users):
+    participant_id = ObjectId(users["participant"]["id"])
+    now = utcnow()
+    submission_ids = db.submissions.insert_many(
+        [
+            {
+                "contestId": ObjectId(),
+                "problemId": ObjectId(),
+                "submittedBy": {"refType": "user", "refId": participant_id},
+                "answer": f"answer-{index}",
+                "status": "pending",
+                "score": 0,
+                "submittedAt": now + timedelta(minutes=index),
+            }
+            for index in range(5)
+        ]
+    ).inserted_ids
+
+    response = client.get(
+        "/submissions",
+        params={"userId": str(participant_id), "limit": 2, "offset": 2},
+    )
+
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()] == [
+        str(submission_ids[2]),
+        str(submission_ids[1]),
+    ]

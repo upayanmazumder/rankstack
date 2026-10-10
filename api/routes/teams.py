@@ -51,17 +51,22 @@ def create_team(payload: TeamCreate, current: CurrentUser):
     "",
     response_model=list[TeamOut],
     summary="List teams",
-    description="List teams visible to the authenticated user. `limit` defaults to 50 and is capped at 200. Requires a Bearer token. Returns 200; errors: 401 for an invalid session.",
+    description="List teams visible to the authenticated user. `limit` is capped at 200. Requires a Bearer token. Returns 200; errors: 401 for an invalid session.",
 )
 def list_teams(
     _: CurrentUser,
-    limit: int = Query(
-        default=50, description="Maximum results to return; capped at 200."
+    limit: int | None = Query(
+        default=None,
+        ge=1,
+        le=200,
+        description="Maximum results to return; capped at 200.",
     ),
 ):
     """List teams for an authenticated caller."""
     db = get_db()
-    docs = db["teams"].find().limit(min(limit, 200))
+    docs = db["teams"].find()
+    if limit is not None:
+        docs = docs.limit(limit)
     return [serialize_doc(d) for d in docs]
 
 

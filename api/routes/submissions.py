@@ -76,8 +76,12 @@ def list_submissions(
         default=None, description="Filter by evaluation status."
     ),
     limit: int = Query(
-        default=100, description="Maximum results to return; capped at 300."
+        default=100,
+        ge=1,
+        le=300,
+        description="Maximum results to return; capped at 300.",
     ),
+    offset: int = Query(default=0, ge=0, description="Number of submissions to skip."),
 ):
     """List submissions matching the supplied filters."""
     db = get_db()
@@ -88,7 +92,9 @@ def list_submissions(
         query["submittedBy.refId"] = oid(userId)
     if status:
         query["status"] = status
-    docs = db["submissions"].find(query).limit(min(limit, 300))
+    docs = (
+        db["submissions"].find(query).sort("submittedAt", -1).skip(offset).limit(limit)
+    )
     return [serialize_doc(d) for d in docs]
 
 

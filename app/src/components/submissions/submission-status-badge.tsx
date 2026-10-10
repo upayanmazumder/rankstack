@@ -5,8 +5,8 @@ const STATUS_MAP: Record<
   SubmissionStatus,
   { label: string; variant: 'success' | 'destructive' | 'warning' | 'secondary' }
 > = {
-  correct: { label: 'Correct', variant: 'success' },
-  incorrect: { label: 'Incorrect', variant: 'destructive' },
+  correct: { label: 'Accepted', variant: 'success' },
+  incorrect: { label: 'Rejected', variant: 'destructive' },
   partial: { label: 'Partial', variant: 'warning' },
   pending: { label: 'Pending', variant: 'secondary' },
 };

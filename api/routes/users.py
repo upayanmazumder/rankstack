@@ -46,20 +46,25 @@ def create_user(payload: UserCreate):
     "",
     response_model=list[UserOut],
     summary="List users",
-    description="List users, optionally filtered by role. `limit` defaults to 50 and is capped at 200. Returns 200.",
+    description="List users, optionally filtered by role. `limit` is capped at 200. Returns 200.",
 )
 def list_users(
     role: str | None = Query(
         default=None, description="Filter by participant or administrator role."
     ),
-    limit: int = Query(
-        default=50, description="Maximum results to return; capped at 200."
+    limit: int | None = Query(
+        default=None,
+        ge=1,
+        le=200,
+        description="Maximum results to return; capped at 200.",
     ),
 ):
     """List user profiles with optional role filtering and a bounded result limit."""
     db = get_db()
     query = {"role": role} if role else {}
-    docs = db["users"].find(query).limit(min(limit, 200))
+    docs = db["users"].find(query)
+    if limit is not None:
+        docs = docs.limit(limit)
     return [serialize_doc(d) for d in docs]
 
 

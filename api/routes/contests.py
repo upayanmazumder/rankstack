@@ -270,6 +270,8 @@ def get_leaderboard(
             for rank, row in enumerate(rows, 1)
         ][: max(top, 0)]
     else:
+        if not db["contests"].find_one({"_id": contest_oid}, {"_id": 1}):
+            raise HTTPException(status_code=404, detail="Contest not found")
         leaderboard = redis_ops.get_leaderboard(contest_id, top)
     member_ids = [row["memberId"] for row in leaderboard]
     counts = (
