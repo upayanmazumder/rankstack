@@ -11,6 +11,8 @@ import type {
   ParticipantRefType,
 } from '@/types';
 
+import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
+
 export const contestKeys = createQueryKeys('contests');
 
 export const leaderboardKeys = {
@@ -127,6 +129,16 @@ export function useDeleteContest(id: string) {
     mutationFn: async () => {
       await api.delete(`/contests/${id}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: contestKeys.all() }),
+    onMutate: () => removeFromCachedLists<Contest>(queryClient, contestKeys.lists(), id),
+    onError: (_error, _variables, snapshots) => {
+      if (snapshots) restoreCachedLists(queryClient, snapshots);
+    },
+    onSuccess: () => queryClient.removeQueries({ queryKey: contestKeys.detail(id) }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: contestKeys.all() });
+      void queryClient.invalidateQueries({ queryKey: ['problems'] });
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] });
+      void queryClient.invalidateQueries({ queryKey: leaderboardKeys.all() });
+    },
   });
 }

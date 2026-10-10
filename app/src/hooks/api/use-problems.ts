@@ -4,6 +4,8 @@ import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
 import type { Problem, ProblemCreate } from '@/types';
 
+import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
+
 export const problemKeys = createQueryKeys('problems');
 
 export function useProblems(contestId?: string) {
@@ -49,6 +51,16 @@ export function useDeleteProblem(id: string) {
     mutationFn: async () => {
       await api.delete(`/problems/${id}`);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: problemKeys.all() }),
+    onMutate: () => removeFromCachedLists<Problem>(queryClient, problemKeys.lists(), id),
+    onError: (_error, _variables, snapshots) => {
+      if (snapshots) restoreCachedLists(queryClient, snapshots);
+    },
+    onSuccess: () => queryClient.removeQueries({ queryKey: problemKeys.detail(id) }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: problemKeys.all() });
+      void queryClient.invalidateQueries({ queryKey: ['contests'] });
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] });
+      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+    },
   });
 }

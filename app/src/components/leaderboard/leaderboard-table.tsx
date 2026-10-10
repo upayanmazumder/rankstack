@@ -1,3 +1,6 @@
+'use client';
+
+import { m, useReducedMotion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
 import {
@@ -8,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { DURATION, EASE } from '@/lib/motion';
 import type { LeaderboardEntry } from '@/types';
 
 const RANK_STYLES: Record<number, string> = {
@@ -22,6 +26,8 @@ interface LeaderboardTableProps {
 }
 
 export function LeaderboardTable({ entries, currentUserId }: LeaderboardTableProps) {
+  const reduceMotion = useReducedMotion();
+
   if (entries.length === 0) {
     return <p className="py-12 text-center text-sm text-muted-foreground">No participants yet.</p>;
   }
@@ -38,9 +44,14 @@ export function LeaderboardTable({ entries, currentUserId }: LeaderboardTablePro
       </TableHeader>
       <TableBody>
         {entries.map(entry => (
-          <TableRow
+          <m.tr
             key={entry.memberId}
-            className={entry.memberId === currentUserId ? 'bg-primary/10' : undefined}
+            data-slot="table-row"
+            layout={reduceMotion ? false : 'position'}
+            transition={{ layout: { duration: DURATION.fast, ease: EASE.out } }}
+            className={`border-b transition-colors hover:bg-muted/50 ${
+              entry.memberId === currentUserId ? 'bg-primary/10' : ''
+            }`}
           >
             <TableCell className={RANK_STYLES[entry.rank] ?? 'text-muted-foreground'}>
               {entry.rank}
@@ -60,7 +71,7 @@ export function LeaderboardTable({ entries, currentUserId }: LeaderboardTablePro
             <TableCell className="text-right tabular-nums">
               {entry.submissionCount ?? '—'}
             </TableCell>
-          </TableRow>
+          </m.tr>
         ))}
       </TableBody>
     </Table>

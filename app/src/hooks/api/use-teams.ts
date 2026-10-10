@@ -4,6 +4,7 @@ import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
 import type { Team, TeamCreate, TeamUpdate } from '@/types';
 
+import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
 import { userKeys } from './use-users';
 
 export const teamKeys = createQueryKeys('teams');
@@ -95,10 +96,19 @@ export function useDeleteTeam(id: string) {
     mutationFn: async () => {
       await api.delete(`/teams/${id}`);
     },
+    onMutate: () => removeFromCachedLists<Team>(queryClient, teamKeys.lists(), id),
+    onError: (_error, _variables, snapshots) => {
+      if (snapshots) restoreCachedLists(queryClient, snapshots);
+    },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: teamKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: teamKeys.all() });
-      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: teamKeys.all() });
+      void queryClient.invalidateQueries({ queryKey: userKeys.all() });
+      void queryClient.invalidateQueries({ queryKey: ['contests'] });
+      void queryClient.invalidateQueries({ queryKey: ['submissions'] });
+      void queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
     },
   });
 }
