@@ -56,3 +56,10 @@ def test_contest_lifecycle(client, db, users, headers_for, contest_payload):
     ]
     assert client.delete(f"/contests/{contest_id}", headers=admin).status_code == 204
     assert client.get(f"/contests/{contest_id}").status_code == 404
+
+
+def test_leaderboard_nonexistent_contest(client):
+    nonexistent = str(ObjectId())
+    res = client.get(f"/contests/{nonexistent}/leaderboard")
+    assert res.status_code == 404
+    assert res.json()["detail"] == "Contest not found"

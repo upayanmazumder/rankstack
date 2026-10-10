@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from api import redis_ops
@@ -56,7 +56,10 @@ def get_admin_user(user: CurrentUser) -> dict[str, Any]:
 AdminUser = Annotated[dict[str, Any], Depends(get_admin_user)]
 
 
-def get_team_member_or_admin(team_id: str, user: CurrentUser) -> dict[str, Any]:
+def get_team_member_or_admin(
+    team_id: Annotated[str, Path(description="Unique ID of the team being accessed.")],
+    user: CurrentUser,
+) -> dict[str, Any]:
     """Require an administrator or a member of the requested team."""
     if user.get("role") == "admin":
         return user
