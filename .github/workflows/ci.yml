@@ -3,8 +3,12 @@ name: CI
 on:
   push:
     branches: ['**']
+    paths-ignore:
+      - 'k8s/chart/values-image.yaml'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'k8s/chart/values-image.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
