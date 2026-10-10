@@ -17,7 +17,13 @@ export {
   useUpdateContestStatus,
   useDeleteContest,
 } from './use-contests';
-export { problemKeys, useProblems, useProblem, useDeleteProblem } from './use-problems';
+export {
+  problemKeys,
+  useProblems,
+  useProblem,
+  useCreateProblem,
+  useDeleteProblem,
+} from './use-problems';
 export {
   submissionKeys,
   useSubmissions,
@@ -37,3 +43,13 @@ export {
   useDeleteTeam,
 } from './use-teams';
 export { useLogin, useLogout, useRegister } from './use-sessions';
+export {
+  aggregationKeys,
+  useAverageScoreByDifficulty,
+  useSubmissionStatusByContest,
+} from './use-aggregations';
+export type {
+  AverageScoreByDifficulty,
+  SubmissionStatusByContest,
+  SubmissionStatusCount,
+} from './use-aggregations';

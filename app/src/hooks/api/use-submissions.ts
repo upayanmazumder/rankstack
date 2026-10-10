@@ -4,9 +4,16 @@ import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
 import type { Submission, SubmissionCreate } from '@/types';
 
+import { leaderboardKeys } from './use-contests';
+import { userKeys } from './use-users';
+
 export const submissionKeys = createQueryKeys('submissions');
 
-export function useSubmissions(filters?: { contestId?: string; userId?: string }) {
+export function useSubmissions(filters?: {
+  contestId?: string;
+  userId?: string;
+  status?: Submission['status'];
+}) {
   return useQuery({
     queryKey: filters ? submissionKeys.list(filters) : submissionKeys.lists(),
     queryFn: async () => {
@@ -48,6 +55,8 @@ export function useUpdateSubmissionStatus(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: submissionKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: submissionKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: leaderboardKeys.all() });
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
     },
   });
 }

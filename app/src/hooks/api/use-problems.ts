@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
-import type { Problem } from '@/types';
+import type { Problem, ProblemCreate } from '@/types';
 
 export const problemKeys = createQueryKeys('problems');
 
@@ -25,6 +25,21 @@ export function useProblem(id: string) {
       return res.data;
     },
     enabled: !!id,
+  });
+}
+
+export function useCreateProblem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: ProblemCreate) => {
+      const res = await api.post<Problem>('/problems', payload);
+      return res.data;
+    },
+    onSuccess: problem => {
+      queryClient.invalidateQueries({ queryKey: problemKeys.all() });
+      queryClient.invalidateQueries({ queryKey: ['contests', problem.contestId] });
+      queryClient.invalidateQueries({ queryKey: ['contests', 'list'] });
+    },
   });
 }
 

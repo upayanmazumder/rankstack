@@ -33,7 +33,16 @@ export type {
   ParticipantRefType,
   LeaderboardEntry,
 } from './contest';
-export type { Problem, Difficulty, ProblemType, CodingTestCase } from './problem';
+export type {
+  Problem,
+  ProblemCreate,
+  McqProblemCreate,
+  CodingProblemCreate,
+  SubjectiveProblemCreate,
+  Difficulty,
+  ProblemType,
+  CodingTestCase,
+} from './problem';
 export type {
   Submission,
   SubmissionCreate,
