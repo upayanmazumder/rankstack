@@ -1,6 +1,6 @@
 """CRUD routes for `users`."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
@@ -34,10 +34,15 @@ def create_user(payload: UserCreate):
 
 
 @router.get("", response_model=list[UserOut])
-def list_users(role: str | None = None, limit: int = 50):
+def list_users(
+    role: str | None = None,
+    limit: int | None = Query(default=None, ge=1, le=200),
+):
     db = get_db()
     query = {"role": role} if role else {}
-    docs = db["users"].find(query).limit(min(limit, 200))
+    docs = db["users"].find(query)
+    if limit is not None:
+        docs = docs.limit(limit)
     return [serialize_doc(d) for d in docs]
 
 

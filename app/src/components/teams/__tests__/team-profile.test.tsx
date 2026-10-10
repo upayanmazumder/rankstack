@@ -50,6 +50,8 @@ const mocks = vi.hoisted(() => ({
   removeMember: vi.fn(),
   deleteTeam: vi.fn(),
   replace: vi.fn(),
+  usersError: false,
+  refetchUsers: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: mocks.replace }) }));
@@ -60,7 +62,12 @@ vi.mock('@/stores', () => ({
 }));
 vi.mock('@/hooks/api', () => ({
   useTeam: () => ({ data: team, isPending: false, isError: false, refetch: vi.fn() }),
-  useUsers: () => ({ data: [admin, member, candidate], isPending: false }),
+  useUsers: () => ({
+    data: [admin, member, candidate],
+    isPending: false,
+    isError: mocks.usersError,
+    refetch: mocks.refetchUsers,
+  }),
   useAddTeamMember: () => ({ mutateAsync: mocks.addMember, isPending: false }),
   useRemoveTeamMember: () => ({ mutateAsync: mocks.removeMember, isPending: false }),
   useDeleteTeam: () => ({ mutateAsync: mocks.deleteTeam, isPending: false }),
@@ -73,6 +80,19 @@ describe('TeamProfile', () => {
     mocks.removeMember.mockReset().mockResolvedValue(team);
     mocks.deleteTeam.mockReset().mockResolvedValue(undefined);
     mocks.replace.mockReset();
+    mocks.usersError = false;
+    mocks.refetchUsers.mockReset();
+  });
+
+  it('shows a retryable error instead of an empty roster when users fail to load', async () => {
+    const user = userEvent.setup();
+    mocks.usersError = true;
+
+    render(<TeamProfile teamId={team.id} />);
+
+    expect(screen.getByRole('heading', { name: 'Roster unavailable' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Retry roster' }));
+    expect(mocks.refetchUsers).toHaveBeenCalledOnce();
   });
 
   it('renders team metrics, member identities, roles, and manager actions', () => {

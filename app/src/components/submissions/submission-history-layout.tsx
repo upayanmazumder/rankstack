@@ -77,7 +77,11 @@ export function SubmissionHistoryUnavailable() {
   );
 }
 
-export function SubmissionHistoryError({ onRetry }: { onRetry: () => void }) {
+interface SubmissionHistoryErrorProps {
+  onRetry: () => void;
+}
+
+export function SubmissionHistoryError({ onRetry }: SubmissionHistoryErrorProps) {
   return (
     <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
       <AlertTriangle className="size-10 text-destructive" />

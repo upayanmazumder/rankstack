@@ -9,16 +9,41 @@ import { userKeys } from './use-users';
 
 export const submissionKeys = createQueryKeys('submissions');
 
-export function useSubmissions(filters?: {
+interface SubmissionFilters extends Record<string, unknown> {
   contestId?: string;
   userId?: string;
   status?: Submission['status'];
-}) {
+}
+
+const SUBMISSION_HISTORY_PAGE_SIZE = 100;
+
+export function useSubmissions(filters?: SubmissionFilters) {
   return useQuery({
     queryKey: filters ? submissionKeys.list(filters) : submissionKeys.lists(),
     queryFn: async () => {
       const res = await api.get<Submission[]>('/submissions', { params: filters });
       return res.data;
+    },
+  });
+}
+
+export function useSubmissionHistory(userId: string) {
+  return useQuery({
+    queryKey: submissionKeys.list({ scope: 'history', userId }),
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const submissions: Submission[] = [];
+      let offset = 0;
+
+      for (;;) {
+        const res = await api.get<Submission[]>('/submissions', {
+          params: { userId, limit: SUBMISSION_HISTORY_PAGE_SIZE, offset },
+        });
+        submissions.push(...res.data);
+
+        if (res.data.length < SUBMISSION_HISTORY_PAGE_SIZE) return submissions;
+        offset += SUBMISSION_HISTORY_PAGE_SIZE;
+      }
     },
   });
 }

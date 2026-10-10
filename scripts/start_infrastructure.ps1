@@ -6,6 +6,10 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $repoRoot
 
 function Test-DockerEngine {
+    if ($null -eq (Get-Command -Name docker -CommandType Application -ErrorAction SilentlyContinue)) {
+        return $false
+    }
+
     $previousErrorActionPreference = $ErrorActionPreference
     try {
         $ErrorActionPreference = "SilentlyContinue"

@@ -37,6 +37,20 @@ export function TeamProfile({ teamId }: TeamProfileProps) {
     );
   }
 
+  if (usersQuery.isError) {
+    return (
+      <section className="mx-auto w-full max-w-4xl flex-1 space-y-4 px-4 py-12 text-center sm:px-6">
+        <h1 className="text-2xl font-semibold">Roster unavailable</h1>
+        <p className="text-sm text-muted-foreground">
+          The team loaded, but its member directory could not be retrieved.
+        </p>
+        <Button variant="outline" onClick={() => void usersQuery.refetch()}>
+          Retry roster
+        </Button>
+      </section>
+    );
+  }
+
   const members = (usersQuery.data ?? []).filter(user => team.memberIds.includes(user.id));
   const candidates = (usersQuery.data ?? []).filter(user => !team.memberIds.includes(user.id));
   const canManage = Boolean(

@@ -27,6 +27,7 @@ export {
 export {
   submissionKeys,
   useSubmissions,
+  useSubmissionHistory,
   useSubmission,
   useCreateSubmission,
   useUpdateSubmissionStatus,

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/components/ui/card';
-import { useContests, useProblems, useSubmissions } from '@/hooks/api';
+import { useContests, useProblems, useSubmissionHistory } from '@/hooks/api';
 import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore } from '@/stores';
 
@@ -39,10 +39,14 @@ export function SubmissionHistory() {
   return <UserSubmissionHistory userId={user.id} />;
 }
 
-function UserSubmissionHistory({ userId }: { userId: string }) {
+interface UserSubmissionHistoryProps {
+  userId: string;
+}
+
+function UserSubmissionHistory({ userId }: UserSubmissionHistoryProps) {
   const [contestId, setContestId] = useState('all');
   const [status, setStatus] = useState<SubmissionStatusFilter>('all');
-  const submissionsQuery = useSubmissions({ userId });
+  const submissionsQuery = useSubmissionHistory(userId);
   const contestsQuery = useContests();
   const problemsQuery = useProblems();
 
@@ -72,9 +76,8 @@ function UserSubmissionHistory({ userId }: { userId: string }) {
   }, [contestTitles, submissionsQuery.data]);
 
   const total = submissionsQuery.data?.length ?? 0;
-  const isLoading =
-    submissionsQuery.isLoading || contestsQuery.isLoading || problemsQuery.isLoading;
-  const isError = submissionsQuery.isError || contestsQuery.isError || problemsQuery.isError;
+  const isLoading = submissionsQuery.isLoading;
+  const isError = submissionsQuery.isError;
   const hasFilters = contestId !== 'all' || status !== 'all';
 
   function resetFilters() {
@@ -84,8 +87,6 @@ function UserSubmissionHistory({ userId }: { userId: string }) {
 
   function retry() {
     void submissionsQuery.refetch();
-    void contestsQuery.refetch();
-    void problemsQuery.refetch();
   }
 
   return (

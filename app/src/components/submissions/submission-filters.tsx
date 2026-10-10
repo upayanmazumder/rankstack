@@ -25,7 +25,12 @@ interface SubmissionFiltersProps {
   onStatusChange: (status: SubmissionStatusFilter) => void;
 }
 
-const STATUS_OPTIONS: Array<{ label: string; value: SubmissionStatusFilter }> = [
+interface SubmissionStatusOption {
+  label: string;
+  value: SubmissionStatusFilter;
+}
+
+const STATUS_OPTIONS: SubmissionStatusOption[] = [
   { label: 'All statuses', value: 'all' },
   { label: 'Pending', value: 'pending' },
   { label: 'Accepted', value: 'correct' },
