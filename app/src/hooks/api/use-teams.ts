@@ -64,7 +64,8 @@ export function useAddTeamMember(teamId: string) {
       const res = await api.post<Team>(`/teams/${teamId}/members`, { userId });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: team => {
+      queryClient.setQueryData(teamKeys.detail(teamId), team);
       queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) });
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
@@ -76,9 +77,11 @@ export function useRemoveTeamMember(teamId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userId: string) => {
-      await api.delete(`/teams/${teamId}/members/${userId}`);
+      const res = await api.delete<Team>(`/teams/${teamId}/members/${userId}`);
+      return res.data;
     },
-    onSuccess: () => {
+    onSuccess: team => {
+      queryClient.setQueryData(teamKeys.detail(teamId), team);
       queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId) });
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
@@ -93,6 +96,7 @@ export function useDeleteTeam(id: string) {
       await api.delete(`/teams/${id}`);
     },
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: teamKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: teamKeys.all() });
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
     },

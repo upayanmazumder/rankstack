@@ -2,6 +2,8 @@
 
 from bson import ObjectId
 
+from api.models.common import utcnow
+
 
 def test_team_membership_and_back_references(client, db, users, headers_for):
     admin = headers_for("admin")
@@ -56,3 +58,38 @@ def test_team_membership_and_back_references(client, db, users, headers_for):
         not in db.users.find_one({"_id": ObjectId(users["admin"]["id"])})["teamIds"]
     )
     assert client.get(f"/teams/{team_id}").status_code == 404
+
+
+def test_team_and_user_catalogs_are_complete_by_default(client, db, users, headers_for):
+    db.teams.insert_many(
+        [
+            {
+                "name": f"Catalog Team {index}",
+                "memberIds": [ObjectId()],
+                "totalScore": index,
+                "createdAt": utcnow(),
+            }
+            for index in range(55)
+        ]
+    )
+    password_hash = db.users.find_one(
+        {"_id": ObjectId(users["participant"]["id"])}, {"passwordHash": 1}
+    )["passwordHash"]
+    db.users.insert_many(
+        [
+            {
+                "name": f"Catalog User {index}",
+                "email": f"catalog-user-{index}@example.test",
+                "passwordHash": password_hash,
+                "role": "participant",
+                "totalScore": index,
+                "teamIds": [],
+                "createdAt": utcnow(),
+            }
+            for index in range(55)
+        ]
+    )
+
+    headers = headers_for("participant")
+    assert len(client.get("/teams", headers=headers).json()) == 55
+    assert len(client.get("/users", headers=headers).json()) == 58

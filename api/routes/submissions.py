@@ -1,7 +1,7 @@
 """CRUD routes for `submissions`, backed by the create/status-update transactions
 and Redis rate limiting / leaderboard sync."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from api import redis_ops, services
 from api.db import get_db
@@ -57,7 +57,8 @@ def list_submissions(
     contestId: str | None = None,
     userId: str | None = None,
     status: str | None = None,
-    limit: int = 100,
+    limit: int = Query(default=100, ge=1, le=300),
+    offset: int = Query(default=0, ge=0),
 ):
     db = get_db()
     query: dict = {}
@@ -67,7 +68,9 @@ def list_submissions(
         query["submittedBy.refId"] = oid(userId)
     if status:
         query["status"] = status
-    docs = db["submissions"].find(query).limit(min(limit, 300))
+    docs = (
+        db["submissions"].find(query).sort("submittedAt", -1).skip(offset).limit(limit)
+    )
     return [serialize_doc(d) for d in docs]
 
 

@@ -1,6 +1,6 @@
 """CRUD routes for `teams`, plus member add/remove via atomic transactions."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pymongo import ReturnDocument
 
 from api import services
@@ -39,9 +39,11 @@ def create_team(payload: TeamCreate, current: CurrentUser):
 
 
 @router.get("", response_model=list[TeamOut])
-def list_teams(_: CurrentUser, limit: int = 50):
+def list_teams(_: CurrentUser, limit: int | None = Query(default=None, ge=1, le=200)):
     db = get_db()
-    docs = db["teams"].find().limit(min(limit, 200))
+    docs = db["teams"].find()
+    if limit is not None:
+        docs = docs.limit(limit)
     return [serialize_doc(d) for d in docs]
 
 
