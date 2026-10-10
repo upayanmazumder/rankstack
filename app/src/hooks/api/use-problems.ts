@@ -53,7 +53,7 @@ export function useDeleteProblem(id: string) {
     },
     onMutate: () => removeFromCachedLists<Problem>(queryClient, problemKeys.lists(), id),
     onError: (_error, _variables, snapshots) => {
-      if (snapshots) restoreCachedLists(queryClient, snapshots);
+      if (snapshots) restoreCachedLists(queryClient, snapshots, id);
     },
     onSuccess: () => queryClient.removeQueries({ queryKey: problemKeys.detail(id) }),
     onSettled: () => {

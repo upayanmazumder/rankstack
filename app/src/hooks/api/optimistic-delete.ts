@@ -26,6 +26,20 @@ export async function removeFromCachedLists<T extends { id: string }>(
   return snapshots;
 }
 
-export function restoreCachedLists<T>(queryClient: QueryClient, snapshots: CachedList<T>[]) {
-  for (const { key, data } of snapshots) queryClient.setQueryData(key, data);
+export function restoreCachedLists<T extends { id: string }>(
+  queryClient: QueryClient,
+  snapshots: CachedList<T>[],
+  id: string
+) {
+  for (const { key, data } of snapshots) {
+    const originalIndex = data.findIndex(item => item.id === id);
+    if (originalIndex < 0) continue;
+
+    queryClient.setQueryData<T[]>(key, current => {
+      if (!current || current.some(item => item.id === id)) return current;
+      const restored = [...current];
+      restored.splice(Math.min(originalIndex, restored.length), 0, data[originalIndex]);
+      return restored;
+    });
+  }
 }

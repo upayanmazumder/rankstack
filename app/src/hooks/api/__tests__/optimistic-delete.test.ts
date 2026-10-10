@@ -25,8 +25,20 @@ describe('optimistic list deletion', () => {
     expect(queryClient.getQueryData(endedKey)).toEqual(ended);
     expect(queryClient.getQueryData(otherKey)).toEqual(all);
 
-    restoreCachedLists(queryClient, snapshots);
+    restoreCachedLists(queryClient, snapshots, 'target');
     expect(queryClient.getQueryData(allKey)).toEqual(all);
     expect(queryClient.getQueryData(liveKey)).toEqual(live);
+  });
+
+  it('restores a failed delete without undoing a second successful delete', async () => {
+    const queryClient = new QueryClient();
+    const listKey = ['teams', 'list'] as const;
+    queryClient.setQueryData(listKey, [{ id: 'first' }, { id: 'second' }, { id: 'third' }]);
+
+    const firstSnapshot = await removeFromCachedLists(queryClient, listKey, 'first');
+    await removeFromCachedLists(queryClient, listKey, 'second');
+    restoreCachedLists(queryClient, firstSnapshot, 'first');
+
+    expect(queryClient.getQueryData(listKey)).toEqual([{ id: 'first' }, { id: 'third' }]);
   });
 });

@@ -62,7 +62,7 @@ export function useDeleteUser(id: string) {
     },
     onMutate: () => removeFromCachedLists<User>(queryClient, userKeys.lists(), id),
     onError: (_error, _variables, snapshots) => {
-      if (snapshots) restoreCachedLists(queryClient, snapshots);
+      if (snapshots) restoreCachedLists(queryClient, snapshots, id);
     },
     onSuccess: () => queryClient.removeQueries({ queryKey: userKeys.detail(id) }),
     onSettled: () => void queryClient.invalidateQueries({ queryKey: userKeys.all() }),

@@ -98,7 +98,7 @@ export function useDeleteTeam(id: string) {
     },
     onMutate: () => removeFromCachedLists<Team>(queryClient, teamKeys.lists(), id),
     onError: (_error, _variables, snapshots) => {
-      if (snapshots) restoreCachedLists(queryClient, snapshots);
+      if (snapshots) restoreCachedLists(queryClient, snapshots, id);
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: teamKeys.detail(id) });

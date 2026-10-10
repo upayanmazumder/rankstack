@@ -131,7 +131,7 @@ export function useDeleteContest(id: string) {
     },
     onMutate: () => removeFromCachedLists<Contest>(queryClient, contestKeys.lists(), id),
     onError: (_error, _variables, snapshots) => {
-      if (snapshots) restoreCachedLists(queryClient, snapshots);
+      if (snapshots) restoreCachedLists(queryClient, snapshots, id);
     },
     onSuccess: () => queryClient.removeQueries({ queryKey: contestKeys.detail(id) }),
     onSettled: () => {
