@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
-    <div className="w-full overflow-auto">
+    <div className="max-w-full min-w-0 overflow-x-auto overscroll-x-contain">
       <table
         data-slot="table"
         className={cn('w-full caption-bottom text-sm', className)}
