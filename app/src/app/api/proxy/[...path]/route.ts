@@ -27,12 +27,17 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
   const rawBody = hasBody ? await request.text() : '';
 
-  const upstream = await fetch(targetUrl, {
-    method: request.method,
-    headers,
-    body: hasBody && rawBody.length > 0 ? rawBody : undefined,
-    cache: 'no-store',
-  });
+  let upstream: Response;
+  try {
+    upstream = await fetch(targetUrl, {
+      method: request.method,
+      headers,
+      body: hasBody && rawBody.length > 0 ? rawBody : undefined,
+      cache: 'no-store',
+    });
+  } catch {
+    return NextResponse.json({ message: 'Upstream API unavailable' }, { status: 502 });
+  }
 
   const responseHeaders = new Headers();
   const upstreamContentType = upstream.headers.get('content-type');
@@ -40,19 +45,12 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
     responseHeaders.set('Content-Type', upstreamContentType);
   }
 
-  const response =
-    upstream.status === 204
-      ? new NextResponse(null, { status: 204, headers: responseHeaders })
-      : new NextResponse(await upstream.text(), {
-          status: upstream.status,
-          headers: responseHeaders,
-        });
-
-  if (upstream.status === 401 && token) {
-    response.cookies.delete(SESSION_COOKIE_NAME);
-  }
-
-  return response;
+  return upstream.status === 204
+    ? new NextResponse(null, { status: 204, headers: responseHeaders })
+    : new NextResponse(await upstream.text(), {
+        status: upstream.status,
+        headers: responseHeaders,
+      });
 }
 
 export async function GET(request: NextRequest, context: ProxyRouteContext) {

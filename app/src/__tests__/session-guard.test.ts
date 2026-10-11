@@ -160,7 +160,7 @@ describe('session route and API proxy', () => {
     expect(headers.get('Authorization')).toBe('Bearer secret-session-token');
   });
 
-  it('clears the rankstack-session cookie when the proxied backend returns 401', async () => {
+  it('returns 401 from the proxy without mutating the rankstack-session cookie', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ detail: 'Invalid or expired session' }), {
         status: 401,
@@ -178,6 +178,19 @@ describe('session route and API proxy', () => {
     });
 
     expect(response.status).toBe(401);
-    expect(response.cookies.get('rankstack-session')?.value).toBe('');
+    expect(response.cookies.get('rankstack-session')).toBeUndefined();
+  });
+
+  it('returns a structured 502 JSON response when the upstream fetch fails', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('connect ECONNREFUSED'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const request = new NextRequest(`${endpoint}/api/proxy/contests`);
+    const response = await proxyGet(request, {
+      params: Promise.resolve({ path: ['contests'] }),
+    });
+
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({ message: 'Upstream API unavailable' });
   });
 });
