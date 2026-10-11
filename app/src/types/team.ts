@@ -11,7 +11,3 @@ export interface TeamCreate {
   name: string;
   memberIds?: string[];
 }
-
-export interface TeamUpdate {
-  name?: string;
-}

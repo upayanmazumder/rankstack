@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { env } from '@/env';
+import { clearSessionCookies, SESSION_COOKIE_NAME } from '@/lib/session-cookie';
 
 const PROTECTED_PREFIXES = ['/submissions', '/teams', '/admin'];
 
@@ -12,7 +13,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('rankstack-session')?.value;
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (token) {
     try {
       const result = await fetch(
@@ -20,8 +21,9 @@ export async function proxy(request: NextRequest) {
         { cache: 'no-store' }
       );
       if (result.ok) return NextResponse.next();
+      if (result.status !== 401 && result.status !== 404) return NextResponse.next();
     } catch {
-      // Fail closed if the session service cannot verify the token.
+      return NextResponse.next();
     }
   }
 
@@ -30,7 +32,7 @@ export async function proxy(request: NextRequest) {
   loginUrl.search = '';
   loginUrl.searchParams.set('from', `${pathname}${request.nextUrl.search}`);
   const response = NextResponse.redirect(loginUrl);
-  response.cookies.delete('rankstack-session');
+  clearSessionCookies(response);
   return response;
 }
 

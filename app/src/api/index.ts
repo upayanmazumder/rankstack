@@ -1,3 +1,2 @@
-export { api, createApiClient } from './client';
-export { ApiError, isApiError, toApiError } from './errors';
-export { request } from './request';
+export { api } from './client';
+export { isApiError, toApiError } from './errors';

@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
-const DialogClose = DialogPrimitive.Close;
 
 function mergeClassName<T>(
   className: string | ((state: T) => string | undefined) | undefined,
@@ -99,9 +98,6 @@ function DialogDescription({
 export {
   Dialog,
   DialogTrigger,
-  DialogClose,
-  DialogPortal,
-  DialogOverlay,
   DialogContent,
   DialogHeader,
   DialogFooter,

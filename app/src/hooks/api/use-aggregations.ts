@@ -10,7 +10,7 @@ export interface AverageScoreByDifficulty {
   problemCount: number;
 }
 
-export interface SubmissionStatusCount {
+interface SubmissionStatusCount {
   status: SubmissionStatus;
   count: number;
 }
@@ -21,7 +21,7 @@ export interface SubmissionStatusByContest {
   statusCounts: SubmissionStatusCount[];
 }
 
-export const aggregationKeys = createQueryKeys('aggregations');
+const aggregationKeys = createQueryKeys('aggregations');
 
 export function useAverageScoreByDifficulty() {
   return useQuery({

@@ -10,6 +10,7 @@ import { LeaderboardTable } from '@/components/leaderboard/leaderboard-table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useContest, useLeaderboard } from '@/hooks/api/use-contests';
+import { LIVE_CONTEST_POLL_INTERVAL_MS } from '@/lib/contest-polling';
 import { useAuthStore } from '@/stores';
 
 interface ContestLeaderboardRouteParams {
@@ -23,7 +24,8 @@ interface ContestLeaderboardPageProps {
 export default function ContestLeaderboardPage({ params }: ContestLeaderboardPageProps) {
   const { id } = use(params);
   const contest = useContest(id);
-  const leaderboard = useLeaderboard(id, 5_000, 100);
+  const isLive = contest.data?.status === 'live';
+  const leaderboard = useLeaderboard(id, isLive ? LIVE_CONTEST_POLL_INTERVAL_MS : false, 100);
   const user = useAuthStore(state => state.user);
 
   if (contest.isPending || leaderboard.isPending) {
@@ -73,7 +75,11 @@ export default function ContestLeaderboardPage({ params }: ContestLeaderboardPag
           <p className="text-sm text-muted-foreground">{contest.data.title}</p>
         </div>
         <p role="status" className="text-sm text-muted-foreground">
-          Refreshing every 5 seconds
+          {isLive
+            ? 'Refreshing every 30 seconds'
+            : contest.data.status === 'ended'
+              ? 'Final standings'
+              : 'Updates begin when the contest goes live'}
         </p>
       </header>
       <LeaderboardTable entries={leaderboard.data ?? []} currentUserId={user?.id} />

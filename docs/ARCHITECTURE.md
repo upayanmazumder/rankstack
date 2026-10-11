@@ -264,7 +264,7 @@ graph LR
 |---|---|---|---|
 | `leaderboard:<contestId>` | `ZSET` | Persistent during contest | Live rankings. The member is `userId` or `teamId` and the score is total points. |
 | `leaderboard_revision:<contestId>` | `STRING` | Persistent during contest | Tracks the latest rebuilt version number to prevent stale writes. |
-| `session:<sessionId>` | `STRING` | 24 Hours (`86400s`) | Stores authenticated `userId`. The backend refreshes the TTL on user activity. |
+| `session:<sessionId>` | `STRING` | Configured TTL (default `3600s`) | Stores authenticated `userId`. The backend refreshes the TTL on authenticated activity. |
 | `rate_limit:<userId>` | `STRING` | 60 Seconds (`60s`) | Counts submissions within the time window. The limit is 10 submissions. |
 
 ### Leaderboard Mechanics and Fault Recovery
@@ -285,6 +285,36 @@ graph LR
 3. **Dirty Leaderboard Tracking:**
    When a deletion transaction occurs, MongoDB flags the contest in `dirty_leaderboards`.
    The flag forces reads to use MongoDB until Redis reconciliation completes.
+
+### Browser Session Lifetime
+
+The session token is held in an HttpOnly, SameSite=Lax browser cookie. A second
+HttpOnly cookie records the TTL returned by login and the last cookie refresh.
+`GET /api/session` validates the token with FastAPI, refreshes its Redis TTL,
+returns the current user profile, and re-issues the browser cookie at most once
+every five minutes. The client calls this route on load and every five minutes,
+so active users keep both lifetimes aligned and role changes appear after a
+reload. On 401/404 the cookies and client profile are cleared. Transient 5xx
+or network failures preserve the cookie; protected pages show their own loading
+or error state until the backend recovers. Successful authenticated proxy calls
+can also refresh an overdue cookie after verifying the session.
+
+### Frontend Polling and Invocation Budget
+
+The contest detail and full leaderboard poll only while a contest is `live`, at
+30-second intervals. An `upcoming` contest schedules one refetch at its start
+time; an `ended` contest does not poll. Public contest-detail and leaderboard
+GET responses are served through the Next.js proxy without credentials and
+carry `Cache-Control: public, s-maxage=5, stale-while-revalidate=10`. The CDN
+can absorb repeated public reads without mixing authenticated responses.
+
+For a conservative 3-hour contest with 100 continuously focused leaderboard
+tabs, two 30-second polls produce `100 × 2 × (10,800 / 30) = 72,000` proxy
+requests. Session revalidation adds at most `100 × (10,800 / 300) = 3,600`,
+for **75,600** before initial loads and other actions, or 7.56% of [Vercel
+Hobby's one-million included monthly function invocations](https://vercel.com/docs/plans/hobby).
+CDN hits can lower actual function invocations further. Monitor the Vercel
+usage dashboard because other routes and contests share the same allowance.
 
 ---
 

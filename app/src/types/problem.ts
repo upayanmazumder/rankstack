@@ -1,7 +1,7 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type ProblemType = 'mcq' | 'coding' | 'subjective';
+type ProblemType = 'mcq' | 'coding' | 'subjective';
 
-export interface CodingTestCase {
+interface CodingTestCase {
   input: string;
   output: string;
 }
@@ -14,20 +14,20 @@ interface ProblemCreateBase {
   points: number;
 }
 
-export interface McqProblemCreate extends ProblemCreateBase {
+interface McqProblemCreate extends ProblemCreateBase {
   type: 'mcq';
   options: string[];
   correctAnswer: string;
 }
 
-export interface CodingProblemCreate extends ProblemCreateBase {
+interface CodingProblemCreate extends ProblemCreateBase {
   type: 'coding';
   inputFormat: string;
   constraints: string;
   testCases: CodingTestCase[];
 }
 
-export interface SubjectiveProblemCreate extends ProblemCreateBase {
+interface SubjectiveProblemCreate extends ProblemCreateBase {
   type: 'subjective';
   wordLimit: number;
   evaluationRubric: string;

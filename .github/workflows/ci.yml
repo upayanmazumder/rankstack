@@ -37,6 +37,7 @@ jobs:
           cache-dependency-path: app/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm knip
       - run: pnpm format:check
 
   typecheck:

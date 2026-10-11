@@ -1,7 +1,7 @@
 export type ContestStatus = 'upcoming' | 'live' | 'ended';
 export type ParticipantRefType = 'user' | 'team';
 
-export interface ParticipantRef {
+interface ParticipantRef {
   refType: ParticipantRefType;
   refId: string;
 }

@@ -11,13 +11,6 @@ export interface User {
   createdAt: string;
 }
 
-export interface UserCreate {
-  name: string;
-  email: string;
-  password: string;
-  role?: Role;
-}
-
 export interface UserUpdate {
   name?: string;
   email?: string;

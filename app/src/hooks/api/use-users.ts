@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
-import type { User, UserCreate, UserUpdate } from '@/types';
+import type { User, UserUpdate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
 
@@ -15,28 +15,6 @@ export function useUsers() {
       const res = await api.get<User[]>('/users');
       return res.data;
     },
-  });
-}
-
-export function useUser(id: string) {
-  return useQuery({
-    queryKey: userKeys.detail(id),
-    queryFn: async () => {
-      const res = await api.get<User>(`/users/${id}`);
-      return res.data;
-    },
-    enabled: !!id,
-  });
-}
-
-export function useCreateUser() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: UserCreate) => {
-      const res = await api.post<User>('/users', payload);
-      return res.data;
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
   });
 }
 

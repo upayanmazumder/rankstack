@@ -1,8 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { env } from '@/env';
-
-const SESSION_COOKIE_NAME = 'rankstack-session';
+import {
+  SESSION_COOKIE_NAME,
+  sessionNeedsRefresh,
+  sessionTtlSeconds,
+  setSessionCookies,
+} from '@/lib/session-cookie';
 
 interface ProxyRouteContext {
   params: Promise<{ path: string[] }>;
@@ -12,6 +16,10 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
   const { path } = await context.params;
   const encodedPath = path.map(segment => encodeURIComponent(segment)).join('/');
   const targetUrl = `${env.NEXT_PUBLIC_API_URL}/${encodedPath}${request.nextUrl.search}`;
+  const publicContestRead =
+    request.method === 'GET' &&
+    path[0] === 'contests' &&
+    (path.length === 2 || (path.length === 3 && path[2] === 'leaderboard'));
 
   const headers = new Headers();
   const contentType = request.headers.get('content-type');
@@ -20,7 +28,7 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
   if (accept) headers.set('Accept', accept);
 
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (token) {
+  if (token && !publicContestRead) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
@@ -36,7 +44,7 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
       cache: 'no-store',
     });
   } catch {
-    return NextResponse.json({ message: 'Upstream API unavailable' }, { status: 502 });
+    return NextResponse.json({ detail: 'Upstream API unavailable' }, { status: 502 });
   }
 
   const responseHeaders = new Headers();
@@ -44,16 +52,35 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
   if (upstreamContentType) {
     responseHeaders.set('Content-Type', upstreamContentType);
   }
+  if (publicContestRead && upstream.ok) {
+    responseHeaders.set('Cache-Control', 'public, s-maxage=5, stale-while-revalidate=10');
+  }
 
   const isNullBodyStatus =
     upstream.status === 204 || upstream.status === 205 || upstream.status === 304;
 
-  return isNullBodyStatus
+  const response = isNullBodyStatus
     ? new NextResponse(null, { status: upstream.status, headers: responseHeaders })
     : new NextResponse(await upstream.text(), {
         status: upstream.status,
         headers: responseHeaders,
       });
+
+  if (token && !publicContestRead && upstream.ok && sessionNeedsRefresh(request)) {
+    try {
+      const session = await fetch(
+        `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`,
+        { cache: 'no-store' }
+      );
+      if (session.status === 200) {
+        setSessionCookies(response, request, token, sessionTtlSeconds(request));
+      }
+    } catch {
+      // Preserve the upstream result if session refresh is temporarily unavailable.
+    }
+  }
+
+  return response;
 }
 
 export async function GET(request: NextRequest, context: ProxyRouteContext) {
@@ -65,10 +92,6 @@ export async function POST(request: NextRequest, context: ProxyRouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: ProxyRouteContext) {
-  return forwardToBackend(request, context);
-}
-
-export async function PUT(request: NextRequest, context: ProxyRouteContext) {
   return forwardToBackend(request, context);
 }
 

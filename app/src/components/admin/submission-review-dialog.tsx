@@ -83,7 +83,7 @@ export function SubmissionReviewDialog({
   );
 }
 
-export function formatAnswer(answer: unknown): string {
+function formatAnswer(answer: unknown): string {
   if (typeof answer === 'string') return answer;
   try {
     return JSON.stringify(answer, null, 2);

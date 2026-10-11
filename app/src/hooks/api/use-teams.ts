@@ -2,12 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
-import type { Team, TeamCreate, TeamUpdate } from '@/types';
+import type { Team, TeamCreate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
 import { userKeys } from './use-users';
 
-export const teamKeys = createQueryKeys('teams');
+const teamKeys = createQueryKeys('teams');
 
 export function useTeams() {
   return useQuery({
@@ -40,20 +40,6 @@ export function useCreateTeam() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
-    },
-  });
-}
-
-export function useUpdateTeam(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: TeamUpdate) => {
-      const res = await api.patch<Team>(`/teams/${id}`, payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: teamKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
     },
   });
 }

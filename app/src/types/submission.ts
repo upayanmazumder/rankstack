@@ -1,7 +1,7 @@
 export type SubmissionStatus = 'pending' | 'correct' | 'incorrect' | 'partial';
-export type SubmissionRefType = 'user' | 'team';
+type SubmissionRefType = 'user' | 'team';
 
-export interface SubmittedBy {
+interface SubmittedBy {
   refType: SubmissionRefType;
   refId: string;
 }
