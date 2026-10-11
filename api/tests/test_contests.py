@@ -6,6 +6,7 @@ from redis.exceptions import RedisError
 from api import redis_ops
 from api.db import get_redis_client
 from api.models.common import utcnow
+from api.redis_ops import leaderboard_key
 
 
 def test_contest_lifecycle(client, db, users, headers_for, contest_payload):
@@ -320,3 +321,24 @@ def test_leaderboard_read_falls_back_to_mongo_during_redis_outage(
     leaderboard = res.json()["leaderboard"]
     assert leaderboard[0]["memberId"] == users["participant"]["id"]
     assert leaderboard[0]["score"] == 10
+
+
+def test_ending_a_contest_sets_a_leaderboard_ttl(client, headers_for, contest_payload):
+    admin = headers_for("admin")
+    contest_id = client.post("/contests", json=contest_payload, headers=admin).json()[
+        "id"
+    ]
+    redis = get_redis_client()
+    key = leaderboard_key(contest_id)
+    redis.zadd(key, {"someone": 1})
+    assert redis.ttl(key) == -1
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "ended"}, headers=admin
+    )
+    assert 0 < redis.ttl(key) <= 604800
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "live"}, headers=admin
+    )
+    assert redis.ttl(key) == -1

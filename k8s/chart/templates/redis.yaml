@@ -1,6 +1,9 @@
 # No PVC -- the app treats Redis as derived/rebuildable state (leaderboard
 # sorted sets, sessions, rate-limit counters), never the source of truth.
-# maxmemory + allkeys-lru caps it as a bounded cache on a shared node.
+# maxmemory + volatile-lru caps it as a bounded cache on a shared node,
+# evicting only keys with a TTL. Sessions and rate limits always carry one;
+# live-contest leaderboards do not, so they are never evicted mid-contest
+# (ended-contest leaderboards gain a TTL, see api/routes/contests.py).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,7 +28,7 @@ spec:
       containers:
         - name: redis
           image: {{ .Values.redis.image }}
-          args: ["--maxmemory", {{ .Values.redis.maxmemory | quote }}, "--maxmemory-policy", "allkeys-lru"]
+          args: ["--maxmemory", {{ .Values.redis.maxmemory | quote }}, "--maxmemory-policy", "volatile-lru"]
           ports:
             - containerPort: 6379
           resources:

@@ -1,8 +1,8 @@
 """Redis-backed fast paths: live leaderboard, sessions, submission rate limiting.
 
 Key layout:
-  leaderboard:<contestId>          -> ZSET   member=userId/teamId  score=cumulative points
-  leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version
+  leaderboard:<contestId>          -> ZSET   member=userId/teamId  score=cumulative points, TTL once the contest ends
+  leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version, TTL once the contest ends
   session:<sessionId>              -> STRING userId, TTL on inactivity
   user_sessions:<userId>           -> SET    sessionIds, for bulk revocation on account deletion
   rate_limit:<userId>              -> STRING counter, TTL sliding window
@@ -48,6 +48,22 @@ local new_score = redis.call('ZINCRBY', KEYS[2], ARGV[2], ARGV[1])
 redis.call('SET', KEYS[1], ARGV[3])
 return new_score
 """
+
+
+def expire_leaderboard(contest_id: str, ttl_seconds: int) -> None:
+    """Give an ended contest's cached leaderboard a TTL so `volatile-lru`
+    can reclaim it under memory pressure. The rebuild path (`get_leaderboard`)
+    recreates it from MongoDB if it's evicted before being read again."""
+    r = get_redis_client()
+    r.expire(leaderboard_key(contest_id), ttl_seconds)
+    r.expire(leaderboard_revision_key(contest_id), ttl_seconds)
+
+
+def persist_leaderboard(contest_id: str) -> None:
+    """Remove a leaderboard's TTL, for a contest that is no longer ended."""
+    r = get_redis_client()
+    r.persist(leaderboard_key(contest_id))
+    r.persist(leaderboard_revision_key(contest_id))
 
 
 def update_leaderboard_score(
