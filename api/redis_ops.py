@@ -4,6 +4,7 @@ Key layout:
   leaderboard:<contestId>          -> ZSET   member=userId/teamId  score=cumulative points
   leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version
   session:<sessionId>              -> STRING userId, TTL on inactivity
+  user_sessions:<userId>           -> SET    sessionIds, for bulk revocation on account deletion
   rate_limit:<userId>              -> STRING counter, TTL sliding window
   rate_limit_window:<userId>       -> STRING opaque token identifying the current window
 """
@@ -133,9 +134,18 @@ def session_key(session_id: str) -> str:
     return f"session:{session_id}"
 
 
+def user_sessions_key(user_id: str) -> str:
+    return f"user_sessions:{user_id}"
+
+
 def create_session(session_id: str, user_id: str) -> None:
+    """Store the session and track it against the owning user so every
+    session can be revoked at once (see `revoke_user_sessions`)."""
     r = get_redis_client()
-    r.set(session_key(session_id), user_id, ex=settings.session_ttl_seconds)
+    with r.pipeline() as pipe:
+        pipe.set(session_key(session_id), user_id, ex=settings.session_ttl_seconds)
+        pipe.sadd(user_sessions_key(user_id), session_id)
+        pipe.execute()
 
 
 def get_session_user(session_id: str) -> str | None:
@@ -151,7 +161,23 @@ def touch_session(session_id: str) -> bool:
 
 def delete_session(session_id: str) -> None:
     r = get_redis_client()
-    r.delete(session_key(session_id))
+    user_id = r.get(session_key(session_id))
+    with r.pipeline() as pipe:
+        pipe.delete(session_key(session_id))
+        if user_id is not None:
+            pipe.srem(user_sessions_key(user_id), session_id)
+        pipe.execute()
+
+
+def revoke_user_sessions(user_id: str) -> None:
+    """Delete every session tracked for a user, for use on account
+    deletion. Sessions that already expired on their own are a no-op."""
+    r = get_redis_client()
+    key = user_sessions_key(user_id)
+    session_ids = r.smembers(key)
+    if session_ids:
+        r.delete(*(session_key(sid) for sid in session_ids))
+    r.delete(key)
 
 
 def rate_limit_key(user_id: str) -> str:
