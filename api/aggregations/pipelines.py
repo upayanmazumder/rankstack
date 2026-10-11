@@ -12,10 +12,22 @@ from api.models.common import oid, serialize_value
 router = APIRouter(prefix="/aggregations", tags=["aggregations"])
 
 
-def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
-    """1. Leaderboard for a contest: group submissions by submitter, sum score, sort desc."""
+def leaderboard_for_contest(db, contest_id, limit: int | None = 10) -> list[dict]:
+    """1. Leaderboard for a contest: group submissions by submitter, sum
+    nonzero scores, and sort by score descending with submitter ID as a
+    deterministic tie-break. The single source of ranking logic for both
+    `GET /contests/{id}/leaderboard` and this aggregation endpoint;
+    `limit=None` returns every ranked submitter (used to rebuild the
+    Redis cache). `submissionCount` is every submission from a ranked
+    submitter, scored or not, counted separately so it matches
+    `GET /contests/{id}/leaderboard`."""
     pipeline = [
-        {"$match": {"contestId": contest_id}},
+        {
+            "$match": {
+                "contestId": contest_id,
+                "score": {"$exists": True, "$ne": 0},
+            }
+        },
         {
             "$group": {
                 "_id": {
@@ -23,22 +35,46 @@ def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
                     "refType": "$submittedBy.refType",
                 },
                 "totalScore": {"$sum": "$score"},
-                "submissionCount": {"$sum": 1},
             }
         },
-        {"$sort": {"totalScore": -1}},
-        {"$limit": limit},
         {
             "$project": {
                 "_id": 0,
                 "refId": "$_id.refId",
                 "refType": "$_id.refType",
                 "totalScore": 1,
-                "submissionCount": 1,
             }
         },
+        {"$sort": {"totalScore": -1, "refId": -1}},
     ]
-    return list(db["submissions"].aggregate(pipeline))
+    if limit is not None:
+        pipeline.append({"$limit": max(limit, 1)})
+    rows = list(db["submissions"].aggregate(pipeline))
+    if rows:
+        counts = {
+            row["_id"]: row["count"]
+            for row in db["submissions"].aggregate(
+                [
+                    {
+                        "$match": {
+                            "contestId": contest_id,
+                            "submittedBy.refId": {
+                                "$in": [row["refId"] for row in rows]
+                            },
+                        }
+                    },
+                    {
+                        "$group": {
+                            "_id": "$submittedBy.refId",
+                            "count": {"$sum": 1},
+                        }
+                    },
+                ]
+            )
+        }
+        for row in rows:
+            row["submissionCount"] = counts.get(row["refId"], 0)
+    return rows
 
 
 def avg_score_per_problem_by_difficulty(db) -> list[dict]:
@@ -192,7 +228,7 @@ def _serialize_rows(rows: list[dict]) -> list[dict]:
 @router.get(
     "/leaderboard/{contest_id}",
     summary="Aggregate a contest leaderboard",
-    description="Group submissions by user or team, sum scores, and return the top-ranked participants. `limit` defaults to 10. Returns 200; errors: 400 for an invalid contest ID.",
+    description="Group submissions by user or team, sum scores, and return the top-ranked participants. `limit` defaults to 10 and must be at least 1. Returns 200; errors: 400 for an invalid contest ID and 422 for a non-positive limit.",
     responses={
         200: {
             "content": {
@@ -215,7 +251,7 @@ def api_leaderboard(
         str, Path(description="Unique ID of the contest to aggregate.")
     ],
     limit: int = Query(
-        default=10, description="Maximum ranked participants to return."
+        default=10, ge=1, description="Maximum ranked participants to return."
     ),
 ):
     """Aggregate scored submissions into a ranked contest leaderboard."""

@@ -1,0 +1,117 @@
+"""Deleting a user scrubs every reference: teams, contests, submissions,
+leaderboards, and active sessions."""
+
+from bson import ObjectId
+
+from api.db import get_redis_client
+from api.redis_ops import session_key, user_sessions_key
+
+
+def test_delete_user_cascades_team_contest_and_submission_references(
+    client, db, users, headers_for, live_contest, mcq_problem
+):
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    participant_id = ObjectId(users["participant"]["id"])
+
+    contest_id = live_contest()
+    problem_id = str(mcq_problem(contest_id))
+    submission_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    client.patch(
+        f"/submissions/{submission_id}/status",
+        json={"status": "correct", "score": 10},
+        headers=admin,
+    )
+
+    team_id = client.post("/teams", json={"name": "Survivors"}, headers=admin).json()[
+        "id"
+    ]
+    client.post(
+        f"/teams/{team_id}/members",
+        json={"userId": users["participant"]["id"]},
+        headers=admin,
+    )
+    second_session_headers = headers_for("participant")
+    first_session_id = participant["Authorization"].removeprefix("Bearer ")
+    second_session_id = second_session_headers["Authorization"].removeprefix("Bearer ")
+
+    assert (
+        client.delete(
+            f"/users/{users['participant']['id']}", headers=participant
+        ).status_code
+        == 204
+    )
+
+    assert db.users.find_one({"_id": participant_id}) is None
+    assert db.submissions.count_documents({"submittedBy.refId": participant_id}) == 0
+    assert db.problems.find_one({"_id": ObjectId(problem_id)})["attemptCount"] == 0
+
+    team = db.teams.find_one({"_id": ObjectId(team_id)})
+    assert team is not None
+    assert participant_id not in team["memberIds"]
+
+    reloaded_contest = db.contests.find_one({"_id": ObjectId(contest_id)})
+    assert all(p["refId"] != participant_id for p in reloaded_contest["participants"])
+    redis = get_redis_client()
+    assert redis.get(session_key(first_session_id)) is None
+    assert redis.get(session_key(second_session_id)) is None
+    assert redis.smembers(user_sessions_key(str(participant_id))) == set()
+    assert client.get("/teams", headers=participant).status_code == 401
+
+
+def test_delete_sole_team_member_deletes_the_team(client, db, users, headers_for):
+    participant = headers_for("participant")
+    team_id = client.post(
+        "/teams", json={"name": "Solo Act"}, headers=participant
+    ).json()["id"]
+
+    assert (
+        client.delete(
+            f"/users/{users['participant']['id']}", headers=participant
+        ).status_code
+        == 204
+    )
+
+    assert db.teams.find_one({"_id": ObjectId(team_id)}) is None
+
+
+def test_delete_team_owner_transfers_ownership_to_remaining_member(
+    client, db, users, headers_for
+):
+    owner = headers_for("participant")
+    admin = headers_for("admin")
+    owner_id = ObjectId(users["participant"]["id"])
+    other_id = ObjectId(users["other"]["id"])
+    team_id = client.post("/teams", json={"name": "Succession"}, headers=owner).json()[
+        "id"
+    ]
+    client.post(
+        f"/teams/{team_id}/members",
+        json={"userId": users["other"]["id"]},
+        headers=admin,
+    )
+
+    assert (
+        client.delete(f"/users/{users['participant']['id']}", headers=owner).status_code
+        == 204
+    )
+
+    team = db.teams.find_one({"_id": ObjectId(team_id)})
+    assert team is not None
+    assert owner_id not in team["memberIds"]
+    assert team["ownerId"] == other_id
+
+    # The new owner, not the deleted account, can now delete the team.
+    assert (
+        client.delete(f"/teams/{team_id}", headers=headers_for("other")).status_code
+        == 204
+    )

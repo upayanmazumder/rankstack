@@ -7,8 +7,14 @@ from pymongo import ReturnDocument
 
 from api import services
 from api.db import get_db
-from api.dependencies import AdminUser, CurrentUser, TeamMemberOrAdmin
-from api.models.common import oid, serialize_doc, utcnow
+from api.dependencies import (
+    AdminUser,
+    CurrentUser,
+    TeamMemberOrAdmin,
+    TeamOwnerOrAdmin,
+    TeamRemovalAuthorizer,
+)
+from api.models.common import oid, serialize_doc
 from api.models.teams import TeamCreate, TeamMemberOp, TeamOut, TeamUpdate
 
 router = APIRouter(prefix="/teams", tags=["teams"])
@@ -32,18 +38,7 @@ def create_team(payload: TeamCreate, current: CurrentUser):
             status_code=403, detail="Admin privileges required to add members"
         )
     member_ids = list(dict.fromkeys([current["_id"], *requested_members]))
-    doc = {
-        "name": payload.name,
-        "memberIds": member_ids,
-        "totalScore": 0,
-        "createdAt": utcnow(),
-    }
-    result = db["teams"].insert_one(doc)
-    doc["_id"] = result.inserted_id
-    for member_id in doc["memberIds"]:
-        db["users"].update_one(
-            {"_id": member_id}, {"$addToSet": {"teamIds": doc["_id"]}}
-        )
+    doc = services.create_team(db, payload.name, member_ids)
     return serialize_doc(doc)
 
 
@@ -137,12 +132,12 @@ def add_member(
     "/{team_id}/members/{user_id}",
     response_model=TeamOut,
     summary="Remove a team member",
-    description="Remove a user from a team. Requires a Bearer token from a team member or administrator. Returns 200; errors: 400 for invalid IDs, 401/403 for authentication or authorization, 404 when no team exists, and 409 when removing the final member.",
+    description="Remove a user from a team. A member may remove only themself; the team owner or an administrator may remove anyone. Requires a Bearer token. Returns 200; errors: 400 for invalid IDs, 401/403 for authentication or authorization, 404 when no team exists, and 409 when removing the final member.",
 )
 def remove_member(
     team_id: Annotated[str, Path(description="Unique ID of the team to update.")],
     user_id: Annotated[str, Path(description="Unique ID of the member to remove.")],
-    _: TeamMemberOrAdmin,
+    _: TeamRemovalAuthorizer,
 ):
     """Remove a member while preserving the team's required final member."""
     db = get_db()
@@ -161,13 +156,19 @@ def remove_member(
     "/{team_id}",
     status_code=204,
     summary="Delete a team",
-    description="Delete a team and update its members' team references. Requires a Bearer token from a team member or administrator. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no team exists.",
+    description="Delete a team and update its members' team references. Requires a Bearer token from the team owner or an administrator. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no team exists.",
 )
 def delete_team(
     team_id: Annotated[str, Path(description="Unique ID of the team to delete.")],
-    _: TeamMemberOrAdmin,
+    current: TeamOwnerOrAdmin,
 ):
     """Delete a team and its membership references."""
     db = get_db()
-    if services.delete_team_transaction(db, oid(team_id)) is None:
+    try:
+        team = services.delete_team_transaction(
+            db, oid(team_id), authorized_user=current
+        )
+    except services.TeamOwnershipChangedError:
+        raise HTTPException(status_code=403, detail="Team owner privileges required")
+    if team is None:
         raise HTTPException(status_code=404, detail="Team not found")

@@ -293,15 +293,33 @@ graph LR
 The platform defines five analytical pipelines in `api/aggregations/pipelines.py`.
 These pipelines compute complex reports across collections.
 
+Two power the frontend admin dashboard: Average Score by Difficulty
+(`useAverageScoreByDifficulty`) and Submission Count by Status
+(`useSubmissionStatusByContest`), both in `app/src/hooks/api/use-aggregations.ts`.
+
+The other three — Contest Leaderboard, Distinct Problems Solved per User,
+and Team Performance — are **reporting-only**. They have no frontend
+caller. They exist as `GET /aggregations/...` endpoints for ad hoc
+inspection and as course deliverables that show the five required
+pipeline shapes. The Contest Leaderboard pipeline (`leaderboard_for_contest`)
+is the exception. It is also the live leaderboard's ranking source (see
+[Leaderboard Mechanics and Fault Recovery](#leaderboard-mechanics-and-fault-recovery)
+above). `GET /contests/{id}/leaderboard` calls it whenever that route
+rebuilds from MongoDB.
+
 ### 1. Contest Leaderboard Pipeline
-Calculates total scores and submission counts for a specific contest.
+Calculates total scores for a specific contest, filtering out ungraded or
+zero-score submissions, and breaks ties with the submitter's ID.
+`submissionCount` is counted separately across every submission from each
+ranked submitter, scored or not, so it matches `GET /contests/{id}/leaderboard`.
 ```
 Pipeline stages:
-$match (contestId)
-  -> $group (_id: {refId, refType}, totalScore: {$sum: "$score"}, count: {$sum: 1})
-  -> $sort (totalScore: -1)
-  -> $limit (limit)
-  -> $project (refId, refType, totalScore, submissionCount)
+$match (contestId, score exists and non-zero)
+  -> $group (_id: {refId, refType}, totalScore: {$sum: "$score"})
+  -> $project (refId, refType, totalScore)
+  -> $sort (totalScore: -1, refId: -1)
+  -> $limit (limit, only when a limit is requested; omitted to fetch every
+     ranked submitter for a full Redis cache rebuild)
 ```
 
 ### 2. Average Score by Difficulty Pipeline

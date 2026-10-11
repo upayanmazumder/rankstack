@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAddParticipant, useContest, useLeaderboard } from '@/hooks/api/use-contests';
+import { useAddParticipant, useContest, useLeaderboard } from '@/hooks/api';
 import { useProblems } from '@/hooks/api/use-problems';
 import { useAuthStore } from '@/stores';
 import { formatDateTime } from '@/utils';

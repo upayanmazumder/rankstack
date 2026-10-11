@@ -6,8 +6,9 @@ from fastapi import APIRouter, HTTPException, Path, Query
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
+from api import services
 from api.db import get_db
-from api.dependencies import CurrentUser
+from api.dependencies import CurrentUser, OptionalUser
 from api.models.common import oid, serialize_doc, utcnow
 from api.models.users import UserCreate, UserOut, UserUpdate
 from api.security import hash_password
@@ -42,13 +43,24 @@ def create_user(payload: UserCreate):
     return serialize_doc(doc)
 
 
+def _visible_user(doc: dict, viewer: dict | None) -> dict:
+    """Redact `email` unless the viewer is the profile owner or an administrator."""
+    is_self = viewer is not None and viewer["_id"] == doc["_id"]
+    is_admin = viewer is not None and viewer.get("role") == "admin"
+    if not is_self and not is_admin:
+        doc = {**doc, "email": None}
+    return doc
+
+
 @router.get(
     "",
     response_model=list[UserOut],
+    response_model_exclude_none=True,
     summary="List users",
-    description="List users, optionally filtered by role. `limit` is capped at 200. Returns 200.",
+    description="List user profiles, optionally filtered by role. Only the caller's own profile and administrators include `email`. `limit` is capped at 200. Returns 200.",
 )
 def list_users(
+    viewer: OptionalUser,
     role: str | None = Query(
         default=None, description="Filter by participant or administrator role."
     ),
@@ -65,24 +77,26 @@ def list_users(
     docs = db["users"].find(query)
     if limit is not None:
         docs = docs.limit(limit)
-    return [serialize_doc(d) for d in docs]
+    return [serialize_doc(_visible_user(d, viewer)) for d in docs]
 
 
 @router.get(
     "/{user_id}",
     response_model=UserOut,
+    response_model_exclude_none=True,
     summary="Get a user",
-    description="Return the public profile for `user_id`. Returns 200; errors: 400 for an invalid ID and 404 when no user exists.",
+    description="Return the public profile for `user_id`. `email` is included only for the profile owner and administrators. Returns 200; errors: 400 for an invalid ID and 404 when no user exists.",
 )
 def get_user(
     user_id: Annotated[str, Path(description="Unique ID of the user to retrieve.")],
+    viewer: OptionalUser,
 ):
     """Fetch one public user profile by ID."""
     db = get_db()
     doc = db["users"].find_one({"_id": oid(user_id)})
     if doc is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return serialize_doc(doc)
+    return serialize_doc(_visible_user(doc, viewer))
 
 
 @router.patch(
@@ -124,7 +138,7 @@ def update_user(
     "/{user_id}",
     status_code=204,
     summary="Delete a user",
-    description="Delete a user account. Requires a Bearer token; participants may delete only themselves. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no user exists.",
+    description="Delete a user account and cascade the deletion to their team membership, contest participation, their own submissions, and their active sessions. Requires a Bearer token; participants may delete only themselves. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no user exists.",
 )
 def delete_user(
     user_id: Annotated[str, Path(description="Unique ID of the user to delete.")],
@@ -135,6 +149,5 @@ def delete_user(
     target_id = oid(user_id)
     if current.get("role") != "admin" and current["_id"] != target_id:
         raise HTTPException(status_code=403, detail="Cannot delete another user")
-    result = db["users"].delete_one({"_id": target_id})
-    if result.deleted_count == 0:
+    if services.delete_user_transaction(db, target_id) is None:
         raise HTTPException(status_code=404, detail="User not found")

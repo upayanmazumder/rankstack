@@ -7,7 +7,11 @@ Submissions are only generated for "live"/"ended" contests (an "upcoming"
 contest realistically has zero submissions yet) and use the same
 `app.services` transactions the API uses, so `problems.attemptCount`,
 `users/teams.totalScore`, and the Redis `leaderboard:<contestId>` sorted
-sets all come out consistent with the submission data.
+sets all come out consistent with the submission data. Ended contests are
+backdated history, not a live request, so seeding inserts their
+submissions directly (`services.create_seeded_submission`) rather than through
+`services.create_submission`, whose `assert_contest_open_for` check
+correctly rejects a real request against a contest that is not live.
 
 Usage: python scripts/seed.py
 """
@@ -92,6 +96,7 @@ def seed_teams(db, users: list[dict], n: int = 5, team_size: int = 3) -> list[di
         doc = {
             "name": f"Team {fake.color_name().title()} {fake.word().title()}",
             "memberIds": member_ids,
+            "ownerId": member_ids[0],
             "totalScore": 0,
             "createdAt": utcnow(),
         }
@@ -203,11 +208,12 @@ def seed_submissions(db, redis_client, contests: list[dict]) -> int:
     for c in contests:
         if c["status"] not in ("live", "ended"):
             continue  # upcoming contests have no submissions yet
+        scores: dict[str, float] = {}
         for participant in c["participants"]:
             problems_sample = random.sample(c["problems"], k=min(2, len(c["problems"])))
             for problem in problems_sample:
                 answer = make_answer(problem)
-                submission = services.create_submission(
+                submission = services.create_seeded_submission(
                     db, c["_id"], problem["_id"], participant, answer
                 )
                 status = weighted_status()
@@ -221,10 +227,23 @@ def seed_submissions(db, redis_client, contests: list[dict]) -> int:
                 )
                 services.update_submission_status(db, submission["_id"], status, score)
                 if score > 0:
-                    redis_ops.update_leaderboard_score(
-                        str(c["_id"]), str(participant["refId"]), score
-                    )
+                    member_id = str(participant["refId"])
+                    scores[member_id] = scores.get(member_id, 0) + score
                 count += 1
+        # Build the Redis leaderboard the same way the API's rebuild path
+        # does (redis_ops.replace_leaderboard), and reconcile the marker
+        # update_submission_status just bumped, so the seeded data is
+        # immediately servable from Redis instead of only after a read
+        # triggers the API's own MongoDB rebuild.
+        if scores:
+            marker = db["dirty_leaderboards"].find_one({"_id": c["_id"]})
+            version = marker["version"] if marker is not None else 0
+            redis_ops.replace_leaderboard(str(c["_id"]), scores, version)
+            if marker is not None:
+                db["dirty_leaderboards"].update_one(
+                    {"_id": c["_id"], "version": version},
+                    {"$set": {"reconciledVersion": version}},
+                )
     return count
 
 

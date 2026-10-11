@@ -33,10 +33,11 @@ USERS_SCHEMA = {
 TEAMS_SCHEMA = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["name", "memberIds", "createdAt"],
+        "required": ["name", "memberIds", "ownerId", "createdAt"],
         "properties": {
             "name": {"bsonType": "string"},
             "memberIds": {"bsonType": "array", "items": {"bsonType": "objectId"}},
+            "ownerId": {"bsonType": "objectId"},
             "totalScore": {"bsonType": ["int", "double"]},
             "createdAt": {"bsonType": "date"},
         },
@@ -181,7 +182,12 @@ COLLECTION_VALIDATORS = {
 
 @lru_cache
 def get_mongo_client() -> MongoClient:
-    return MongoClient(settings.mongo_uri)
+    return MongoClient(
+        settings.mongo_uri,
+        serverSelectionTimeoutMS=settings.mongo_server_selection_timeout_ms,
+        connectTimeoutMS=settings.mongo_connect_timeout_ms,
+        socketTimeoutMS=settings.mongo_socket_timeout_ms,
+    )
 
 
 def get_db() -> Database:
@@ -190,7 +196,12 @@ def get_db() -> Database:
 
 @lru_cache
 def get_redis_client() -> redis.Redis:
-    return redis.from_url(settings.redis_uri, decode_responses=True)
+    return redis.from_url(
+        settings.redis_uri,
+        decode_responses=True,
+        socket_timeout=settings.redis_socket_timeout_seconds,
+        socket_connect_timeout=settings.redis_socket_connect_timeout_seconds,
+    )
 
 
 def ensure_collections(db: Database) -> None:
@@ -225,8 +236,62 @@ def ensure_indexes(db: Database) -> None:
     db["contests"].create_index([("status", ASCENDING)], name="by_status")
 
 
+def backfill_team_owners(db: Database) -> None:
+    """Set `ownerId` on teams created before the field existed, to their
+    first member. `validationLevel="moderate"` lets this update run on
+    documents that do not yet satisfy the current schema.
+
+    Each write re-checks that `ownerId` is still unset AND that the chosen
+    member is still present, closing the race where a concurrent
+    membership change (e.g. that member leaving) could otherwise install a
+    departed member as owner. If that conditional write misses because
+    membership changed since the read, the team is re-read and retried
+    (bounded) against its current membership rather than silently left
+    without an owner for the rest of this process's lifetime.
+
+    Teams predating the invariant that a team is deleted rather than left
+    without members (`remove_team_member`, `delete_user_transaction`) have
+    no member to become owner; since `TeamOut.ownerId` is required, such
+    orphaned teams are removed through `delete_team_transaction`'s own
+    submission/contest/leaderboard cascade rather than exposed broken.
+    `require_empty=True` rechecks emptiness inside that transaction, so a
+    team that gains a member between this read and the delete is spared.
+    """
+    from api.services import delete_team_transaction  # local import: api.services
+    # imports api.redis_ops, which imports api.db, so a module-level import
+    # here would be circular.
+
+    for stub in db["teams"].find({"ownerId": {"$exists": False}}, {"_id": 1}):
+        team_id = stub["_id"]
+        for _ in range(5):  # bounded retries against concurrent membership churn
+            team = db["teams"].find_one(
+                {"_id": team_id}, {"memberIds": 1, "ownerId": 1}
+            )
+            if team is None or "ownerId" in team:
+                break  # deleted, or already owned by this loop or a concurrent writer
+            member_ids = team.get("memberIds") or []
+            if not member_ids:
+                delete_team_transaction(db, team_id, require_empty=True)
+                break
+            result = db["teams"].update_one(
+                {
+                    "_id": team_id,
+                    "ownerId": {"$exists": False},
+                    "memberIds": member_ids[0],
+                },
+                {"$set": {"ownerId": member_ids[0]}},
+            )
+            if result.matched_count:
+                break
+        else:
+            raise RuntimeError(
+                f"Could not backfill ownerId for team {team_id} after five attempts"
+            )
+
+
 def init_db() -> Database:
     db = get_db()
     ensure_collections(db)
     ensure_indexes(db)
+    backfill_team_owners(db)
     return db

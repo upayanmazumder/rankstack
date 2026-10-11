@@ -42,7 +42,7 @@ export function AddTeamMemberDialog({ teamId, candidates }: AddTeamMemberDialogP
 
   async function submit(values: AddTeamMemberFormValues) {
     const email = values.memberEmail.trim().toLowerCase();
-    const selectedUser = candidates.find(user => user.email.toLowerCase() === email);
+    const selectedUser = candidates.find(user => (user.email ?? '').toLowerCase() === email);
     if (!selectedUser) {
       form.setError('memberEmail', { message: 'Select a matching user email.' });
       return;
@@ -85,7 +85,10 @@ export function AddTeamMemberDialog({ teamId, candidates }: AddTeamMemberDialogP
             helpText="Only users who are not already on this team are shown."
             onChange={value => form.setValue('memberEmail', value, { shouldValidate: true })}
             onSelect={user =>
-              form.setValue('memberEmail', user.email, { shouldValidate: true, shouldDirty: true })
+              form.setValue('memberEmail', user.email ?? '', {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
             }
           />
           <DialogFooter>

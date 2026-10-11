@@ -46,7 +46,7 @@ export function TeamMemberRow({ teamId, member, canRemove, isCurrentUser }: Team
             {member.role}
           </Badge>
         </div>
-        <p className="truncate text-xs text-muted-foreground">{member.email}</p>
+        {member.email && <p className="truncate text-xs text-muted-foreground">{member.email}</p>}
       </div>
       <span className="font-mono text-sm">{member.totalScore.toLocaleString()} pts</span>
       {canRemove && (

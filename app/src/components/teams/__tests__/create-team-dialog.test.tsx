@@ -28,6 +28,7 @@ const createdTeam: Team = {
   id: 'team-1',
   name: 'Binary Brigade',
   memberIds: [participant.id],
+  ownerId: participant.id,
   totalScore: 0,
   createdAt: '2026-10-10T00:00:00.000Z',
 };

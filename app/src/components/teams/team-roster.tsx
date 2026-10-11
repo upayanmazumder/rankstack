@@ -21,7 +21,7 @@ export function TeamRoster({
   canManage,
   canAddMembers,
 }: TeamRosterProps) {
-  const canRemove = canManage && members.length > 1;
+  const canRemoveOthers = canManage && members.length > 1;
 
   return (
     <Card>
@@ -40,7 +40,7 @@ export function TeamRoster({
             key={member.id}
             teamId={teamId}
             member={member}
-            canRemove={canRemove}
+            canRemove={members.length > 1 && (canRemoveOthers || member.id === currentUserId)}
             isCurrentUser={member.id === currentUserId}
           />
         ))}
