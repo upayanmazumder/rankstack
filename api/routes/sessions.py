@@ -107,9 +107,11 @@ def get_session(
     user_id = redis_ops.get_session_user(session_id)
     if user_id is None:
         raise HTTPException(status_code=404, detail="Session not found or expired")
-    redis_ops.touch_session(session_id)
     db = get_db()
     user = db["users"].find_one({"_id": oid(user_id)})
+    if user is None:
+        raise HTTPException(status_code=404, detail="Session not found or expired")
+    redis_ops.touch_session(session_id)
     return {"sessionId": session_id, "user": serialize_doc(user)}
 
 

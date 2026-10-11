@@ -3,9 +3,11 @@
 Run with: uvicorn api.main:app --reload
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
+from pymongo.errors import ConnectionFailure, DuplicateKeyError, WriteError
+from redis.exceptions import RedisError
 
 from api.aggregations.pipelines import router as aggregations_router
 from api.config import settings
@@ -30,6 +32,47 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(RedisError)
+def handle_redis_error(request: Request, exc: RedisError) -> JSONResponse:
+    """Redis is unreachable, timed out, or refused a command. Covers
+    ConnectionError and TimeoutError, both subclasses of RedisError."""
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "A dependent service is temporarily unavailable."},
+        headers={"Retry-After": "5"},
+    )
+
+
+@app.exception_handler(ConnectionFailure)
+def handle_mongo_connection_failure(
+    request: Request, exc: ConnectionFailure
+) -> JSONResponse:
+    """MongoDB is unreachable or took too long to select a server. Covers
+    AutoReconnect and ServerSelectionTimeoutError, both subclasses of
+    ConnectionFailure."""
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "A dependent service is temporarily unavailable."},
+        headers={"Retry-After": "5"},
+    )
+
+
+@app.exception_handler(DuplicateKeyError)
+def handle_duplicate_key(request: Request, exc: DuplicateKeyError) -> JSONResponse:
+    return JSONResponse(
+        status_code=409, content={"detail": "The resource already exists."}
+    )
+
+
+@app.exception_handler(WriteError)
+def handle_write_error(request: Request, exc: WriteError) -> JSONResponse:
+    """$jsonSchema validation failures and other single-document write
+    errors that are not a duplicate key."""
+    return JSONResponse(
+        status_code=422, content={"detail": "The request failed document validation."}
+    )
 
 
 @app.on_event("startup")

@@ -8,8 +8,13 @@ class Settings(BaseSettings):
 
     mongo_uri: str = "mongodb://localhost:27017/?replicaSet=rs0"
     mongo_db: str = "rankstack"
+    mongo_server_selection_timeout_ms: int = 5000
+    mongo_connect_timeout_ms: int = 5000
+    mongo_socket_timeout_ms: int = 10000
 
     redis_uri: str = "redis://localhost:6379/0"
+    redis_socket_timeout_seconds: int = 5
+    redis_socket_connect_timeout_seconds: int = 5
 
     # Comma-separated list of allowed browser origins for the frontend.
     cors_origins: str = "http://localhost:3000"
