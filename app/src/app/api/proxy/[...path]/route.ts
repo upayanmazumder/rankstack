@@ -45,8 +45,11 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
     responseHeaders.set('Content-Type', upstreamContentType);
   }
 
-  return upstream.status === 204
-    ? new NextResponse(null, { status: 204, headers: responseHeaders })
+  const isNullBodyStatus =
+    upstream.status === 204 || upstream.status === 205 || upstream.status === 304;
+
+  return isNullBodyStatus
+    ? new NextResponse(null, { status: upstream.status, headers: responseHeaders })
     : new NextResponse(await upstream.text(), {
         status: upstream.status,
         headers: responseHeaders,
