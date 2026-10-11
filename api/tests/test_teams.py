@@ -66,6 +66,7 @@ def test_team_and_user_catalogs_are_complete_by_default(client, db, users, heade
             {
                 "name": f"Catalog Team {index}",
                 "memberIds": [ObjectId()],
+                "ownerId": ObjectId(),
                 "totalScore": index,
                 "createdAt": utcnow(),
             }
@@ -107,3 +108,50 @@ def test_team_create_rejects_nonexistent_member_id(client, db, headers_for):
 
     assert response.status_code == 400
     assert db.teams.count_documents({"name": "Ghosts"}) == 0
+def test_team_delete_requires_owner_or_admin(client, users, headers_for):
+    admin = headers_for("admin")
+    owner = headers_for("participant")
+    other_member = headers_for("other")
+    created = client.post("/teams", json={"name": "Owners Only"}, headers=owner)
+    team_id = created.json()["id"]
+    assert created.json()["ownerId"] == users["participant"]["id"]
+    client.post(
+        f"/teams/{team_id}/members",
+        json={"userId": users["other"]["id"]},
+        headers=admin,
+    )
+
+    assert client.delete(f"/teams/{team_id}", headers=other_member).status_code == 403
+    assert client.delete(f"/teams/{team_id}", headers=owner).status_code == 204
+
+
+def test_team_member_can_only_remove_self_unless_owner_or_admin(
+    client, users, headers_for
+):
+    admin = headers_for("admin")
+    owner = headers_for("participant")
+    other_member = headers_for("other")
+    created = client.post("/teams", json={"name": "Leavers"}, headers=owner)
+    team_id = created.json()["id"]
+    client.post(
+        f"/teams/{team_id}/members",
+        json={"userId": users["other"]["id"]},
+        headers=admin,
+    )
+
+    forbidden = client.delete(
+        f"/teams/{team_id}/members/{users['participant']['id']}",
+        headers=other_member,
+    )
+    assert forbidden.status_code == 403
+
+    left = client.delete(
+        f"/teams/{team_id}/members/{users['other']['id']}", headers=other_member
+    )
+    assert left.status_code == 200
+    assert users["other"]["id"] not in left.json()["memberIds"]
+
+    removed_by_owner = client.delete(
+        f"/teams/{team_id}/members/{users['participant']['id']}", headers=admin
+    )
+    assert removed_by_owner.status_code == 409

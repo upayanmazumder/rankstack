@@ -33,10 +33,11 @@ USERS_SCHEMA = {
 TEAMS_SCHEMA = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["name", "memberIds", "createdAt"],
+        "required": ["name", "memberIds", "ownerId", "createdAt"],
         "properties": {
             "name": {"bsonType": "string"},
             "memberIds": {"bsonType": "array", "items": {"bsonType": "objectId"}},
+            "ownerId": {"bsonType": "objectId"},
             "totalScore": {"bsonType": ["int", "double"]},
             "createdAt": {"bsonType": "date"},
         },
@@ -235,8 +236,21 @@ def ensure_indexes(db: Database) -> None:
     db["contests"].create_index([("status", ASCENDING)], name="by_status")
 
 
+def backfill_team_owners(db: Database) -> None:
+    """Set `ownerId` on teams created before the field existed, to their
+    first member. `validationLevel="moderate"` lets this update run on
+    documents that do not yet satisfy the current schema."""
+    for team in db["teams"].find({"ownerId": {"$exists": False}}, {"memberIds": 1}):
+        member_ids = team.get("memberIds") or []
+        if member_ids:
+            db["teams"].update_one(
+                {"_id": team["_id"]}, {"$set": {"ownerId": member_ids[0]}}
+            )
+
+
 def init_db() -> Database:
     db = get_db()
     ensure_collections(db)
     ensure_indexes(db)
+    backfill_team_owners(db)
     return db

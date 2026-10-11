@@ -45,6 +45,7 @@ class TeamOut(BaseModel):
                     "id": "507f1f77bcf86cd799439015",
                     "name": "Runtime Terrors",
                     "memberIds": ["507f1f77bcf86cd799439011"],
+                    "ownerId": "507f1f77bcf86cd799439011",
                     "totalScore": 340,
                     "createdAt": "2026-10-01T12:00:00Z",
                 }
@@ -55,5 +56,6 @@ class TeamOut(BaseModel):
     id: str
     name: str
     memberIds: list[str]
+    ownerId: str
     totalScore: float = 0
     createdAt: datetime

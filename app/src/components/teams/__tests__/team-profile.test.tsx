@@ -36,16 +36,28 @@ const candidate: User = {
   createdAt: '2026-10-01T00:00:00.000Z',
 };
 
+const otherMember: User = {
+  id: 'user-3',
+  name: 'Katherine Johnson',
+  email: 'katherine@rankstack.io',
+  role: 'participant',
+  totalScore: 60,
+  teamIds: ['team-1'],
+  createdAt: '2026-10-01T00:00:00.000Z',
+};
+
 const team: Team = {
   id: 'team-1',
   name: 'Binary Brigade',
   memberIds: [admin.id, member.id],
+  ownerId: member.id,
   totalScore: 420,
   createdAt: '2026-10-01T00:00:00.000Z',
 };
 
 const mocks = vi.hoisted(() => ({
   currentUser: undefined as User | undefined,
+  team: undefined as Team | undefined,
   addMember: vi.fn(),
   removeMember: vi.fn(),
   deleteTeam: vi.fn(),
@@ -61,9 +73,9 @@ vi.mock('@/stores', () => ({
     selector({ user: mocks.currentUser }),
 }));
 vi.mock('@/hooks/api', () => ({
-  useTeam: () => ({ data: team, isPending: false, isError: false, refetch: vi.fn() }),
+  useTeam: () => ({ data: mocks.team, isPending: false, isError: false, refetch: vi.fn() }),
   useUsers: () => ({
-    data: [admin, member, candidate],
+    data: [admin, member, candidate, otherMember],
     isPending: false,
     isError: mocks.usersError,
     refetch: mocks.refetchUsers,
@@ -76,6 +88,7 @@ vi.mock('@/hooks/api', () => ({
 describe('TeamProfile', () => {
   beforeEach(() => {
     mocks.currentUser = admin;
+    mocks.team = team;
     mocks.addMember.mockReset().mockResolvedValue(team);
     mocks.removeMember.mockReset().mockResolvedValue(team);
     mocks.deleteTeam.mockReset().mockResolvedValue(undefined);
@@ -135,5 +148,17 @@ describe('TeamProfile', () => {
 
     await waitFor(() => expect(mocks.deleteTeam).toHaveBeenCalledOnce());
     expect(mocks.replace).toHaveBeenCalledWith('/teams');
+  });
+
+  it('lets a non-owner member leave but hides delete and removing others', () => {
+    mocks.currentUser = otherMember;
+    mocks.team = { ...team, memberIds: [...team.memberIds, otherMember.id] };
+
+    render(<TeamProfile teamId={team.id} />);
+
+    expect(screen.queryByRole('button', { name: 'Delete team' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Remove ${member.name}` })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Remove ${admin.name}` })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Remove ${otherMember.name}` })).toBeInTheDocument();
   });
 });
