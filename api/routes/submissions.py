@@ -4,6 +4,7 @@ and Redis rate limiting / leaderboard sync."""
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query
+from redis.exceptions import RedisError
 
 from api import redis_ops, services
 from api.db import get_db
@@ -45,7 +46,9 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
         raise HTTPException(status_code=403, detail="Team membership required")
 
     services.validate_submission_problem(db, contest_id, problem_id, payload.answer)
-    allowed, count = redis_ops.check_and_increment_rate_limit(str(current["_id"]))
+    allowed, count, window_token = redis_ops.check_and_increment_rate_limit(
+        str(current["_id"])
+    )
     if not allowed:
         raise HTTPException(
             status_code=429,
@@ -60,7 +63,10 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
             payload.answer,
         )
     except Exception:
-        redis_ops.decrement_rate_limit(str(current["_id"]))
+        try:
+            redis_ops.decrement_rate_limit(str(current["_id"]), window_token)
+        except RedisError:
+            pass  # Best-effort refund; the submission error still takes priority.
         raise
     return serialize_doc(doc)
 
@@ -139,12 +145,12 @@ def update_status(
         raise HTTPException(status_code=403, detail="Admin privileges required")
     db = get_db()
     sub_id = oid(submission_id)
-    existing = db["submissions"].find_one({"_id": sub_id}, {"score": 1})
-    if existing is None:
+    result = services.update_submission_status(
+        db, sub_id, payload.status, payload.score
+    )
+    if result is None:
         raise HTTPException(status_code=404, detail="Submission not found")
-    old_score = existing.get("score", 0)
-    doc = services.update_submission_status(db, sub_id, payload.status, payload.score)
-    delta = payload.score - old_score
+    doc, delta = result
     if (
         delta != 0
         and db["dirty_leaderboards"].find_one({"_id": doc["contestId"]}, {"_id": 1})

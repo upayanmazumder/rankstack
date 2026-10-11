@@ -118,17 +118,23 @@ def create_submission(
 
 def update_submission_status(
     db: Database, submission_id: ObjectId, status: str, score: float
-) -> dict[str, Any] | None:
+) -> tuple[dict[str, Any], float] | None:
     """Update a submission's status/score and atomically apply the score delta
     to the submitter's cached `totalScore` (on `users` or `teams`).
 
     Transaction #2: `submissions.update_one` + `{users|teams}.update_one($inc)`.
+    Returns `(updated submission, score delta)`, or `None` if the submission
+    was deleted before this transaction could read it. The delta is
+    computed inside the (possibly retried) transaction, not from a caller's
+    pre-read, so a retried attempt can never apply a stale delta to Redis.
     """
+    result: dict[str, Any] = {}
 
-    def callback(session: ClientSession) -> dict[str, Any] | None:
+    def callback(session: ClientSession) -> None:
         existing = db["submissions"].find_one({"_id": submission_id}, session=session)
         if existing is None:
-            return None
+            result["existing"] = None
+            return
         delta = score - existing.get("score", 0)
         db["submissions"].update_one(
             {"_id": submission_id},
@@ -148,14 +154,16 @@ def update_submission_status(
                 {"$inc": {"version": 1}},
                 session=session,
             )
-        return existing
+        result["existing"] = existing
+        result["delta"] = delta
 
-    existing = run_in_transaction(db, callback)
+    run_in_transaction(db, callback)
+    existing = result["existing"]
     if existing is None:
         return None
     existing["status"] = status
     existing["score"] = score
-    return existing
+    return existing, result["delta"]
 
 
 def create_team(db: Database, name: str, member_ids: list[ObjectId]) -> dict[str, Any]:
