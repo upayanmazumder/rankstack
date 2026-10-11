@@ -149,9 +149,15 @@ def update_submission_status(
             session=session,
         )
         if delta != 0:
+            # Upsert, not a plain update: without a pre-existing marker the
+            # contest's very first grade must still mint a revision so
+            # get_leaderboard's rebuild and the direct Redis write in
+            # api.routes.submissions.update_status can coordinate on it
+            # (see redis_ops.update_leaderboard_score).
             db["dirty_leaderboards"].update_one(
                 {"_id": existing["contestId"]},
                 {"$inc": {"version": 1}},
+                upsert=True,
                 session=session,
             )
         result["existing"] = existing

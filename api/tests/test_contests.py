@@ -2,6 +2,10 @@
 
 from bson import ObjectId
 
+from api import redis_ops
+from api.db import get_redis_client
+from api.models.common import utcnow
+
 
 def test_contest_lifecycle(client, db, users, headers_for, contest_payload):
     admin = headers_for("admin")
@@ -144,3 +148,127 @@ def test_leaderboard_and_aggregation_endpoint_rank_identically(
         str(row["refId"]) for row in aggregated
     ]
     assert [row["score"] for row in live] == [row["totalScore"] for row in aggregated]
+
+
+def _grade(client, admin, submission_id, score):
+    return client.patch(
+        f"/submissions/{submission_id}/status",
+        json={"status": "correct", "score": score},
+        headers=admin,
+    )
+
+
+def test_leaderboard_rebuilds_after_redis_flush(
+    client, db, users, headers_for, contest_payload, mcq_problem
+):
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    submission_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    _grade(client, admin, submission_id, 10)
+    # A grade on a never-built contest defers to the read path instead of
+    # creating a partial ZSET from a lone zincrby: see redis_ops.
+    # update_leaderboard_score. The first read builds the real thing.
+    assert not redis_ops.leaderboard_exists(contest_id)
+    first_read = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    assert first_read[0]["score"] == 10
+    assert redis_ops.leaderboard_exists(contest_id)
+
+    get_redis_client().flushall()
+    assert not redis_ops.leaderboard_exists(contest_id)
+
+    rebuilt = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    assert rebuilt[0]["memberId"] == users["participant"]["id"]
+    assert rebuilt[0]["score"] == 10
+    assert redis_ops.leaderboard_exists(contest_id)
+
+
+def test_leaderboard_reads_return_to_redis_after_reconciliation(
+    client, db, users, headers_for, contest_payload, mcq_problem
+):
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    other = headers_for("other")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    top_submission = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["other"]["id"]},
+            "answer": "A",
+        },
+        headers=other,
+    )
+    _grade(client, admin, top_submission, 10)
+
+    # Delete the top scorer so only a nonzero entry for "other" remains,
+    # which leaves the dirty_leaderboards marker pending.
+    assert (
+        client.delete(f"/submissions/{top_submission}", headers=participant).status_code
+        == 204
+    )
+
+    reconciled = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    assert reconciled == []
+    marker = db.dirty_leaderboards.find_one({"_id": ObjectId(contest_id)})
+    assert marker["reconciledVersion"] == marker["version"]
+    # The rebuilt board has no entries, but it *was* built: the revision
+    # key records that, so a later read trusts the (correctly empty) cache
+    # instead of re-aggregating MongoDB on every request forever.
+    assert redis_ops.leaderboard_exists(contest_id)
+
+    # Grade the second submission; its direct Redis write reconciles the
+    # board immediately since it was already built above.
+    other_submission_id = db.submissions.find_one(
+        {"submittedBy.refId": ObjectId(users["other"]["id"])}
+    )["_id"]
+    _grade(client, admin, str(other_submission_id), 5)
+    first_reconcile = client.get(f"/contests/{contest_id}/leaderboard").json()[
+        "leaderboard"
+    ]
+    assert [row["score"] for row in first_reconcile] == [5]
+    assert redis_ops.leaderboard_exists(contest_id)
+
+    # An out-of-band write bypasses the grade/delete flows, so it never
+    # marks the leaderboard dirty. If a reconciled read still aggregated
+    # Mongo on every call, this would appear immediately.
+    db.submissions.insert_one(
+        {
+            "contestId": ObjectId(contest_id),
+            "problemId": ObjectId(problem_id),
+            "submittedBy": {"refType": "user", "refId": ObjectId()},
+            "answer": "A",
+            "status": "correct",
+            "score": 999,
+            "submittedAt": utcnow(),
+        }
+    )
+
+    served_from_cache = client.get(f"/contests/{contest_id}/leaderboard").json()[
+        "leaderboard"
+    ]
+    assert [row["score"] for row in served_from_cache] == [5]

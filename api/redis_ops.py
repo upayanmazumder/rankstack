@@ -20,12 +20,65 @@ def leaderboard_key(contest_id: str) -> str:
     return f"leaderboard:{contest_id}"
 
 
+def leaderboard_revision_key(contest_id: str) -> str:
+    return f"leaderboard_revision:{contest_id}"
+
+
+def leaderboard_exists(contest_id: str) -> bool:
+    """True once `replace_leaderboard` has written a revision for this
+    contest -- including an empty board -- so a cached read can be trusted
+    without re-aggregating MongoDB. False for a never-seeded contest or one
+    whose cache was lost to a Redis restart or eviction. Deliberately keyed
+    on the revision marker rather than the ZSET itself: `update_leaderboard_score`
+    never writes the revision key, so a lone incremental delta applied to a
+    missing board can never masquerade as a complete rebuild."""
+    return bool(get_redis_client().exists(leaderboard_revision_key(contest_id)))
+
+
+_UPDATE_SCORE_IF_BUILT = """
+local current = redis.call('GET', KEYS[1])
+if not current then
+    return false
+end
+if tonumber(current) >= tonumber(ARGV[3]) then
+    return false
+end
+local new_score = redis.call('ZINCRBY', KEYS[2], ARGV[2], ARGV[1])
+redis.call('SET', KEYS[1], ARGV[3])
+return new_score
+"""
+
+
 def update_leaderboard_score(
-    contest_id: str, member_id: str, score_delta: float
-) -> float:
-    """Atomically apply a score delta to a contestant's leaderboard entry."""
+    contest_id: str, member_id: str, score_delta: float, version: int
+) -> float | None:
+    """Atomically apply a score delta to a contestant's leaderboard entry,
+    coordinated against the same revision `replace_leaderboard` writes.
+
+    Returns `None` instead of writing anything when either:
+      - the leaderboard was never built (no revision key yet) -- applying a
+        lone delta would create an incomplete ZSET that looks "built" but is
+        missing every other participant; or
+      - a rebuild already published a revision `>= version` -- it read
+        MongoDB *after* this delta's score committed there (callers always
+        pass the `version` from the same, just-incremented marker document
+        that gates the rebuild), so the full snapshot it wrote already
+        includes this delta and applying it again would double-count it.
+
+    Either way, the caller leaves its `dirty_leaderboards` marker pending so
+    the next read's rebuild (re)derives the correct score from MongoDB.
+    """
     r = get_redis_client()
-    return r.zincrby(leaderboard_key(contest_id), score_delta, member_id)
+    result = r.eval(
+        _UPDATE_SCORE_IF_BUILT,
+        2,
+        leaderboard_revision_key(contest_id),
+        leaderboard_key(contest_id),
+        member_id,
+        score_delta,
+        version,
+    )
+    return None if result is None else float(result)
 
 
 def decrement_existing_leaderboard_score(
@@ -57,7 +110,7 @@ def replace_leaderboard(
 ) -> bool:
     """Replace cached scores unless Redis already holds a newer revision."""
     key = leaderboard_key(contest_id)
-    revision_key = f"leaderboard_revision:{contest_id}"
+    revision_key = leaderboard_revision_key(contest_id)
     with get_redis_client().pipeline() as pipe:
         while True:
             try:
