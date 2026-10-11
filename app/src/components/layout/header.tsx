@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/hooks/api';
+import { useHydratedUser } from '@/hooks/use-hydrated-user';
 import { useMounted } from '@/hooks/use-mounted';
-import { useAuthStore, useUiStore } from '@/stores';
+import { useUiStore } from '@/stores';
 
 const NAV_LINKS = [
   { href: '/contests', label: 'Contests' },
@@ -40,7 +41,7 @@ export function Header() {
   const mounted = useMounted();
   const activeTheme = mounted ? (theme ?? 'system') : 'system';
   const toggleSidebar = useUiStore(state => state.toggleSidebar);
-  const user = useAuthStore(state => state.user);
+  const user = useHydratedUser();
   const logout = useLogout();
 
   function handleLogout() {
