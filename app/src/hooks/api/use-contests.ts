@@ -24,7 +24,7 @@ interface ContestFilters extends Record<string, unknown> {
   status?: ContestStatus;
 }
 
-interface AddParticipantInput {
+export interface AddParticipantInput {
   refType: ParticipantRefType;
   refId: string;
 }

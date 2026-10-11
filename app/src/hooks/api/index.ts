@@ -16,7 +16,9 @@ export {
   useUpdateContest,
   useUpdateContestStatus,
   useDeleteContest,
+  useAddParticipant,
 } from './use-contests';
+export type { AddParticipantInput } from './use-contests';
 export {
   problemKeys,
   useProblems,
