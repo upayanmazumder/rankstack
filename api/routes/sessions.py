@@ -79,6 +79,13 @@ class SessionDetail(BaseModel):
 )
 def login(payload: LoginRequest, request: Request):
     """Authenticate a user and issue a time-limited session token."""
+    # app/src/app/api/session/route.ts calls this server-side without
+    # forwarding the browser's address, so every login proxied through the
+    # Next.js app shares one IP bucket there. The API is also reachable
+    # directly (see k8s/chart/templates/api.yaml's Ingress), so a
+    # client-supplied forwarded-for header cannot be trusted here without a
+    # real trusted-proxy allowlist; the per-email limit still throttles
+    # credential stuffing against one account regardless of this gap.
     client_ip = request.client.host if request.client else "unknown"
     allowed, _ = redis_ops.check_and_increment_login_attempts(payload.email, client_ip)
     if not allowed:

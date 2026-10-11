@@ -253,12 +253,18 @@ def login_attempt_key(identifier: str) -> str:
 
 
 def check_and_increment_login_attempts(email: str, client_ip: str) -> tuple[bool, int]:
-    """Throttle login attempts per email and per client IP; the busier key wins."""
+    """Throttle login attempts per client IP and per email; the busier key
+    wins. Checks the IP first and only touches the email key if the IP is
+    still within budget, so a blocked IP cannot keep creating new email
+    counters by varying the email on every request."""
     window = settings.login_rate_limit_window_seconds
-    email_count = _increment_with_expiry(
-        login_attempt_key(f"email:{email.strip().lower()}"), window
-    )
     ip_count = _increment_with_expiry(login_attempt_key(f"ip:{client_ip}"), window)
+    if ip_count > settings.login_rate_limit_max_attempts:
+        return False, ip_count
+    normalized_email = email.strip().lower()[:254]  # RFC 5321 max mailbox length
+    email_count = _increment_with_expiry(
+        login_attempt_key(f"email:{normalized_email}"), window
+    )
     count = max(email_count, ip_count)
     allowed = count <= settings.login_rate_limit_max_attempts
     return allowed, count

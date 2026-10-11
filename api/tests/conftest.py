@@ -13,6 +13,7 @@ from api.main import app
 from api.models.common import utcnow
 from api.redis_ops import (
     leaderboard_key,
+    login_attempt_key,
     rate_limit_key,
     rate_limit_window_key,
     user_sessions_key,
@@ -34,6 +35,7 @@ def db(monkeypatch):
             user_ids = {
                 str(user["_id"]) for user in database.users.find({}, {"_id": 1})
             }
+            emails = {user["email"] for user in database.users.find({}, {"email": 1})}
             contest_ids = {
                 str(contest["_id"])
                 for contest in database.contests.find({}, {"_id": 1})
@@ -50,7 +52,14 @@ def db(monkeypatch):
                 for key in redis.scan_iter("session:*")
                 if redis.get(key) in user_ids
             )
-            keys.extend(redis.scan_iter("login_attempts:*"))
+            # TestClient always reports this fixed host, regardless of test;
+            # scoped to known test emails plus that one shared IP bucket,
+            # never a blanket scan of every login_attempts:* key in Redis.
+            keys.extend(
+                login_attempt_key(f"email:{email.strip().lower()[:254]}")
+                for email in emails
+            )
+            keys.append(login_attempt_key("ip:testclient"))
             if keys:
                 redis.delete(*keys)
         finally:
