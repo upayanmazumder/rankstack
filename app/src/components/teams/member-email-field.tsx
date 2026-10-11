@@ -36,10 +36,10 @@ export function MemberEmailField({
   const normalizedValue = inputValue.trim().toLowerCase();
   const matches = normalizedValue
     ? users
-        .filter(user => `${user.email} ${user.name}`.toLowerCase().includes(normalizedValue))
+        .filter(user => `${user.email ?? ''} ${user.name}`.toLowerCase().includes(normalizedValue))
         .slice(0, 5)
     : [];
-  const exactMatch = users.some(user => user.email.toLowerCase() === normalizedValue);
+  const exactMatch = users.some(user => (user.email ?? '').toLowerCase() === normalizedValue);
 
   return (
     <div className="space-y-2">
@@ -89,7 +89,7 @@ export function MemberEmailField({
               aria-selected="false"
               className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
               onClick={() => {
-                setInputValue(user.email);
+                setInputValue(user.email ?? '');
                 onSelect(user);
               }}
             >

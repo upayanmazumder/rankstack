@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Request
 from pydantic import BaseModel, ConfigDict
 
 from api import redis_ops
@@ -10,7 +10,7 @@ from api.config import settings
 from api.db import get_db
 from api.models.common import oid, serialize_doc
 from api.models.users import UserOut
-from api.security import new_session_token, verify_password
+from api.security import DUMMY_PASSWORD_HASH, new_session_token, verify_password
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -75,13 +75,23 @@ class SessionDetail(BaseModel):
     response_model=LoginResponse,
     status_code=201,
     summary="Create a session",
-    description="Authenticate with an email and password and return an opaque session ID, user ID, and TTL. Returns 201; errors: 401 when credentials are invalid.",
+    description="Authenticate with an email and password and return an opaque session ID, user ID, and TTL. Returns 201; errors: 401 when credentials are invalid and 429 when throttled.",
 )
-def login(payload: LoginRequest):
+def login(payload: LoginRequest, request: Request):
     """Authenticate a user and issue a time-limited session token."""
+    client_ip = request.client.host if request.client else "unknown"
+    allowed, _ = redis_ops.check_and_increment_login_attempts(payload.email, client_ip)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many login attempts. Try again later.",
+            headers={"Retry-After": str(settings.login_rate_limit_window_seconds)},
+        )
     db = get_db()
     user = db["users"].find_one({"email": payload.email})
-    if user is None or not verify_password(payload.password, user["passwordHash"]):
+    stored_hash = user["passwordHash"] if user is not None else DUMMY_PASSWORD_HASH
+    password_ok = verify_password(payload.password, stored_hash)
+    if user is None or not password_ok:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     token = new_session_token()
     redis_ops.create_session(token, str(user["_id"]))

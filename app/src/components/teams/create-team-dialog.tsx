@@ -53,7 +53,7 @@ export function CreateTeamDialog() {
   async function submit(values: CreateTeamFormValues) {
     const email = values.memberEmail.trim().toLowerCase();
     const selectedUser = isAdmin
-      ? selectableUsers.find(user => user.email.toLowerCase() === email)
+      ? selectableUsers.find(user => (user.email ?? '').toLowerCase() === email)
       : currentUser;
 
     if (isAdmin && email && !selectedUser) {
@@ -123,7 +123,10 @@ export function CreateTeamDialog() {
             readOnly={!isAdmin}
             onChange={value => form.setValue('memberEmail', value, { shouldValidate: true })}
             onSelect={user =>
-              form.setValue('memberEmail', user.email, { shouldValidate: true, shouldDirty: true })
+              form.setValue('memberEmail', user.email ?? '', {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
             }
           />
 

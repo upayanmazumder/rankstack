@@ -50,6 +50,7 @@ def db(monkeypatch):
                 for key in redis.scan_iter("session:*")
                 if redis.get(key) in user_ids
             )
+            keys.extend(redis.scan_iter("login_attempts:*"))
             if keys:
                 redis.delete(*keys)
         finally:

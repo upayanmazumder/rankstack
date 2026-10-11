@@ -25,5 +25,10 @@ def verify_password(password: str, stored: str) -> bool:
     return secrets.compare_digest(digest.hex(), hex_digest)
 
 
+# Verified against unknown emails so login timing does not reveal whether an
+# account exists. Fixed at import time; never written to storage.
+DUMMY_PASSWORD_HASH = hash_password(secrets.token_urlsafe(32))
+
+
 def new_session_token() -> str:
     return secrets.token_urlsafe(32)
