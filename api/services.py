@@ -325,7 +325,11 @@ class LastTeamMemberError(Exception):
 def remove_team_member(
     db: Database, team_id: ObjectId, user_id: ObjectId
 ) -> dict[str, Any] | None:
-    """Remove a member from a team and atomically drop the back-reference."""
+    """Remove a member from a team and atomically drop the back-reference.
+
+    If the departing member is the owner, ownership passes to another
+    remaining member so the team is never left owned by a non-member.
+    """
 
     def callback(session: ClientSession) -> bool:
         team = db["teams"].find_one({"_id": team_id}, session=session)
@@ -334,9 +338,12 @@ def remove_team_member(
         member_ids = team.get("memberIds", [])
         if user_id in member_ids and len(member_ids) == 1:
             raise LastTeamMemberError
-        db["teams"].update_one(
-            {"_id": team_id}, {"$pull": {"memberIds": user_id}}, session=session
-        )
+        update: dict[str, Any] = {"$pull": {"memberIds": user_id}}
+        if team.get("ownerId") == user_id:
+            remaining = [member_id for member_id in member_ids if member_id != user_id]
+            if remaining:
+                update["$set"] = {"ownerId": remaining[0]}
+        db["teams"].update_one({"_id": team_id}, update, session=session)
         db["users"].update_one(
             {"_id": user_id}, {"$pull": {"teamIds": team_id}}, session=session
         )

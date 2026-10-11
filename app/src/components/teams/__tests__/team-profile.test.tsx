@@ -161,4 +161,13 @@ describe('TeamProfile', () => {
     expect(screen.queryByRole('button', { name: `Remove ${admin.name}` })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: `Remove ${otherMember.name}` })).toBeInTheDocument();
   });
+
+  it('lets the owner delete the team and remove other members', () => {
+    mocks.currentUser = member;
+
+    render(<TeamProfile teamId={team.id} />);
+
+    expect(screen.getByRole('button', { name: 'Delete team' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Remove ${admin.name}` })).toBeInTheDocument();
+  });
 });
