@@ -4,10 +4,10 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-type AvatarContextValue = {
+interface AvatarContextValue {
   status: 'idle' | 'loading' | 'loaded' | 'error';
   setStatus: (status: 'idle' | 'loading' | 'loaded' | 'error') => void;
-};
+}
 
 const AvatarContext = React.createContext<AvatarContextValue>({
   status: 'idle',

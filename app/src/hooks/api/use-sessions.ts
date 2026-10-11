@@ -10,7 +10,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (payload: LoginRequest) => {
       try {
-        const response = await axios.post<{ user: User | null }>('/api/session', payload);
+        const response = await axios.post<{ user: User }>('/api/session', payload);
         return response.data;
       } catch (error) {
         throw toApiError(error);

@@ -27,4 +27,35 @@ describe('Avatar', () => {
 
     expect(screen.getByText('AL')).toBeInTheDocument();
   });
+
+  it('resets fallback visibility when src changes after an error and shows fallback when src is empty', () => {
+    const { rerender } = render(
+      <Avatar>
+        <AvatarImage src="/broken.png" alt="Ada Lovelace" />
+        <AvatarFallback>AL</AvatarFallback>
+      </Avatar>
+    );
+
+    fireEvent.error(screen.getByRole('img', { name: 'Ada Lovelace' }));
+    expect(screen.getByText('AL')).toBeInTheDocument();
+
+    rerender(
+      <Avatar>
+        <AvatarImage src="/recovered.png" alt="Ada Lovelace" />
+        <AvatarFallback>AL</AvatarFallback>
+      </Avatar>
+    );
+    expect(screen.queryByText('AL')).not.toBeInTheDocument();
+
+    fireEvent.load(screen.getByRole('img', { name: 'Ada Lovelace' }));
+    expect(screen.queryByText('AL')).not.toBeInTheDocument();
+
+    rerender(
+      <Avatar>
+        <AvatarImage src="" alt="Ada Lovelace" />
+        <AvatarFallback>AL</AvatarFallback>
+      </Avatar>
+    );
+    expect(screen.getByText('AL')).toBeInTheDocument();
+  });
 });

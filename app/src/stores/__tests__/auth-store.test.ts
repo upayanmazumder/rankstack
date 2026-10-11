@@ -41,4 +41,23 @@ describe('useAuthStore', () => {
       'token'
     );
   });
+
+  it('migrates legacy persisted records by keeping user and discarding token', async () => {
+    localStorage.setItem(
+      'auth-store',
+      JSON.stringify({
+        state: { token: 'legacy-session-token', user },
+        version: 0,
+      })
+    );
+
+    await useAuthStore.persist.rehydrate();
+
+    expect(useAuthStore.getState().user).toEqual(user);
+    expect('token' in useAuthStore.getState()).toBe(false);
+    const persisted = JSON.parse(localStorage.getItem('auth-store') ?? '{}');
+    expect(persisted.version).toBe(1);
+    expect(persisted.state).toEqual({ user });
+    expect(persisted.state).not.toHaveProperty('token');
+  });
 });

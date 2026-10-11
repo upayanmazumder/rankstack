@@ -22,17 +22,34 @@ export async function POST(request: NextRequest) {
 
   const session = (await login.json()) as Session;
   let user: User | null = null;
+  let profileStatus = 502;
   try {
     const profile = await fetch(
       `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(session.sessionId)}`,
       { cache: 'no-store' }
     );
+    profileStatus = profile.status;
     if (profile.ok) {
-      const detail = (await profile.json()) as { sessionId: string; user: User };
-      user = detail.user;
+      const detail = (await profile.json()) as { sessionId: string; user?: User | null };
+      user = detail.user ?? null;
     }
   } catch {
-    // A failed profile request does not invalidate the created session.
+    profileStatus = 502;
+  }
+
+  if (!user) {
+    try {
+      await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(session.sessionId)}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+      });
+    } catch {
+      // Best-effort cleanup when user profile lookup fails.
+    }
+    return NextResponse.json(
+      { detail: 'Unable to load authenticated user profile' },
+      { status: profileStatus >= 400 ? profileStatus : 502 }
+    );
   }
 
   const response = NextResponse.json({ user });

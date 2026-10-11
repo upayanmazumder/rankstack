@@ -66,13 +66,13 @@ function SelectScrollDownButton({
   );
 }
 
-type SelectContentProps = Omit<
+interface SelectContentProps extends Omit<
   React.ComponentProps<typeof SelectPrimitive.Positioner>,
   'className'
-> & {
+> {
   className?: React.ComponentProps<typeof SelectPrimitive.Popup>['className'];
   children?: React.ReactNode;
-};
+}
 
 function SelectContent({ className, children, ...props }: SelectContentProps) {
   return (
