@@ -31,6 +31,7 @@ rankstack/
 │   ├── security.py         # Password hashing (PBKDF2) and session token generation
 │   └── services.py         # Multi-document ACID transactions
 ├── app/                    # Next.js 16 App Router frontend
+│   ├── COMPONENTS.md       # Frontend component, hook, and store reference
 │   ├── src/
 │   │   ├── api/            # Axios client, error normalizers, and request helpers
 │   │   ├── app/            # App Router pages, route groups, and layouts
@@ -118,6 +119,8 @@ pnpm dev
 ```
 
 The Next.js client listens on `http://localhost:3000`.
+See [the frontend component reference](app/COMPONENTS.md) for UI props,
+TanStack Query hooks, cache keys, and Zustand selectors.
 
 ## Testing and Verification
 
