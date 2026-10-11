@@ -63,3 +63,61 @@ def test_leaderboard_nonexistent_contest(client):
     res = client.get(f"/contests/{nonexistent}/leaderboard")
     assert res.status_code == 404
     assert res.json()["detail"] == "Contest not found"
+
+
+def test_leaderboard_and_aggregation_endpoint_rank_identically(
+    client, users, headers_for, contest_payload, mcq_problem
+):
+    """GET /contests/{id}/leaderboard and GET /aggregations/leaderboard/{id}
+    must agree on both the score and the tie-break: they share one ranking
+    pipeline (leaderboard_for_contest)."""
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    other = headers_for("other")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+
+    def submit_and_grade(headers, ref_id, score):
+        submission_id = client.post(
+            "/submissions",
+            json={
+                "contestId": contest_id,
+                "problemId": problem_id,
+                "submittedBy": {"refType": "user", "refId": ref_id},
+                "answer": "A",
+            },
+            headers=headers,
+        ).json()["id"]
+        client.patch(
+            f"/submissions/{submission_id}/status",
+            json={"status": "correct", "score": score},
+            headers=admin,
+        )
+
+    submit_and_grade(participant, users["participant"]["id"], 10)
+    submit_and_grade(other, users["other"]["id"], 5)
+    submit_and_grade(admin, users["admin"]["id"], 5)
+
+    # Delete a throwaway (never-graded) submission so a dirty_leaderboards
+    # marker exists; that is what routes get_leaderboard through the same
+    # MongoDB aggregation the standalone endpoint always uses.
+    throwaway_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    client.delete(f"/submissions/{throwaway_id}", headers=participant)
+
+    live = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    aggregated = client.get(f"/aggregations/leaderboard/{contest_id}").json()
+
+    assert [row["memberId"] for row in live] == [
+        str(row["refId"]) for row in aggregated
+    ]
+    assert [row["score"] for row in live] == [row["totalScore"] for row in aggregated]

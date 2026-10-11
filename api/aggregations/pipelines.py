@@ -12,10 +12,20 @@ from api.models.common import oid, serialize_value
 router = APIRouter(prefix="/aggregations", tags=["aggregations"])
 
 
-def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
-    """1. Leaderboard for a contest: group submissions by submitter, sum score, sort desc."""
+def leaderboard_for_contest(db, contest_id, limit: int | None = 10) -> list[dict]:
+    """1. Leaderboard for a contest: group submissions by submitter, sum
+    nonzero scores, and sort by score descending with submitter ID as a
+    deterministic tie-break. The single source of ranking logic for both
+    `GET /contests/{id}/leaderboard` and this aggregation endpoint;
+    `limit=None` returns every ranked submitter (used to rebuild the
+    Redis cache)."""
     pipeline = [
-        {"$match": {"contestId": contest_id}},
+        {
+            "$match": {
+                "contestId": contest_id,
+                "score": {"$exists": True, "$ne": 0},
+            }
+        },
         {
             "$group": {
                 "_id": {
@@ -26,8 +36,6 @@ def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
                 "submissionCount": {"$sum": 1},
             }
         },
-        {"$sort": {"totalScore": -1}},
-        {"$limit": limit},
         {
             "$project": {
                 "_id": 0,
@@ -37,7 +45,10 @@ def leaderboard_for_contest(db, contest_id, limit: int = 10) -> list[dict]:
                 "submissionCount": 1,
             }
         },
+        {"$sort": {"totalScore": -1, "refId": -1}},
     ]
+    if limit is not None:
+        pipeline.append({"$limit": max(limit, 1)})
     return list(db["submissions"].aggregate(pipeline))
 
 
