@@ -7,6 +7,16 @@ import { cn } from '@/lib/utils';
 const Select = SelectPrimitive.Root;
 const SelectValue = SelectPrimitive.Value;
 
+function mergeClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  staticClassName: string
+) {
+  if (typeof className === 'function') {
+    return (state: T) => cn(staticClassName, className(state));
+  }
+  return cn(staticClassName, className);
+}
+
 function SelectTrigger({
   className,
   children,
@@ -14,9 +24,9 @@ function SelectTrigger({
 }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
     <SelectPrimitive.Trigger
-      className={cn(
-        'flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-        className
+      className={mergeClassName(
+        className,
+        'flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
       )}
       {...props}
     >
@@ -56,18 +66,22 @@ function SelectScrollDownButton({
   );
 }
 
-function SelectContent({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Positioner>) {
+interface SelectContentProps extends Omit<
+  React.ComponentProps<typeof SelectPrimitive.Positioner>,
+  'className'
+> {
+  className?: React.ComponentProps<typeof SelectPrimitive.Popup>['className'];
+  children?: React.ReactNode;
+}
+
+function SelectContent({ className, children, ...props }: SelectContentProps) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner {...props}>
         <SelectPrimitive.Popup
-          className={cn(
-            'relative z-50 flex max-h-[min(20rem,var(--available-height))] min-w-[8rem] flex-col overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
-            className
+          className={mergeClassName(
+            className,
+            'relative z-50 flex max-h-[min(20rem,var(--available-height))] min-w-[8rem] flex-col rounded-md border bg-popover text-popover-foreground shadow-md transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0'
           )}
         >
           <SelectScrollUpButton />

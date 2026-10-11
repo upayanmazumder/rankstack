@@ -9,22 +9,41 @@ import type { User } from '@/types';
 import { createSelectors } from './create-selectors';
 
 interface AuthState {
-  token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User | null) => void;
+  sessionGeneration: number;
+  setAuth: (userOrToken: User | string | null, legacyUser?: User | null) => void;
   clearAuth: () => void;
 }
 
 const useAuthStoreBase = create<AuthState>()(
   persist(
     set => ({
-      token: null,
       user: null,
-      setAuth: (token, user) => set({ token, user }),
-      clearAuth: () => set({ token: null, user: null }),
+      sessionGeneration: 0,
+      setAuth: (userOrToken, legacyUser) => {
+        const nextUser = typeof userOrToken === 'string' ? (legacyUser ?? null) : userOrToken;
+        set(state => ({
+          user: nextUser,
+          sessionGeneration: state.sessionGeneration + 1,
+        }));
+      },
+      clearAuth: () =>
+        set(state => ({
+          user: null,
+          sessionGeneration: state.sessionGeneration + 1,
+        })),
     }),
-    { name: 'auth-store' }
+    {
+      name: 'auth-store',
+      version: 1,
+      partialize: state => ({ user: state.user }),
+      migrate: persistedState => ({
+        user: (persistedState as Partial<AuthState> | undefined)?.user ?? null,
+      }),
+    }
   )
-) as unknown as UseBoundStore<StoreApi<AuthState>>;
+) as unknown as UseBoundStore<StoreApi<AuthState>> & {
+  persist: { rehydrate: () => Promise<void> | void };
+};
 
 export const useAuthStore = createSelectors(useAuthStoreBase);

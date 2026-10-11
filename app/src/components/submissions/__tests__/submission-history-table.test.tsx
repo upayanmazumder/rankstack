@@ -26,7 +26,14 @@ describe('SubmissionHistoryTable', () => {
       />
     );
 
-    expect(screen.getByRole('table', { name: 'Submission history' })).toBeInTheDocument();
+    const table = screen.getByRole('table', { name: 'Submission history' });
+    expect(table).toBeInTheDocument();
+    expect(table.parentElement).toHaveClass(
+      'min-w-0',
+      'max-w-full',
+      'overflow-x-auto',
+      'overscroll-x-contain'
+    );
     expect(screen.getByText('Array Rotation')).toBeInTheDocument();
     expect(screen.getByText('Autumn Invitational')).toBeInTheDocument();
     expect(screen.getByText('Accepted')).toBeInTheDocument();

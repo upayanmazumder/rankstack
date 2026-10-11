@@ -1,205 +1,244 @@
 # Rankstack
 
-A contest platform with a live leaderboard: MongoDB as the system of record, Redis for the parts
-that need to be fast and short-lived (leaderboard, sessions, rate limiting), and a FastAPI backend
-in front of both. It started as a database systems lab project and grew into something closer to a
-normal small backend.
+Rankstack is a contest platform with live leaderboards, real-time submission evaluation, and team management.
+The platform uses MongoDB as the system of record.
+Redis provides ephemeral storage for live leaderboards, user sessions, and rate limits.
+A FastAPI backend serves the REST API.
+A Next.js 16 frontend serves the user interface.
 
-Team: Upayan Mazumder, Aditya Rawat, Shloak Sinha
+**Team:** Upayan Mazumder, Aditya Rawat, Shloak Sinha
 
-## Stack
+## Technology Stack
 
-- Python 3.14, FastAPI, PyMongo (sync driver)
-- MongoDB 7, running as a single-node replica set (`rs0`). Multi-document transactions need a
-  replica set; a standalone `mongod` won't do it.
-- Redis 7 for the leaderboard (`ZSET`), sessions (`TTL`), and submission rate limiting (`TTL`)
-- Next.js frontend in `app/`, pnpm
-- Mongo and Redis run in Docker via `docker-compose.yml`; the API and scripts run on the host in a
-  Python venv
+- **Backend:** Python 3.14, FastAPI, PyMongo (synchronous driver), Pydantic v2
+- **System of Record:** MongoDB 7 single-node replica set (`rs0`) for multi-document ACID transactions
+- **Cache and Ephemeral Storage:** Redis 7 for leaderboards (`ZSET`), sessions (`STRING` with TTL), and rate limiting
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, TanStack Query v5, Zustand v5
+- **Infrastructure:** Docker Compose, Helm chart, GitHub Actions workflows
 
-## Project layout
+## Project Layout
 
 ```
-api/                    Backend (FastAPI + PyMongo)
-  main.py                 FastAPI app + router wiring
-  config.py               Settings (env-driven)
-  db.py                   Mongo/Redis clients, $jsonSchema validators, indexes
-  security.py             Password hashing (PBKDF2), session tokens
-  redis_ops.py            Leaderboard / session / rate-limit Redis operations
-  services.py             Multi-document transactions (shared by API + seed script)
-  models/                 Pydantic request/response schemas per collection
-  routes/                 Routers: users, teams, contests, problems, submissions, sessions
-  aggregations/
-    pipelines.py          Aggregation pipelines + their GET endpoints
-app/                    Frontend (Next.js, pnpm)
-scripts/
-  init_db.py              Idempotently create collections/validators/indexes
-  seed.py                 Wipe + reseed sample data
-  demo.py                 Walks through CRUD, indexing, transactions, aggregations, Redis
-api/Dockerfile          Backend image, published to ghcr.io/upayanmazumder/rankstack/api
-docker-compose.yml      Mongo (replica set) + Redis
-Makefile                up/down/test/seed/demo/api/reset targets
+rankstack/
+├── api/                    # FastAPI backend service
+│   ├── aggregations/       # MongoDB analytical aggregation pipelines
+│   ├── models/             # Pydantic schemas for request and response validation
+│   ├── routes/             # REST route controllers (users, teams, contests, problems, submissions, sessions)
+│   ├── config.py           # Environment-driven Pydantic settings
+│   ├── db.py               # Mongo and Redis client singletons, $jsonSchema validators, indexes
+│   ├── dependencies.py     # Session authentication and role verification dependencies
+│   ├── redis_ops.py        # Redis operations for leaderboards, sessions, and rate limits
+│   ├── security.py         # Password hashing (PBKDF2) and session token generation
+│   └── services.py         # Multi-document ACID transactions
+├── app/                    # Next.js 16 App Router frontend
+│   ├── src/
+│   │   ├── api/            # Axios client, error normalizers, and request helpers
+│   │   ├── app/            # App Router pages, route groups, and layouts
+│   │   ├── components/     # UI primitives and domain components
+│   │   ├── hooks/          # Shared hooks and TanStack Query hooks
+│   │   ├── lib/            # Utilities and query client setup
+│   │   ├── schemas/        # Zod validation schemas
+│   │   ├── stores/         # Zustand state stores
+│   │   ├── types/          # Domain TypeScript interfaces
+│   │   └── utils/          # Formatting and identifier helpers
+│   ├── package.json        # Frontend package configuration and scripts
+│   └── vitest.config.ts    # Vitest testing configuration
+├── docs/                   # System architecture and review presentation documentation
+├── k8s/chart/              # Production Helm chart (API, Mongo, Redis)
+├── scripts/                # Database initialization, seeding, and demo scripts
+│   ├── init_db.py          # Idempotent collection, validator, and index creation
+│   ├── seed.py             # Deterministic database seeding script
+│   └── demo.py             # Verification script for CRUD, indexes, transactions, and Redis
+├── docker-compose.yml      # Local MongoDB replica set and Redis service definitions
+└── Makefile                # Central project management commands
 ```
 
-## Setup
+## Local Setup
 
-Needs Docker, Docker Compose, and Python 3.14 (`python3.14 -m venv` has to work).
+### Prerequisites
+
+Install the following tools before starting:
+- Docker and Docker Compose
+- Python 3.14 (or Python 3.12+)
+- Node.js 22 LTS
+- pnpm (version 9 or later)
+
+### Quick Start
+
+Run these commands from the repository root:
 
 ```bash
-make up        # start MongoDB (replica set) + Redis
-make install   # create a venv, install dependencies
-make init-db   # create collections, $jsonSchema validators, indexes
-make seed      # wipe app collections and reseed 5 core collections
+# 1. Start MongoDB replica set and Redis containers
+make up
+
+# 2. Install backend dependencies into .venv
+make install
+
+# 3. Create collections, $jsonSchema validators, and indexes
+make init-db
+
+# 4. Seed sample records across all five collections
+make seed
+
+# 5. Install frontend dependencies
+make web-install
 ```
 
-Or all at once from a clean slate: `make reset` (down + up + init-db + seed).
-
-Copy `.env.example` to `.env` if you want to change any connection settings. The defaults already
-match `docker-compose.yml`.
-
-### Run from VS Code on Windows
-
-The repository includes shared tasks and a full-stack debug profile under `.vscode/`.
-
-1. Install Docker Desktop, Python 3.14 (Python 3.12+ also works for local development), Node.js 22,
-   pnpm, and the VS Code extensions recommended by the workspace.
-2. Open the repository root in VS Code.
-3. Run **Tasks: Run Task** -> **Rankstack: Setup development environment**. This creates `.venv`,
-   installs backend and frontend dependencies, creates local environment files, starts MongoDB and
-   Redis, and initializes the database. Use **Rankstack: Reset and seed demo data** when sample data
-   is wanted; that task replaces records in the application collections.
-4. Open **Run and Debug**, choose **Rankstack: Full Stack**, and press `F5`.
-
-The frontend is served at `http://localhost:3000`, the API at `http://localhost:8000`, and Swagger
-at `http://localhost:8000/docs`. The full-stack profile starts Docker services automatically and
-launches both development servers in VS Code terminals. Use **Rankstack: Stop infrastructure** when
-finished. If another project already uses Redis port 6379, set `REDIS_HOST_PORT` and the port in
-`REDIS_URI` to the same free value in `.env` (for example, 6380).
-## Backend lint
-
-Run `make lint` after `make install`. Ruff checks `api/` and `scripts/` for lint and
-format errors. CI runs the same checks before backend database smoke tests.
-
-## Backend integration tests
-
-Run `make test` with MongoDB replica set `rs0` and Redis available. The suite
-creates a unique MongoDB database for each test and deletes only its own
-Redis sessions, rate limits, and leaderboard keys. It does not modify seeded
-application data. CI runs the same pytest suite against its service containers.
-
-## Running the demo
+To reset the local databases to a clean state, run:
 
 ```bash
-make demo
+make reset
 ```
 
-Runs against the seeded database and prints real output as it goes: a CRUD round trip on a user,
-an indexed query with `.explain()` showing it hit `IXSCAN` on the `by_contest` /
-`by_contest_and_submitter` indexes instead of scanning the collection, a transaction (a submission
-insert that atomically bumps `problems.attemptCount`, then a status update that atomically bumps
-the submitter's `totalScore`), all five aggregation pipelines, and the Redis leaderboard, a session
-with its TTL, and the rate-limit counter. It cleans up whatever it writes, so it's fine to run more
-than once.
+The command stops the containers, restarts them, creates the schemas, and seeds fresh data.
 
-## Running the API
+## Running the Services
+
+### Start the Backend API
 
 ```bash
 make api
 ```
 
-Serves on `http://localhost:8000`. Swagger docs are at `http://localhost:8000/docs`, usable
-directly or exported into Postman.
+The backend server listens on `http://localhost:8000`.
+Swagger interactive documentation is available at `http://localhost:8000/docs`.
+The OpenAPI JSON schema is available at `http://localhost:8000/openapi.json`.
 
-### Endpoints
+### Start the Frontend
 
-| Collection | Routes |
-|---|---|
-| `users` | `POST /users`, `GET /users`, `GET /users/{id}`, `PATCH /users/{id}`, `DELETE /users/{id}` |
-| `teams` | `POST /teams`, `GET /teams`, `GET /teams/{id}`, `PATCH /teams/{id}`, `POST /teams/{id}/members`, `DELETE /teams/{id}/members/{userId}`, `DELETE /teams/{id}` |
-| `contests` | `POST /contests`, `GET /contests`, `GET /contests/{id}`, `PATCH /contests/{id}`, `PATCH /contests/{id}/status`, `POST /contests/{id}/participants`, `GET /contests/{id}/leaderboard`, `DELETE /contests/{id}` |
-| `problems` | `POST /problems` (`type` is `mcq`, `coding`, or `subjective`), `GET /problems?contestId=`, `GET /problems/{id}`, `PATCH /problems/{id}`, `DELETE /problems/{id}` |
-| `submissions` | `POST /submissions`, `GET /submissions?contestId=&userId=&status=`, `GET /submissions/{id}`, `PATCH /submissions/{id}/status`, `DELETE /submissions/{id}` |
-| sessions | `POST /sessions` (login), `GET /sessions/{id}`, `DELETE /sessions/{id}` (logout), Redis-backed |
-| aggregations | `GET /aggregations/leaderboard/{contestId}`, `/avg-score-by-difficulty`, `/submission-status-by-contest`, `/problems-solved-per-user`, `/team-performance` |
+```bash
+make web
+```
 
-All seeded users share the password `Passw0rd!` (see `scripts/seed.py`).
+Alternatively, run from the `app` directory:
 
-### Frontend sessions
+```bash
+cd app
+pnpm dev
+```
 
-The login form sends credentials to the Next.js `/api/session` route. That route creates the
-FastAPI session and sets an HttpOnly `rankstack-session` cookie. The Next.js proxy checks that
-cookie against FastAPI before it serves protected routes. Sign-out removes the cookie and
-requests session revocation. The session profile response excludes `passwordHash`.
+The Next.js client listens on `http://localhost:3000`.
 
-After login or registration, the frontend opens `/contests`. Guests can also browse this
-catalog and its contest pages. Joining requires a valid session. Participants can join
-upcoming and live contests, but only administrators can add teams or change ended contests.
+## Testing and Verification
 
-An expired API session clears client authentication and redirects to `/login`.
-The user sees a session-expired notice. Unknown URLs show a custom 404 page,
-and route errors show a retry action. The header theme control cycles through
-system, light, and dark preferences.
+### Backend Verification
 
-`GET /contests/{id}/leaderboard?top=` accepts 1–100 results. Each entry includes a
-participant name, score, rank, and submission count. The full leaderboard shows the top 100.
+```bash
+# Check Python code style and formatting
+make lint
 
-Public `GET /problems` returns problem metadata without statements, answers, test cases,
-or rubrics. Public problem details stay locked while the contest is upcoming. After the
-contest becomes live, details include statements but omit grading data. Administrators
-with a valid session can access the complete problem records.
+# Execute Pytest integration tests against local database containers
+make test
 
-Participants can create a team with themselves as its only initial member.
-Only administrators can add other members during creation or through the member route.
+# Run the complete platform verification script
+make demo
+```
 
-Contest dates must satisfy `startTime < endTime`, including partial updates.
-Contest creators and problem contests must exist. Submissions must reference a problem in the
-specified contest. MCQ answers must match one of that problem's options.
+The `make demo` script tests five core database capabilities:
+1. Document creation and reading.
+2. Query execution with `IXSCAN` index verification via `.explain()`.
+3. Multi-document ACID transactions with atomic score updates.
+4. Five analytical aggregation pipelines.
+5. Redis leaderboard ranking calculations, session lifecycles, and rate limiting counters.
 
-Deletion transactions record affected contests in `dirty_leaderboards`. Their leaderboard reads
-use MongoDB scores until the contest is deleted. Pending reads attempt to rebuild Redis from MongoDB
-and retry while Redis is unavailable. Later score updates trigger another attempt.
-The marker keeps MongoDB authoritative during recovery.
+### Frontend Verification
 
+Run these commands from the `app` directory:
 
-## Database features worth knowing about
+```bash
+cd app
 
-Aggregation pipelines live in `api/aggregations/pipelines.py`: contest leaderboard, average score
-per problem by difficulty, submission count by status per contest, distinct problems solved per
-user, and team performance, which uses `$lookup` from `teams` to `submissions` on `memberIds`.
+# Run ESLint validation
+pnpm lint
 
-Indexes, all defined in `api/db.py`: a unique index on `users.email`, an index on
-`problems.contestId`, compound indexes on `submissions (contestId, submittedBy.refId)`
-and `(submittedBy.refType, submittedBy.refId)`, an index on `submissions.problemId`,
-an index on `teams.memberIds`, and an index on `contests.status`.
+# Run TypeScript type check
+pnpm type-check
 
-Transactions live in `api/services.py` and are used by both the API and the seed script. Creating a
-submission inserts it and bumps `problems.attemptCount` in the same transaction, so the two writes
-can't drift apart. Updating a submission's status applies the score delta to the submitter's
-`totalScore` at the same time. Adding or removing a team member updates `teams.memberIds` and the
-`users.teamIds` back-reference together.
+# Run Vitest test suite
+pnpm test
 
-Every collection has a `$jsonSchema` validator in `api/db.py`, including a `oneOf` schema on
-`problems` that requires different fields depending on whether `type` is mcq, coding, or
-subjective.
+# Build production bundle
+pnpm build
+```
 
-## Sample data
+## REST API Endpoints
 
-`scripts/seed.py` generates about 88 records: 15 users, 5 teams, 5 contests (2 ended, 1 live, 2
-upcoming), 15 problems (5 mcq, 5 coding, 5 subjective), and 40-50-odd submissions, only for
-live/ended contests since an upcoming one wouldn't have any yet. Every `contestId`, `problemId`,
-`submittedBy`, and `memberIds` reference points at a document that actually exists.
+The API authenticates requests with a bearer session token.
+Pass the token in the `Authorization: Bearer <token>` header.
+Public routes do not require an authorization header.
 
-## Deployment
+| Category | Method | Path | Access Control | Description |
+|---|---|---|---|---|
+| **Sessions** | `POST` | `/sessions` | Public | Authenticate user and create Redis session token |
+| | `GET` | `/sessions/{id}` | Public | Resolve session token to public user profile |
+| | `DELETE` | `/sessions/{id}` | Public | Invalidate and delete Redis session token |
+| **Users** | `POST` | `/users` | Public | Register new user account |
+| | `GET` | `/users` | Public | List users with pagination |
+| | `GET` | `/users/{id}` | Public | Get user details by user ID |
+| | `PATCH` | `/users/{id}` | Current User or Admin | Update user profile data |
+| | `DELETE` | `/users/{id}` | Current User or Admin | Delete user account and related records |
+| **Teams** | `POST` | `/teams` | Current User | Create a team with creator as first member |
+| | `GET` | `/teams` | Current User | List all teams with pagination |
+| | `GET` | `/teams/{id}` | Public | Get team details by team ID |
+| | `PATCH` | `/teams/{id}` | Team Member or Admin | Update team name or bio |
+| | `POST` | `/teams/{id}/members` | Admin | Add member to team |
+| | `DELETE` | `/teams/{id}/members/{userId}` | Team Member or Admin | Delete member from team |
+| | `DELETE` | `/teams/{id}` | Team Member or Admin | Delete team |
+| **Contests** | `POST` | `/contests` | Admin | Create contest |
+| | `GET` | `/contests` | Public | List contests filtered by status or type |
+| | `GET` | `/contests/{id}` | Public | Get contest details by contest ID |
+| | `PATCH` | `/contests/{id}` | Admin | Update contest metadata or schedule |
+| | `PATCH` | `/contests/{id}/status` | Admin | Transition contest status (`upcoming`, `live`, `ended`) |
+| | `POST` | `/contests/{id}/participants` | Current User or Admin | Register participant for contest |
+| | `GET` | `/contests/{id}/leaderboard` | Public | Get live contest leaderboard from Redis cache |
+| | `DELETE` | `/contests/{id}` | Admin | Delete contest and dependent records |
+| **Problems** | `POST` | `/problems` | Admin | Create problem (`mcq`, `coding`, `subjective`) |
+| | `GET` | `/problems` | Public (Filtered) / Admin | List problems for contest |
+| | `GET` | `/problems/{id}` | Public (Filtered) / Admin | Get problem details |
+| | `PATCH` | `/problems/{id}` | Admin | Update problem statement or test data |
+| | `DELETE` | `/problems/{id}` | Admin | Delete problem and related submissions |
+| **Submissions** | `POST` | `/submissions` | Current User (Rate Limited) | Submit answer for evaluation |
+| | `GET` | `/submissions` | Public | List submissions filtered by contest, user, or status |
+| | `GET` | `/submissions/{id}` | Public | Get submission details by submission ID |
+| | `PATCH` | `/submissions/{id}/status` | Admin | Update submission status and award score |
+| | `DELETE` | `/submissions/{id}` | Submitter or Admin | Delete submission |
+| **Aggregations** | `GET` | `/aggregations/leaderboard/{contestId}` | Public | Calculate contest leaderboard using MongoDB aggregation |
+| | `GET` | `/aggregations/avg-score-by-difficulty` | Public | Calculate average problem score grouped by difficulty |
+| | `GET` | `/aggregations/submission-status-by-contest` | Public | Count submissions grouped by status per contest |
+| | `GET` | `/aggregations/problems-solved-per-user` | Public | Count distinct solved problems per user |
+| | `GET` | `/aggregations/team-performance` | Public | Calculate team submission statistics with member lookup |
 
-The frontend is on Vercel at `rankstack.upayan.dev` (`NEXT_PUBLIC_API_URL` points at the API
-below). `.github/workflows/api-image.yml` builds `api/Dockerfile` on every push to `main` and
-publishes `ghcr.io/upayanmazumder/rankstack/api:edge` (floating) and `:sha-<short>` (immutable).
-The `upayanmazumder/vps` repo's Argo CD `de-rankstack` app (`k8s/apps/de/rankstack/`) tracks `:edge`
-by digest and deploys to `api-rankstack.upayan.dev`, with MongoDB (replica set) and Redis running
-in-cluster alongside it.
+All seeded accounts use the password `Passw0rd!`.
 
-## Notes on scope
+## Database Architecture
 
-Passwords are hashed with PBKDF2-HMAC-SHA256 at 200k iterations. The frontend has login and
-registration pages, shared display components, and a navigation shell. Domain pages remain
-unimplemented. Use Swagger, curl, or Postman to exercise the remaining API flows.
+### MongoDB Collections and Indexes
+
+The database uses five collections with `$jsonSchema` validation defined in `api/db.py`:
+
+1. **`users`**: User credentials, profiles, roles (`participant`, `admin`), and team memberships.
+   - Unique index on `email`.
+2. **`teams`**: Team metadata and member lists.
+   - Index on `memberIds`.
+3. **`contests`**: Contest schedules, formats, participant lists, and lifecycle statuses.
+   - Index on `status`.
+4. **`problems`**: Problem specifications with polymorphic `oneOf` schemas for `mcq`, `coding`, and `subjective` types.
+   - Index on `contestId`.
+5. **`submissions`**: Participant solutions, evaluation statuses, and scores.
+   - Compound index on `(contestId, submittedBy.refId)`.
+   - Compound index on `(submittedBy.refType, submittedBy.refId)`.
+   - Index on `problemId`.
+
+### Multi-Document ACID Transactions
+
+The backend coordinates multi-document mutations inside database transactions in `api/services.py`:
+- **Submission Creation:** Inserts a submission document and increments `problems.attemptCount` atomically.
+- **Scoring Update:** Updates submission status, calculates score delta, and updates participant total score atomically.
+- **Team Membership:** Updates `teams.memberIds` and updates `users.teamIds` in the same transaction.
+
+### Redis Fast-Path
+
+Redis provides high-performance ephemeral storage:
+- **Live Leaderboard:** Stored in sorted sets (`ZSET`) keyed by `leaderboard:<contestId>`. Updates use `ZINCRBY`. Reads use `ZREVRANGE` with scores.
+- **Session Store:** Opaque 32-byte tokens stored in string keys (`session:<token>`) with a 24-hour expiration time.
+- **Submission Rate Limiting:** Enforces submission limits using atomic keys (`rate_limit:<userId>`) with short expiration windows.

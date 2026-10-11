@@ -8,6 +8,16 @@ const Sheet = DialogPrimitive.Root;
 const SheetTrigger = DialogPrimitive.Trigger;
 const SheetClose = DialogPrimitive.Close;
 
+function mergeClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  staticClassName: string
+) {
+  if (typeof className === 'function') {
+    return (state: T) => cn(staticClassName, className(state));
+  }
+  return cn(staticClassName, className);
+}
+
 function SheetPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;
 }
@@ -18,9 +28,9 @@ function SheetOverlay({
 }: React.ComponentProps<typeof DialogPrimitive.Backdrop>) {
   return (
     <DialogPrimitive.Backdrop
-      className={cn(
-        'fixed inset-0 z-50 bg-black/80 transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
-        className
+      className={mergeClassName(
+        className,
+        'fixed inset-0 z-50 bg-black/80 transition-opacity duration-300 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0'
       )}
       {...props}
     />
@@ -48,10 +58,9 @@ function SheetContent({
     <SheetPortal>
       <SheetOverlay />
       <DialogPrimitive.Popup
-        className={cn(
-          'fixed z-50 flex max-h-screen flex-col gap-4 overflow-y-auto bg-background p-6 shadow-lg transition-transform duration-300 ease-in-out',
-          sheetSideClass[side],
-          className
+        className={mergeClassName(
+          className,
+          `fixed z-50 flex max-h-screen flex-col gap-4 overflow-y-auto bg-background p-6 shadow-lg transition-transform duration-300 ease-in-out ${sheetSideClass[side]}`
         )}
         {...props}
       >

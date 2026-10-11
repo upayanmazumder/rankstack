@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { toast } from 'sonner';
 
 import { API_TIMEOUT_MS } from '@/constants';
@@ -8,6 +8,12 @@ import { useAuthStore } from '@/stores/auth-store';
 
 import { toApiError } from './errors';
 
+export const API_PROXY_BASE_URL = '/api/proxy';
+
+interface SessionTaggedRequestConfig extends InternalAxiosRequestConfig {
+  _sessionGeneration?: number;
+}
+
 export function createApiClient(baseURL: string) {
   const client = axios.create({
     baseURL,
@@ -15,14 +21,13 @@ export function createApiClient(baseURL: string) {
     timeout: API_TIMEOUT_MS,
   });
 
-  // Attach session token from live auth store.
   client.interceptors.request.use(config => {
-    try {
-      const token = useAuthStore.getState().token;
-      if (token) config.headers.set('Authorization', `Bearer ${token}`);
-    } catch {
-      // In case store is accessed in an environment where Zustand isn't initialized yet
+    if (typeof window !== 'undefined' && config.baseURL === env.NEXT_PUBLIC_API_URL) {
+      config.baseURL = API_PROXY_BASE_URL;
+      config.withCredentials = true;
     }
+    (config as SessionTaggedRequestConfig)._sessionGeneration =
+      useAuthStore.getState().sessionGeneration;
     return config;
   });
 
@@ -34,9 +39,14 @@ export function createApiClient(baseURL: string) {
         error.response?.status === 401 &&
         typeof window !== 'undefined'
       ) {
-        const token = useAuthStore.getState().token;
-        if (token && error.config?.headers.get('Authorization') === `Bearer ${token}`) {
-          useAuthStore.getState().clearAuth();
+        const requestGeneration = (error.config as SessionTaggedRequestConfig | undefined)
+          ?._sessionGeneration;
+        const currentState = useAuthStore.getState();
+        if (
+          requestGeneration === undefined ||
+          requestGeneration === currentState.sessionGeneration
+        ) {
+          currentState.clearAuth();
           if (window.location.pathname !== '/login') {
             toast.error('Session expired. Please log in again.');
             window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
