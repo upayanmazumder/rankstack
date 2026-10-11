@@ -9,21 +9,25 @@ import type { User } from '@/types';
 import { createSelectors } from './create-selectors';
 
 interface AuthState {
-  token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User | null) => void;
+  setAuth: (userOrToken: User | string | null, legacyUser?: User | null) => void;
   clearAuth: () => void;
 }
 
 const useAuthStoreBase = create<AuthState>()(
   persist(
     set => ({
-      token: null,
       user: null,
-      setAuth: (token, user) => set({ token, user }),
-      clearAuth: () => set({ token: null, user: null }),
+      setAuth: (userOrToken, legacyUser) => {
+        const nextUser = typeof userOrToken === 'string' ? (legacyUser ?? null) : userOrToken;
+        set({ user: nextUser });
+      },
+      clearAuth: () => set({ user: null }),
     }),
-    { name: 'auth-store' }
+    {
+      name: 'auth-store',
+      partialize: state => ({ user: state.user }),
+    }
   )
 ) as unknown as UseBoundStore<StoreApi<AuthState>>;
 

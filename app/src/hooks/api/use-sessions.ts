@@ -3,25 +3,22 @@ import axios from 'axios';
 
 import { api, toApiError } from '@/api';
 import { useAuthStore } from '@/stores';
-import type { LoginRequest, Session, User } from '@/types';
+import type { LoginRequest, User } from '@/types';
 
 export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: LoginRequest) => {
       try {
-        const response = await axios.post<{ session: Session; user: User | null }>(
-          '/api/session',
-          payload
-        );
+        const response = await axios.post<{ user: User | null }>('/api/session', payload);
         return response.data;
       } catch (error) {
         throw toApiError(error);
       }
     },
-    onSuccess: ({ session, user }) => {
+    onSuccess: ({ user }) => {
       queryClient.clear();
-      useAuthStore.getState().setAuth(session.sessionId, user);
+      useAuthStore.getState().setAuth(user);
     },
   });
 }

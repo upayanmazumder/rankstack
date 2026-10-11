@@ -15,16 +15,7 @@ export function createApiClient(baseURL: string) {
     timeout: API_TIMEOUT_MS,
   });
 
-  // Attach session token from live auth store.
-  client.interceptors.request.use(config => {
-    try {
-      const token = useAuthStore.getState().token;
-      if (token) config.headers.set('Authorization', `Bearer ${token}`);
-    } catch {
-      // In case store is accessed in an environment where Zustand isn't initialized yet
-    }
-    return config;
-  });
+  client.interceptors.request.use(config => config);
 
   client.interceptors.response.use(
     response => response,
@@ -34,13 +25,10 @@ export function createApiClient(baseURL: string) {
         error.response?.status === 401 &&
         typeof window !== 'undefined'
       ) {
-        const token = useAuthStore.getState().token;
-        if (token && error.config?.headers.get('Authorization') === `Bearer ${token}`) {
-          useAuthStore.getState().clearAuth();
-          if (window.location.pathname !== '/login') {
-            toast.error('Session expired. Please log in again.');
-            window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
-          }
+        useAuthStore.getState().clearAuth();
+        if (window.location.pathname !== '/login') {
+          toast.error('Session expired. Please log in again.');
+          window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
         }
       }
       return Promise.reject(toApiError(error));

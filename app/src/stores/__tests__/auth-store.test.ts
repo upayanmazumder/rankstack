@@ -18,21 +18,27 @@ describe('useAuthStore', () => {
     localStorage.clear();
   });
 
-  it('stores the authenticated user across persistence', () => {
-    useAuthStore.getState().setAuth('session-token', user);
+  it('stores the authenticated user without persisting the session token', () => {
+    useAuthStore.getState().setAuth(user);
 
-    expect(useAuthStore.getState()).toMatchObject({ token: 'session-token', user });
+    expect(useAuthStore.getState()).toMatchObject({ user });
+    expect('token' in useAuthStore.getState()).toBe(false);
     expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state.user).toEqual(user);
+    expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state).not.toHaveProperty(
+      'token'
+    );
   });
 
   it('clears authentication state and persists the cleared values', () => {
-    useAuthStore.getState().setAuth('session-token', user);
+    useAuthStore.getState().setAuth(user);
     useAuthStore.getState().clearAuth();
 
-    expect(useAuthStore.getState()).toMatchObject({ token: null, user: null });
+    expect(useAuthStore.getState()).toMatchObject({ user: null });
     expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state).toMatchObject({
-      token: null,
       user: null,
     });
+    expect(JSON.parse(localStorage.getItem('auth-store') ?? '{}').state).not.toHaveProperty(
+      'token'
+    );
   });
 });

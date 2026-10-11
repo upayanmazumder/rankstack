@@ -20,7 +20,7 @@ describe('API client session expiration', () => {
   });
 
   it('clears the session and navigates to login after an unauthorized response', async () => {
-    useAuthStore.getState().setAuth('session-token', null);
+    useAuthStore.getState().setAuth(null);
     render(<SessionExpiredRedirect />);
 
     const client = createApiClient('https://api.example.test');
@@ -37,39 +37,19 @@ describe('API client session expiration', () => {
 
     await expect(client.get('/contests')).rejects.toMatchObject({ status: 401 });
 
-    expect(useAuthStore.getState()).toMatchObject({ token: null, user: null });
+    expect(useAuthStore.getState()).toMatchObject({ user: null });
+    expect('token' in useAuthStore.getState()).toBe(false);
     expect(toastError).toHaveBeenCalledWith('Session expired. Please log in again.');
     expect(replace).toHaveBeenCalledWith('/login');
   });
 
-  it('keeps a replacement session when an older request fails', async () => {
-    useAuthStore.getState().setAuth('token-A', null);
-    render(<SessionExpiredRedirect />);
-
-    const gate = Promise.withResolvers<void>();
-    let requestStarted = false;
+  it('does not send a bearer token from browser state when making authenticated requests', async () => {
     const client = createApiClient('https://api.example.test');
     client.defaults.adapter = async config => {
-      requestStarted = true;
-      await gate.promise;
-      const response: AxiosResponse = {
-        config,
-        data: { detail: 'Session expired' },
-        headers: {},
-        status: 401,
-        statusText: 'Unauthorized',
-      };
-      throw new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', config, undefined, response);
+      expect(config.headers?.get?.('Authorization')).toBeUndefined();
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config };
     };
 
-    const pending = client.get('/contests');
-    await vi.waitFor(() => expect(requestStarted).toBe(true));
-    useAuthStore.getState().setAuth('token-B', null);
-    gate.resolve();
-    await expect(pending).rejects.toMatchObject({ status: 401 });
-
-    expect(useAuthStore.getState().token).toBe('token-B');
-    expect(toastError).not.toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
+    await expect(client.get('/contests')).resolves.toMatchObject({ status: 200 });
   });
 });

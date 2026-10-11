@@ -7,6 +7,16 @@ const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
 const DialogClose = DialogPrimitive.Close;
 
+function mergeClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  staticClassName: string
+) {
+  if (typeof className === 'function') {
+    return (state: T) => cn(staticClassName, className(state));
+  }
+  return cn(staticClassName, className);
+}
+
 function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;
 }
@@ -17,9 +27,9 @@ function DialogOverlay({
 }: React.ComponentProps<typeof DialogPrimitive.Backdrop>) {
   return (
     <DialogPrimitive.Backdrop
-      className={cn(
-        'fixed inset-0 z-50 bg-black/80 transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
-        className
+      className={mergeClassName(
+        className,
+        'fixed inset-0 z-50 bg-black/80 transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0'
       )}
       {...props}
     />
@@ -35,9 +45,9 @@ function DialogContent({
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Popup
-        className={cn(
-          'fixed top-[50%] left-[50%] z-50 max-h-[85dvh] w-[95vw] max-w-lg translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-xl border bg-background p-4 shadow-lg transition-all duration-200 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6',
-          className
+        className={mergeClassName(
+          className,
+          'fixed top-[50%] left-[50%] z-50 max-h-[85dvh] w-[95vw] max-w-lg translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-xl border bg-background p-4 shadow-lg transition-all duration-200 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6'
         )}
         {...props}
       >

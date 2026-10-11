@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     // A failed profile request does not invalidate the created session.
   }
 
-  const response = NextResponse.json({ session, user });
+  const response = NextResponse.json({ user });
   response.cookies.set(cookieName, session.sessionId, {
     httpOnly: true,
     secure: request.nextUrl.protocol === 'https:',

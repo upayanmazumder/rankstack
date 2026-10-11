@@ -31,17 +31,27 @@ function Avatar({ className, ...props }: React.ComponentProps<'span'>) {
 function AvatarImage({
   className,
   alt,
+  src,
   onLoad,
   onError,
   ...props
 }: React.ComponentProps<'img'> & { alt: string }) {
   const { setStatus } = React.useContext(AvatarContext);
 
+  React.useEffect(() => {
+    if (src) {
+      setStatus('loading');
+    } else {
+      setStatus('error');
+    }
+  }, [setStatus, src]);
+
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       data-slot="avatar-image"
       alt={alt}
+      src={src}
       className={cn('aspect-square size-full object-cover', className)}
       onLoad={e => {
         setStatus('loaded');
@@ -59,7 +69,7 @@ function AvatarImage({
 function AvatarFallback({ className, ...props }: React.ComponentProps<'span'>) {
   const { status } = React.useContext(AvatarContext);
 
-  if (status === 'loaded') {
+  if (status === 'loaded' || status === 'loading') {
     return null;
   }
 
