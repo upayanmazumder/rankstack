@@ -113,6 +113,24 @@ def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int]:
     return allowed, count
 
 
+_DECR_IF_POSITIVE = """
+local count = tonumber(redis.call('GET', KEYS[1]) or '0')
+if count > 0 then
+    redis.call('DECR', KEYS[1])
+end
+return count
+"""
+
+
+def decrement_rate_limit(user_id: str) -> None:
+    """Undo a rate-limit increment after a failed submission insert.
+
+    A Lua script keeps the read and the decrement atomic, so this can never
+    go negative or resurrect a counter whose window already expired.
+    """
+    get_redis_client().eval(_DECR_IF_POSITIVE, 1, rate_limit_key(user_id))
+
+
 def remove_leaderboard_member(contest_id: str, member_id: str) -> None:
     """Remove one participant from a contest leaderboard."""
     get_redis_client().zrem(leaderboard_key(contest_id), member_id)

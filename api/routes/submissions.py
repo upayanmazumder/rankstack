@@ -51,13 +51,17 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
             status_code=429,
             detail=f"Rate limit exceeded ({count} submissions in the current window)",
         )
-    doc = services.create_submission(
-        db,
-        contest_id,
-        problem_id,
-        {"refType": payload.submittedBy.refType, "refId": submitter_id},
-        payload.answer,
-    )
+    try:
+        doc = services.create_submission(
+            db,
+            contest_id,
+            problem_id,
+            {"refType": payload.submittedBy.refType, "refId": submitter_id},
+            payload.answer,
+        )
+    except Exception:
+        redis_ops.decrement_rate_limit(str(current["_id"]))
+        raise
     return serialize_doc(doc)
 
 
