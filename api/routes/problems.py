@@ -38,7 +38,7 @@ def create_problem(payload: ProblemCreate, _: AdminUser):
     response_model=list[ProblemOut],
     response_model_exclude_none=True,
     summary="List problems",
-    description="List problems, optionally filtered by `contestId`. Administrators receive full problem data; unauthenticated and participant responses omit answers and evaluation details. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid contest ID.",
+    description="List problems, optionally filtered by `contestId`. Administrators receive full problem data; unauthenticated and participant responses omit answers and evaluation details, and problems of `upcoming` contests are excluded. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid contest ID.",
 )
 def list_problems(
     user: OptionalUser,
@@ -49,8 +49,22 @@ def list_problems(
 ):
     """List problems while withholding answer and evaluation fields from non-admins."""
     db = get_db()
-    query = {"contestId": oid(contestId)} if contestId else {}
     admin = user is not None and user.get("role") == "admin"
+    query: dict = {}
+    if contestId:
+        contest_oid = oid(contestId)
+        if not admin:
+            contest = db["contests"].find_one({"_id": contest_oid}, {"status": 1})
+            if contest is None or contest["status"] == "upcoming":
+                return []
+        query["contestId"] = contest_oid
+    elif not admin:
+        upcoming_ids = [
+            doc["_id"]
+            for doc in db["contests"].find({"status": "upcoming"}, {"_id": 1})
+        ]
+        if upcoming_ids:
+            query["contestId"] = {"$nin": upcoming_ids}
     projection = (
         None
         if admin

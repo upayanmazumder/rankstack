@@ -5,6 +5,7 @@ standalone `mongod` does not support `start_transaction()`.
 """
 
 from collections.abc import Callable
+from datetime import timezone
 from typing import Any, TypeVar
 
 from bson import ObjectId
@@ -83,6 +84,40 @@ def validate_submission_problem(
         )
 
 
+def assert_contest_open_for(
+    db: Database,
+    contest_id: ObjectId,
+    submitted_by: dict[str, Any],
+    session=None,
+) -> None:
+    """Reject unless the contest is live, inside its time window, and the
+    submitter has joined as a participant."""
+    contest = db["contests"].find_one(
+        {"_id": contest_id},
+        {"status": 1, "startTime": 1, "endTime": 1, "participants": 1},
+        session=session,
+    )
+    if contest is None:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    now = utcnow()
+    start, end = contest["startTime"], contest["endTime"]
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=timezone.utc)
+    if contest["status"] != "live" or not (start <= now <= end):
+        raise HTTPException(status_code=409, detail="Contest is not live")
+    is_participant = any(
+        participant["refType"] == submitted_by["refType"]
+        and participant["refId"] == submitted_by["refId"]
+        for participant in contest.get("participants", [])
+    )
+    if not is_participant:
+        raise HTTPException(
+            status_code=403, detail="Submitter has not joined this contest"
+        )
+
+
 def create_submission(
     db: Database,
     contest_id: ObjectId,
@@ -105,6 +140,7 @@ def create_submission(
     }
 
     def callback(session: ClientSession) -> ObjectId:
+        assert_contest_open_for(db, contest_id, submitted_by, session=session)
         validate_submission_problem(db, contest_id, problem_id, answer, session=session)
         result = db["submissions"].insert_one(doc, session=session)
         db["problems"].update_one(

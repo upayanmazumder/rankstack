@@ -16,12 +16,11 @@ from api.redis_ops import leaderboard_key
 
 
 def test_submission_scoring_and_rate_limit(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -76,7 +75,9 @@ def test_submission_scoring_and_rate_limit(
     assert db.submissions.count_documents({"problemId": ObjectId(problem_id)}) == 10
 
 
-def test_submission_list_is_newest_first_and_offset_paginated(client, db, users):
+def test_submission_list_is_newest_first_and_offset_paginated(
+    client, db, users, headers_for
+):
     participant_id = ObjectId(users["participant"]["id"])
     now = utcnow()
     submission_ids = db.submissions.insert_many(
@@ -96,7 +97,8 @@ def test_submission_list_is_newest_first_and_offset_paginated(client, db, users)
 
     response = client.get(
         "/submissions",
-        params={"userId": str(participant_id), "limit": 2, "offset": 2},
+        params={"limit": 2, "offset": 2},
+        headers=headers_for("participant"),
     )
 
     assert response.status_code == 200
@@ -371,3 +373,76 @@ def test_rebuild_during_grading_does_not_double_count_delta(
         leaderboard_key(contest_id), users["participant"]["id"]
     )
     assert redis_score == 10
+def test_submission_create_requires_live_contest_and_participation(
+    client, users, headers_for, contest_payload, mcq_problem
+):
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    payload = {
+        "contestId": contest_id,
+        "problemId": problem_id,
+        "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+        "answer": "A",
+    }
+
+    not_live = client.post("/submissions", json=payload, headers=participant)
+    assert not_live.status_code == 409
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "live"}, headers=admin
+    )
+    not_joined = client.post("/submissions", json=payload, headers=participant)
+    assert not_joined.status_code == 403
+
+    client.post(
+        f"/contests/{contest_id}/participants",
+        json={"refType": "user", "refId": users["participant"]["id"]},
+        headers=participant,
+    )
+    joined = client.post("/submissions", json=payload, headers=participant)
+    assert joined.status_code == 201
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "ended"}, headers=admin
+    )
+    ended = client.post("/submissions", json=payload, headers=participant)
+    assert ended.status_code == 409
+
+
+def test_submission_read_and_delete_are_scoped_to_owner(
+    client, users, headers_for, live_contest, mcq_problem
+):
+    participant = headers_for("participant")
+    other = headers_for("other")
+    admin = headers_for("admin")
+    contest_id = live_contest()
+    problem_id = str(mcq_problem(contest_id))
+    payload = {
+        "contestId": contest_id,
+        "problemId": problem_id,
+        "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+        "answer": "A",
+    }
+    submission_id = client.post(
+        "/submissions", json=payload, headers=participant
+    ).json()["id"]
+
+    assert client.get("/submissions").status_code == 401
+    assert client.get(f"/submissions/{submission_id}").status_code == 401
+    assert client.get("/submissions", headers=other).json() == []
+    assert client.get(f"/submissions/{submission_id}", headers=other).status_code == 404
+    assert (
+        client.delete(f"/submissions/{submission_id}", headers=other).status_code == 403
+    )
+
+    assert client.get(f"/submissions/{submission_id}", headers=participant).json()[
+        "id"
+    ] == (submission_id)
+    assert len(client.get("/submissions", headers=admin).json()) == 1
+    assert (
+        client.delete(f"/submissions/{submission_id}", headers=participant).status_code
+        == 204
+    )
