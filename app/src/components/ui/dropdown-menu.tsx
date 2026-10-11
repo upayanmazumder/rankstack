@@ -13,6 +13,16 @@ function DropdownMenuPortal({ ...props }: React.ComponentProps<typeof MenuPrimit
   return <MenuPrimitive.Portal {...props} />;
 }
 
+function mergeClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  staticClassName: string
+) {
+  if (typeof className === 'function') {
+    return (state: T) => cn(staticClassName, className(state));
+  }
+  return cn(staticClassName, className);
+}
+
 function DropdownMenuContent({
   className,
   ...props
@@ -21,9 +31,9 @@ function DropdownMenuContent({
     <DropdownMenuPortal>
       <MenuPrimitive.Positioner>
         <MenuPrimitive.Popup
-          className={cn(
-            'z-50 max-h-[min(24rem,var(--available-height))] min-w-[8rem] overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
-            className
+          className={mergeClassName(
+            className,
+            'z-50 max-h-[min(24rem,var(--available-height))] min-w-[8rem] overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0'
           )}
           {...props}
         />

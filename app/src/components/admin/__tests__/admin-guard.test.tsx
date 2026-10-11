@@ -26,7 +26,7 @@ describe('AdminGuard', () => {
   });
 
   it('redirects a participant away from administrative routes', async () => {
-    useAuthStore.getState().setAuth('token', participant);
+    useAuthStore.getState().setAuth(participant);
     render(
       <AdminGuard>
         <div>Secret controls</div>
@@ -38,7 +38,7 @@ describe('AdminGuard', () => {
   });
 
   it('renders administrative routes for an administrator', async () => {
-    useAuthStore.getState().setAuth('token', { ...participant, role: 'admin' });
+    useAuthStore.getState().setAuth({ ...participant, role: 'admin' });
     render(
       <AdminGuard>
         <div>Secret controls</div>
