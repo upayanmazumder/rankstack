@@ -102,13 +102,28 @@ def rate_limit_key(user_id: str) -> str:
     return f"rate_limit:{user_id}"
 
 
+_INCR_WITH_EXPIRY = """
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+    redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+return count
+"""
+
+
+def _increment_with_expiry(key: str, window_seconds: int) -> int:
+    """Atomically increment a fixed-window counter and set its TTL on first
+    use. A Lua script keeps the increment and the TTL set in one Redis
+    round trip, so a crash or a lost connection between the two can never
+    leave the counter without an expiry."""
+    return get_redis_client().eval(_INCR_WITH_EXPIRY, 1, key, window_seconds)
+
+
 def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int]:
     """Sliding-window-ish fixed-window counter. Returns (allowed, current_count)."""
-    r = get_redis_client()
-    key = rate_limit_key(user_id)
-    count = r.incr(key)
-    if count == 1:
-        r.expire(key, settings.rate_limit_window_seconds)
+    count = _increment_with_expiry(
+        rate_limit_key(user_id), settings.rate_limit_window_seconds
+    )
     allowed = count <= settings.rate_limit_max_submissions
     return allowed, count
 
