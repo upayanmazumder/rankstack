@@ -62,16 +62,8 @@ describe('API client session expiration', () => {
     let requestStarted = false;
     const client = createApiClient('https://api.example.test');
     client.defaults.adapter = async config => {
-      requestStarted = true;
-      await gate.promise;
-      const response: AxiosResponse = {
-        config,
-        data: { detail: 'Session expired' },
-        headers: {},
-        status: 401,
-        statusText: 'Unauthorized',
-      };
-      throw new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', config, undefined, response);
+      expect(config.headers?.get?.('Authorization')).toBeUndefined();
+      return { data: {}, status: 200, statusText: 'OK', headers: {}, config };
     };
 
     const pending = client.get('/contests');

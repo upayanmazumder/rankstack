@@ -16,6 +16,16 @@ function mergeClassName<T>(
   return cn(staticClassName, className);
 }
 
+function mergeClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  staticClassName: string
+) {
+  if (typeof className === 'function') {
+    return (state: T) => cn(staticClassName, className(state));
+  }
+  return cn(staticClassName, className);
+}
+
 function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;
 }
