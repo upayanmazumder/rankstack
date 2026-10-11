@@ -59,12 +59,11 @@ def list_problems(
                 return []
         query["contestId"] = contest_oid
     elif not admin:
-        upcoming_ids = [
+        visible_contest_ids = [
             doc["_id"]
-            for doc in db["contests"].find({"status": "upcoming"}, {"_id": 1})
+            for doc in db["contests"].find({"status": {"$ne": "upcoming"}}, {"_id": 1})
         ]
-        if upcoming_ids:
-            query["contestId"] = {"$nin": upcoming_ids}
+        query["contestId"] = {"$in": visible_contest_ids}
     projection = (
         None
         if admin
