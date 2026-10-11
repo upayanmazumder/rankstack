@@ -11,7 +11,7 @@ from redis.exceptions import RedisError
 from api import redis_ops, services
 from api.db import get_db
 from api.dependencies import CurrentUser
-from api.models.common import oid, serialize_doc
+from api.models.common import oid, paginate_collection, serialize_doc
 from api.models.submissions import (
     SubmissionCreate,
     SubmissionOut,
@@ -124,7 +124,7 @@ def list_submissions(
     ),
     offset: int = Query(default=0, ge=0, description="Number of submissions to skip."),
 ):
-    """List submissions matching the supplied filters, scoped to the caller."""
+    """List submissions matching the supplied filters with a stable sort, scoped to the caller."""
     db = get_db()
     query: dict = {}
     if contestId:
@@ -136,8 +136,12 @@ def list_submissions(
             query["submittedBy.refId"] = oid(userId)
     else:
         query["submittedBy.refId"] = {"$in": _visible_ref_ids(db, current["_id"])}
-    docs = (
-        db["submissions"].find(query).sort("submittedAt", -1).skip(offset).limit(limit)
+    docs = paginate_collection(
+        db["submissions"],
+        query=query,
+        limit=limit,
+        offset=offset,
+        sort=[("submittedAt", -1), ("_id", -1)],
     )
     return [serialize_doc(d) for d in docs]
 

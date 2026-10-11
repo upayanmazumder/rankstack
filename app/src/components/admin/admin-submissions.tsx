@@ -30,7 +30,11 @@ export function AdminSubmissions() {
   const [contestId, setContestId] = useState('all');
   const [status, setStatus] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<Submission | null>(null);
-  const submissions = useSubmissions();
+  const submissions = useSubmissions({
+    contestId: contestId === 'all' ? undefined : contestId,
+    status: status === 'all' ? undefined : status,
+    limit: 300,
+  });
   const contests = useContests();
   const problems = useProblems();
   const users = useUsers();
@@ -46,13 +50,7 @@ export function AdminSubmissions() {
     }),
     [contests.data, problems.data, teams.data, users.data]
   );
-  const visible = (submissions.data ?? [])
-    .filter(
-      item =>
-        (contestId === 'all' || item.contestId === contestId) &&
-        (status === 'all' || item.status === status)
-    )
-    .sort((a, b) => Date.parse(b.submittedAt) - Date.parse(a.submittedAt));
+  const visible = submissions.data ?? [];
   const selectedProblem = problems.data?.find(problem => problem.id === selected?.problemId);
 
   return (

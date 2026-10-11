@@ -13,7 +13,7 @@ export function useTeams() {
   return useQuery({
     queryKey: teamKeys.lists(),
     queryFn: async () => {
-      const res = await api.get<Team[]>('/teams');
+      const res = await api.get<Team[]>('/teams', { params: { limit: 200 } });
       return res.data;
     },
   });

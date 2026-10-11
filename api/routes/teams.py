@@ -14,7 +14,7 @@ from api.dependencies import (
     TeamOwnerOrAdmin,
     TeamRemovalAuthorizer,
 )
-from api.models.common import oid, serialize_doc
+from api.models.common import oid, paginate_collection, serialize_doc
 from api.models.teams import TeamCreate, TeamMemberOp, TeamOut, TeamUpdate
 
 router = APIRouter(prefix="/teams", tags=["teams"])
@@ -50,18 +50,18 @@ def create_team(payload: TeamCreate, current: CurrentUser):
 )
 def list_teams(
     _: CurrentUser,
-    limit: int | None = Query(
-        default=None,
-        ge=1,
-        le=200,
-        description="Maximum results to return; capped at 200.",
-    ),
+    limit: int = Query(default=200, ge=1, le=200, description="Maximum results to return."),
+    offset: int = Query(default=0, ge=0, description="Number of teams to skip."),
 ):
-    """List teams for an authenticated caller."""
+    """List teams for an authenticated caller with a stable bounded page."""
     db = get_db()
-    docs = db["teams"].find()
-    if limit is not None:
-        docs = docs.limit(limit)
+    docs = paginate_collection(
+        db["teams"],
+        query={},
+        limit=limit,
+        offset=offset,
+        sort=[("_id", 1)],
+    )
     return [serialize_doc(d) for d in docs]
 
 

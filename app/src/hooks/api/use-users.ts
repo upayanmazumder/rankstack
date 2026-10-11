@@ -12,7 +12,7 @@ export function useUsers() {
   return useQuery({
     queryKey: userKeys.lists(),
     queryFn: async () => {
-      const res = await api.get<User[]>('/users');
+      const res = await api.get<User[]>('/users', { params: { limit: 200 } });
       return res.data;
     },
   });

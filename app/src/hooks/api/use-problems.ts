@@ -12,7 +12,7 @@ export function useProblems(contestId?: string) {
   return useQuery({
     queryKey: contestId ? problemKeys.list({ contestId }) : problemKeys.lists(),
     queryFn: async () => {
-      const params = contestId ? { contestId } : undefined;
+      const params = contestId ? { contestId, limit: 300 } : { limit: 300 };
       const res = await api.get<Problem[]>('/problems', { params });
       return res.data;
     },

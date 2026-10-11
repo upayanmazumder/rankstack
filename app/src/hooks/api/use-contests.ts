@@ -34,7 +34,9 @@ export function useContests(filters?: ContestFilters) {
   return useQuery({
     queryKey: contestKeys.list(filters),
     queryFn: async () => {
-      const res = await api.get<Contest[]>('/contests', { params: filters });
+      const res = await api.get<Contest[]>('/contests', {
+        params: { ...filters, limit: filters?.status ? 200 : 200 },
+      });
       return res.data;
     },
   });

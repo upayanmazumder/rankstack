@@ -11,6 +11,19 @@ import {
 import type { Session, User } from '@/types';
 
 export async function POST(request: NextRequest) {
+  const contentType = request.headers.get('content-type') ?? '';
+  const origin = request.headers.get('origin');
+  const sameSite = request.headers.get('sec-fetch-site');
+  const isSameOrigin = !!origin && new URL(origin).origin === request.nextUrl.origin;
+  const isSameSiteRequest = sameSite === 'same-origin';
+
+  if (!contentType.includes('application/json') || (!isSameOrigin && !isSameSiteRequest)) {
+    return new NextResponse(JSON.stringify({ detail: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const credentials = await request.text();
   const login = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions`, {
     method: 'POST',
@@ -34,10 +47,10 @@ export async function POST(request: NextRequest) {
   let user: User | null = null;
   let profileStatus = 502;
   try {
-    const profile = await fetch(
-      `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(session.sessionId)}`,
-      { cache: 'no-store' }
-    );
+    const profile = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
+      cache: 'no-store',
+      headers: { Authorization: `Bearer ${session.sessionId}` },
+    });
     profileStatus = profile.status;
     if (profile.ok) {
       const detail = (await profile.json()) as { sessionId: string; user?: User | null };
@@ -49,9 +62,10 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     try {
-      await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(session.sessionId)}`, {
+      await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
         method: 'DELETE',
         cache: 'no-store',
+        headers: { Authorization: `Bearer ${session.sessionId}` },
       });
     } catch {
       // Best-effort cleanup when user profile lookup fails.
@@ -73,8 +87,9 @@ export async function GET(request: NextRequest) {
 
   let profile: Response;
   try {
-    profile = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`, {
+    profile = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
       cache: 'no-store',
+      headers: { Authorization: `Bearer ${token}` },
     });
   } catch {
     return NextResponse.json({ detail: 'Session service unavailable' }, { status: 502 });
@@ -105,13 +120,11 @@ export async function DELETE(request: NextRequest) {
   let revoked = true;
   if (token) {
     try {
-      const result = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`,
-        {
-          method: 'DELETE',
-          cache: 'no-store',
-        }
-      );
+      const result = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: { Authorization: `Bearer ${token}` },
+      });
       revoked = result.ok;
     } catch {
       revoked = false;

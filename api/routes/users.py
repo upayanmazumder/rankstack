@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 from api import services
 from api.db import get_db
 from api.dependencies import CurrentUser, OptionalUser
-from api.models.common import oid, serialize_doc, utcnow
+from api.models.common import oid, paginate_collection, serialize_doc, utcnow
 from api.models.users import UserCreate, UserOut, UserUpdate
 from api.security import hash_password
 
@@ -64,19 +64,19 @@ def list_users(
     role: str | None = Query(
         default=None, description="Filter by participant or administrator role."
     ),
-    limit: int | None = Query(
-        default=None,
-        ge=1,
-        le=200,
-        description="Maximum results to return; capped at 200.",
-    ),
+    limit: int = Query(default=200, ge=1, le=200, description="Maximum results to return."),
+    offset: int = Query(default=0, ge=0, description="Number of users to skip."),
 ):
-    """List user profiles with optional role filtering and a bounded result limit."""
+    """List user profiles with optional role filtering and a stable bounded page."""
     db = get_db()
     query = {"role": role} if role else {}
-    docs = db["users"].find(query)
-    if limit is not None:
-        docs = docs.limit(limit)
+    docs = paginate_collection(
+        db["users"],
+        query=query,
+        limit=limit,
+        offset=offset,
+        sort=[("_id", 1)],
+    )
     return [serialize_doc(_visible_user(d, viewer)) for d in docs]
 
 

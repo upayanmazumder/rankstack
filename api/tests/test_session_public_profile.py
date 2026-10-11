@@ -5,6 +5,7 @@ from bson import ObjectId
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from api import dependencies
 from api.routes import sessions
 
 
@@ -34,13 +35,17 @@ class SessionProfileTests(unittest.TestCase):
         app = FastAPI()
         app.include_router(sessions.router)
         with (
-            patch.object(sessions.redis_ops, "get_session_user", return_value=user_id),
-            patch.object(sessions.redis_ops, "touch_session"),
-            patch.object(sessions, "get_db", return_value=Database()),
+            patch.object(dependencies.redis_ops, "get_session_user", return_value=user_id),
+            patch.object(dependencies.redis_ops, "touch_session"),
+            patch.object(dependencies, "get_db", return_value=Database()),
             TestClient(app) as client,
         ):
-            response = client.get("/sessions/session-token")
+            response = client.get(
+                "/sessions/current",
+                headers={"Authorization": "Bearer session-token"},
+            )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["user"]["id"], user_id)
+        self.assertEqual(response.json()["sessionId"], "session-token")
         self.assertNotIn("passwordHash", response.json()["user"])

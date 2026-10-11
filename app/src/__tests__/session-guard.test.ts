@@ -50,8 +50,9 @@ describe('protected route guard', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('location')).toBeNull();
-    expect(verify).toHaveBeenCalledWith(expect.stringContaining('/sessions/valid-token'), {
+    expect(verify).toHaveBeenCalledWith(expect.stringContaining('/sessions/current'), {
       cache: 'no-store',
+      headers: { Authorization: 'Bearer valid-token' },
     });
   });
 
