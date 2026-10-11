@@ -8,7 +8,7 @@ from pymongo import ReturnDocument
 from api import services
 from api.db import get_db
 from api.dependencies import AdminUser, CurrentUser, TeamMemberOrAdmin
-from api.models.common import oid, serialize_doc, utcnow
+from api.models.common import oid, serialize_doc
 from api.models.teams import TeamCreate, TeamMemberOp, TeamOut, TeamUpdate
 
 router = APIRouter(prefix="/teams", tags=["teams"])
@@ -32,18 +32,7 @@ def create_team(payload: TeamCreate, current: CurrentUser):
             status_code=403, detail="Admin privileges required to add members"
         )
     member_ids = list(dict.fromkeys([current["_id"], *requested_members]))
-    doc = {
-        "name": payload.name,
-        "memberIds": member_ids,
-        "totalScore": 0,
-        "createdAt": utcnow(),
-    }
-    result = db["teams"].insert_one(doc)
-    doc["_id"] = result.inserted_id
-    for member_id in doc["memberIds"]:
-        db["users"].update_one(
-            {"_id": member_id}, {"$addToSet": {"teamIds": doc["_id"]}}
-        )
+    doc = services.create_team(db, payload.name, member_ids)
     return serialize_doc(doc)
 
 

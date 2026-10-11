@@ -93,3 +93,17 @@ def test_team_and_user_catalogs_are_complete_by_default(client, db, users, heade
     headers = headers_for("participant")
     assert len(client.get("/teams", headers=headers).json()) == 55
     assert len(client.get("/users", headers=headers).json()) == 58
+
+
+def test_team_create_rejects_nonexistent_member_id(client, db, headers_for):
+    admin = headers_for("admin")
+    bogus_id = str(ObjectId())
+
+    response = client.post(
+        "/teams",
+        json={"name": "Ghosts", "memberIds": [bogus_id]},
+        headers=admin,
+    )
+
+    assert response.status_code == 400
+    assert db.teams.count_documents({"name": "Ghosts"}) == 0

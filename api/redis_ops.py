@@ -5,7 +5,10 @@ Key layout:
   leaderboard_revision:<contestId> -> STRING latest rebuilt leaderboard version
   session:<sessionId>              -> STRING userId, TTL on inactivity
   rate_limit:<userId>              -> STRING counter, TTL sliding window
+  rate_limit_window:<userId>       -> STRING opaque token identifying the current window
 """
+
+import secrets
 
 from redis.exceptions import WatchError
 
@@ -102,15 +105,65 @@ def rate_limit_key(user_id: str) -> str:
     return f"rate_limit:{user_id}"
 
 
-def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int]:
-    """Sliding-window-ish fixed-window counter. Returns (allowed, current_count)."""
-    r = get_redis_client()
-    key = rate_limit_key(user_id)
-    count = r.incr(key)
-    if count == 1:
-        r.expire(key, settings.rate_limit_window_seconds)
+def rate_limit_window_key(user_id: str) -> str:
+    return f"rate_limit_window:{user_id}"
+
+
+_INCR_WITH_EXPIRY_AND_WINDOW_TOKEN = """
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+    redis.call('EXPIRE', KEYS[1], ARGV[1])
+    redis.call('SET', KEYS[2], ARGV[2], 'EX', ARGV[1])
+end
+return {count, redis.call('GET', KEYS[2])}
+"""
+
+
+def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int, str]:
+    """Sliding-window-ish fixed-window counter.
+
+    Returns `(allowed, current_count, window_token)`. `window_token`
+    identifies the fixed window this increment landed in: pass it to
+    `decrement_rate_limit` so a refund issued after the window has already
+    rolled over decrements the *new* window's counter instead of this
+    (expired) one.
+    """
+    count, token = get_redis_client().eval(
+        _INCR_WITH_EXPIRY_AND_WINDOW_TOKEN,
+        2,
+        rate_limit_key(user_id),
+        rate_limit_window_key(user_id),
+        settings.rate_limit_window_seconds,
+        secrets.token_hex(8),
+    )
     allowed = count <= settings.rate_limit_max_submissions
-    return allowed, count
+    return allowed, count, token
+
+
+_DECR_IF_SAME_WINDOW = """
+if redis.call('GET', KEYS[2]) == ARGV[1] then
+    local count = tonumber(redis.call('GET', KEYS[1]) or '0')
+    if count > 0 then
+        redis.call('DECR', KEYS[1])
+    end
+end
+"""
+
+
+def decrement_rate_limit(user_id: str, window_token: str) -> None:
+    """Undo a rate-limit increment after a failed submission insert.
+
+    Only decrements if `rate_limit_window_key(user_id)` still holds
+    `window_token`: if the original window has since expired and a new one
+    started, this is a no-op instead of erasing a newer, unrelated count.
+    """
+    get_redis_client().eval(
+        _DECR_IF_SAME_WINDOW,
+        2,
+        rate_limit_key(user_id),
+        rate_limit_window_key(user_id),
+        window_token,
+    )
 
 
 def remove_leaderboard_member(contest_id: str, member_id: str) -> None:

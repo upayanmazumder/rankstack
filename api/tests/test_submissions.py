@@ -1,6 +1,8 @@
 """Submission transactions, score deltas, pagination, and Redis rate limits."""
 
+import concurrent.futures
 from datetime import timedelta
+from uuid import uuid4
 
 from bson import ObjectId
 
@@ -96,3 +98,56 @@ def test_submission_list_is_newest_first_and_offset_paginated(client, db, users)
         str(submission_ids[2]),
         str(submission_ids[1]),
     ]
+
+
+def test_concurrent_submissions_to_one_problem_do_not_500(
+    client, db, users, headers_for, contest_payload, mcq_problem
+):
+    """20 different users submit to the same problem at once. Every request
+    must retry past MongoDB write conflicts instead of surfacing a 500."""
+    admin = headers_for("admin")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    password_hash = db.users.find_one(
+        {"_id": ObjectId(users["participant"]["id"])}, {"passwordHash": 1}
+    )["passwordHash"]
+
+    submitters = []
+    for index in range(20):
+        email = f"concurrent-{index}-{uuid4().hex}@example.test"
+        user_id = db.users.insert_one(
+            {
+                "name": f"Concurrent User {index}",
+                "email": email,
+                "passwordHash": password_hash,
+                "role": "participant",
+                "totalScore": 0,
+                "teamIds": [],
+                "createdAt": utcnow(),
+            }
+        ).inserted_id
+        token = client.post(
+            "/sessions", json={"email": email, "password": "Passw0rd!"}
+        ).json()["sessionId"]
+        submitters.append((str(user_id), token))
+
+    def submit(entry: tuple[str, str]) -> int:
+        user_id, token = entry
+        payload = {
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": user_id},
+            "answer": "A",
+        }
+        response = client.post(
+            "/submissions", json=payload, headers={"Authorization": f"Bearer {token}"}
+        )
+        return response.status_code
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
+        statuses = list(pool.map(submit, submitters))
+
+    assert statuses == [201] * 20, statuses
+    assert db.problems.find_one({"_id": ObjectId(problem_id)})["attemptCount"] == 20
+    assert db.submissions.count_documents({"problemId": ObjectId(problem_id)}) == 20

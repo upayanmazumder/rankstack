@@ -166,12 +166,16 @@ def main() -> None:
 
     rl_user = "demo-rate-limit-user"
     redis_client.delete(redis_ops.rate_limit_key(rl_user))
+    redis_client.delete(redis_ops.rate_limit_window_key(rl_user))
     for _ in range(3):
-        allowed, count = redis_ops.check_and_increment_rate_limit(rl_user)
+        allowed, count, _window_token = redis_ops.check_and_increment_rate_limit(
+            rl_user
+        )
     print(
         f"rate_limit:{rl_user} -> count={count}, allowed={allowed}, ttl={redis_client.ttl(redis_ops.rate_limit_key(rl_user))}s"
     )
     redis_client.delete(redis_ops.rate_limit_key(rl_user))
+    redis_client.delete(redis_ops.rate_limit_window_key(rl_user))
 
     section("Demo complete.")
 
