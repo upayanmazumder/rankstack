@@ -239,13 +239,26 @@ def ensure_indexes(db: Database) -> None:
 def backfill_team_owners(db: Database) -> None:
     """Set `ownerId` on teams created before the field existed, to their
     first member. `validationLevel="moderate"` lets this update run on
-    documents that do not yet satisfy the current schema."""
+    documents that do not yet satisfy the current schema.
+
+    The write re-checks `ownerId` is still unset at update time, closing
+    the race where a concurrent membership change (e.g. the owner leaving)
+    assigns an owner between this function's read and write.
+
+    Teams predating the invariant that a team is deleted rather than left
+    without members (`remove_team_member`, `delete_user_transaction`) have
+    no member to become owner; since `TeamOut.ownerId` is required, such
+    orphaned teams are deleted rather than exposed broken.
+    """
     for team in db["teams"].find({"ownerId": {"$exists": False}}, {"memberIds": 1}):
         member_ids = team.get("memberIds") or []
         if member_ids:
             db["teams"].update_one(
-                {"_id": team["_id"]}, {"$set": {"ownerId": member_ids[0]}}
+                {"_id": team["_id"], "ownerId": {"$exists": False}},
+                {"$set": {"ownerId": member_ids[0]}},
             )
+        else:
+            db["teams"].delete_one({"_id": team["_id"]})
 
 
 def init_db() -> Database:

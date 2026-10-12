@@ -109,6 +109,8 @@ def test_team_create_rejects_nonexistent_member_id(client, db, headers_for):
 
     assert response.status_code == 400
     assert db.teams.count_documents({"name": "Ghosts"}) == 0
+
+
 def test_team_delete_requires_owner_or_admin(client, users, headers_for):
     admin = headers_for("admin")
     owner = headers_for("participant")
@@ -234,3 +236,21 @@ def test_backfill_team_owners_upgrades_legacy_teams(client, db, users):
     response = client.get(f"/teams/{legacy_team_id}")
     assert response.status_code == 200
     assert response.json()["ownerId"] == str(owner_id)
+
+
+def test_backfill_team_owners_deletes_empty_legacy_teams(client, db, headers_for):
+    empty_team_id = db.teams.insert_one(
+        {
+            "name": "Abandoned",
+            "memberIds": [],
+            "totalScore": 0,
+            "createdAt": utcnow(),
+        },
+        bypass_document_validation=True,
+    ).inserted_id
+
+    init_db()  # simulates a second app boot / rollout against existing data
+
+    assert db.teams.find_one({"_id": empty_team_id}) is None
+    response = client.get("/teams", headers=headers_for("participant"))
+    assert response.status_code == 200

@@ -467,6 +467,10 @@ def delete_user_transaction(db: Database, user_id: ObjectId) -> dict[str, Any] |
     own submissions (with score and attempt-count reversal), team
     membership, and contest participation.
 
+    If the user owned a team that keeps other members, ownership passes
+    to another remaining member, mirroring `remove_team_member`'s
+    succession so a deleted account never leaves a team ownerless.
+
     A team left with zero members is also deleted, in a second transaction
     after this one commits, reusing `delete_team_transaction`'s own
     submission/leaderboard cascade. This is the documented choice for
@@ -496,17 +500,23 @@ def delete_user_transaction(db: Database, user_id: ObjectId) -> dict[str, Any] |
             )
             affected_teams = list(
                 db["teams"].find(
-                    {"memberIds": user_id}, {"memberIds": 1}, session=session
+                    {"memberIds": user_id},
+                    {"memberIds": 1, "ownerId": 1},
+                    session=session,
                 )
             )
-            db["teams"].update_many(
-                {"memberIds": user_id},
-                {"$pull": {"memberIds": user_id}},
-                session=session,
-            )
-            emptied_team_ids = [
-                team["_id"] for team in affected_teams if team["memberIds"] == [user_id]
-            ]
+            emptied_team_ids = []
+            for team in affected_teams:
+                remaining = [
+                    member_id for member_id in team["memberIds"] if member_id != user_id
+                ]
+                update: dict[str, Any] = {"$pull": {"memberIds": user_id}}
+                if remaining:
+                    if team.get("ownerId") == user_id:
+                        update["$set"] = {"ownerId": remaining[0]}
+                else:
+                    emptied_team_ids.append(team["_id"])
+                db["teams"].update_one({"_id": team["_id"]}, update, session=session)
             db["contests"].update_many(
                 {"participants.refType": "user", "participants.refId": user_id},
                 {"$pull": {"participants": {"refType": "user", "refId": user_id}}},
