@@ -50,7 +50,9 @@ def create_team(payload: TeamCreate, current: CurrentUser):
 )
 def list_teams(
     _: CurrentUser,
-    limit: int = Query(default=200, ge=1, le=200, description="Maximum results to return."),
+    limit: int = Query(
+        default=200, ge=1, le=200, description="Maximum results to return."
+    ),
     offset: int = Query(default=0, ge=0, description="Number of teams to skip."),
 ):
     """List teams for an authenticated caller with a stable bounded page."""

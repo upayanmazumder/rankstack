@@ -35,7 +35,9 @@ class SessionProfileTests(unittest.TestCase):
         app = FastAPI()
         app.include_router(sessions.router)
         with (
-            patch.object(dependencies.redis_ops, "get_session_user", return_value=user_id),
+            patch.object(
+                dependencies.redis_ops, "get_session_user", return_value=user_id
+            ),
             patch.object(dependencies.redis_ops, "touch_session"),
             patch.object(dependencies, "get_db", return_value=Database()),
             TestClient(app) as client,

@@ -18,7 +18,10 @@ def test_login_and_protected_route(client, users):
     token = response.json()["sessionId"]
     headers = {"Authorization": f"Bearer {token}"}
     assert client.get("/teams", headers=headers).status_code == 200
-    assert client.get("/sessions/current", headers=headers).json()["user"]["id"] == account["id"]
+    assert (
+        client.get("/sessions/current", headers=headers).json()["user"]["id"]
+        == account["id"]
+    )
     assert client.delete("/sessions/current", headers=headers).status_code == 204
     assert client.get("/sessions/current", headers=headers).status_code == 401
     assert client.get("/teams", headers=headers).status_code == 401

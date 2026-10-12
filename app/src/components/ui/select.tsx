@@ -2,20 +2,10 @@ import * as React from 'react';
 import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn, mergeClassName } from '@/lib/utils';
 
 const Select = SelectPrimitive.Root;
 const SelectValue = SelectPrimitive.Value;
-
-function mergeClassName<T>(
-  className: string | ((state: T) => string | undefined) | undefined,
-  staticClassName: string
-) {
-  if (typeof className === 'function') {
-    return (state: T) => cn(staticClassName, className(state));
-  }
-  return cn(staticClassName, className);
-}
 
 function SelectTrigger({
   className,

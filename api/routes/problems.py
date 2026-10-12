@@ -43,7 +43,9 @@ def create_problem(payload: ProblemCreate, _: AdminUser):
 def list_problems(
     user: OptionalUser,
     contestId: str | None = Query(default=None, description="Filter by contest ID."),
-    limit: int = Query(default=100, ge=1, le=300, description="Maximum results to return."),
+    limit: int = Query(
+        default=100, ge=1, le=300, description="Maximum results to return."
+    ),
     offset: int = Query(default=0, ge=0, description="Number of problems to skip."),
 ):
     """List problems while withholding answer and evaluation fields from non-admins."""

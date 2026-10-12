@@ -60,7 +60,9 @@ def create_contest(payload: ContestCreate, _: AdminUser):
 )
 def list_contests(
     status: str | None = Query(default=None, description="Filter by contest status."),
-    limit: int = Query(default=50, ge=1, le=200, description="Maximum results to return."),
+    limit: int = Query(
+        default=50, ge=1, le=200, description="Maximum results to return."
+    ),
     offset: int = Query(default=0, ge=0, description="Number of contests to skip."),
 ):
     """List contests with optional status filtering and a stable bounded page."""

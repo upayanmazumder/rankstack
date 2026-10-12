@@ -64,7 +64,9 @@ def list_users(
     role: str | None = Query(
         default=None, description="Filter by participant or administrator role."
     ),
-    limit: int = Query(default=200, ge=1, le=200, description="Maximum results to return."),
+    limit: int = Query(
+        default=200, ge=1, le=200, description="Maximum results to return."
+    ),
     offset: int = Query(default=0, ge=0, description="Number of users to skip."),
 ):
     """List user profiles with optional role filtering and a stable bounded page."""

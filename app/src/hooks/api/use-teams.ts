@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
-import { createQueryKeys } from '@/lib/query';
+import { createQueryKeys, fetchAllPages } from '@/lib/query';
 import type { Team, TeamCreate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
@@ -12,10 +12,11 @@ const teamKeys = createQueryKeys('teams');
 export function useTeams() {
   return useQuery({
     queryKey: teamKeys.lists(),
-    queryFn: async () => {
-      const res = await api.get<Team[]>('/teams', { params: { limit: 200 } });
-      return res.data;
-    },
+    queryFn: async () =>
+      fetchAllPages<Team>(async ({ limit, offset }) => {
+        const res = await api.get<Team[]>('/teams', { params: { limit, offset } });
+        return res.data;
+      }),
   });
 }
 

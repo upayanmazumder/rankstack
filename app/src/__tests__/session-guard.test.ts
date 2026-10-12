@@ -103,7 +103,7 @@ describe('session route and API proxy', () => {
 
     const request = new NextRequest(`${endpoint}/api/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', origin: endpoint },
       body: JSON.stringify({ email: 'ada@example.com', password: 'secret' }),
     });
 
@@ -145,7 +145,7 @@ describe('session route and API proxy', () => {
 
     const request = new NextRequest(`${endpoint}/api/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', origin: endpoint },
       body: JSON.stringify({ email: 'ada@example.com', password: 'secret' }),
     });
 
