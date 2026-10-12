@@ -10,6 +10,7 @@ from pymongo.collection import Collection
 from redis.exceptions import RedisError
 
 from api import redis_ops
+from api.config import settings
 from api.db import get_redis_client
 from api.models.common import utcnow
 from api.redis_ops import leaderboard_key
@@ -109,10 +110,14 @@ def test_submission_list_is_newest_first_and_offset_paginated(
 
 
 def test_concurrent_submissions_to_one_problem_do_not_500(
-    client, db, users, headers_for, live_contest, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """20 different users submit to the same problem at once. Every request
     must retry past MongoDB write conflicts instead of surfacing a 500."""
+    # Raise the per-IP login throttle: all 20 logins below share the
+    # TestClient's one "testclient" address, which is unrelated to this
+    # test's actual concern (concurrent submission writes).
+    monkeypatch.setattr(settings, "login_rate_limit_max_attempts", 25)
     contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     password_hash = db.users.find_one(

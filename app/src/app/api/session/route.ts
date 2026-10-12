@@ -14,9 +14,14 @@ export async function POST(request: NextRequest) {
     cache: 'no-store',
   });
   if (!login.ok) {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const retryAfter = login.headers.get('Retry-After');
+    if (retryAfter) {
+      headers['Retry-After'] = retryAfter;
+    }
     return new NextResponse(await login.text(), {
       status: login.status,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     });
   }
 
