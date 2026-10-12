@@ -154,16 +154,17 @@ def update_status(
     if result is None:
         raise HTTPException(status_code=404, detail="Submission not found")
     doc, delta = result
-    if (
-        delta != 0
-        and db["dirty_leaderboards"].find_one({"_id": doc["contestId"]}, {"_id": 1})
-        is None
-    ):
+    if delta != 0:
+        contest_id_str = str(doc["contestId"])
+        member_id_str = str(doc["submittedBy"]["refId"])
+        marker = db["dirty_leaderboards"].find_one({"_id": doc["contestId"]})
+        version = marker["version"] if marker is not None else 0
         try:
-            redis_ops.update_leaderboard_score(
-                str(doc["contestId"]), str(doc["submittedBy"]["refId"]), delta
+            applied = redis_ops.update_leaderboard_score(
+                contest_id_str, member_id_str, delta, version
             )
         except RedisError as exc:
+            applied = None
             # Mongo already has the correct score; mark the leaderboard dirty
             # so a later read rebuilds the ZSET from Mongo instead of
             # serving a Redis score that silently missed this delta.
@@ -175,9 +176,24 @@ def update_status(
             )
             db["dirty_leaderboards"].update_one(
                 {"_id": doc["contestId"]},
-                {"$set": {"dirty": True}, "$inc": {"version": 1}},
+                {"$set": {"dirty": True}},
                 upsert=True,
             )
+        if applied is not None:
+            # The direct write landed and now matches `version`: resolve the
+            # marker so the next read takes the fast Redis path instead of
+            # re-aggregating MongoDB for no reason.
+            db["dirty_leaderboards"].update_one(
+                {"_id": doc["contestId"], "version": version},
+                {"$set": {"reconciledVersion": version}},
+            )
+        # `applied is None` without a RedisError means either the
+        # leaderboard was never built (a lone delta would leave it
+        # incomplete -- see redis_ops.update_leaderboard_score) or a
+        # concurrent rebuild already captured this exact revision from
+        # MongoDB and double-applying it here would double-count the
+        # delta. Either way the marker is already pending, or was just
+        # reconciled by that rebuild, so there's nothing more to do.
     return serialize_doc(doc)
 
 

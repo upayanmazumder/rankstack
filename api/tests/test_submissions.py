@@ -301,3 +301,73 @@ def test_submission_status_redis_failure_marks_leaderboard_dirty(
 
     reconciled_marker = db.dirty_leaderboards.find_one({"_id": ObjectId(contest_id)})
     assert reconciled_marker["reconciledVersion"] == reconciled_marker["version"]
+
+
+def test_rebuild_during_grading_does_not_double_count_delta(
+    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+):
+    """A leaderboard read that rebuilds from MongoDB can race a concurrent
+    grade's direct Redis delta write: the grade's MongoDB transaction (and
+    its dirty_leaderboards version bump) commits first, then -- before the
+    grade's own direct Redis write runs -- a GET rebuilds the whole
+    leaderboard from MongoDB, which already reflects the grade, and marks
+    it reconciled. The grade's direct write must then see its own revision
+    already superseded and skip, instead of applying the delta on top of a
+    snapshot that already includes it."""
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    submission_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+
+    # Establish a built (empty) leaderboard so the grade's direct Redis
+    # write path is live rather than deferring to the read path outright.
+    client.get(f"/contests/{contest_id}/leaderboard")
+    assert redis_ops.leaderboard_exists(contest_id)
+
+    original = redis_ops.update_leaderboard_score
+    triggered = threading.local()
+
+    def racing_update(contest_id_arg, member_id_arg, delta, version):
+        if not getattr(triggered, "done", False):
+            triggered.done = True
+            # Simulate a concurrent GET whose rebuild lands *after*
+            # MongoDB committed this grade but *before* this grade's own
+            # direct Redis write runs.
+            resp = client.get(f"/contests/{contest_id_arg}/leaderboard")
+            assert resp.status_code == 200
+        return original(contest_id_arg, member_id_arg, delta, version)
+
+    monkeypatch.setattr(
+        "api.routes.submissions.redis_ops.update_leaderboard_score", racing_update
+    )
+
+    grade_resp = client.patch(
+        f"/submissions/{submission_id}/status",
+        json={"status": "correct", "score": 10},
+        headers=admin,
+    )
+    assert grade_resp.status_code == 200
+
+    mongo_score = db.users.find_one({"_id": ObjectId(users["participant"]["id"])})[
+        "totalScore"
+    ]
+    assert mongo_score == 10
+
+    final = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    assert final[0]["score"] == 10
+
+    redis_score = get_redis_client().zscore(
+        leaderboard_key(contest_id), users["participant"]["id"]
+    )
+    assert redis_score == 10

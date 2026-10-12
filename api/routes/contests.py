@@ -222,40 +222,45 @@ def get_leaderboard(
         description="Maximum number of ranked participants to return.",
     ),
 ):
-    """Read MongoDB after deletions and repair Redis when it becomes available."""
+    """Serve the live Redis leaderboard; rebuild from MongoDB when Redis has
+    lost its revision (restart, eviction, never-seeded), a delete or grade
+    left it pending, or Redis itself is unreachable."""
     db = get_db()
     contest_oid = oid(contest_id)
+    if db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is None:
+        raise HTTPException(status_code=404, detail="Contest not found")
+
     marker = db["dirty_leaderboards"].find_one({"_id": contest_oid})
-    if marker:
-        pending = "reconciledVersion" not in marker or marker.get(
-            "reconciledVersion"
-        ) != marker.get("version")
-        exists = db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is not None
-        rows = []
-        if exists:
-            rows = leaderboard_for_contest(
-                db, contest_oid, limit=None if pending else max(top, 1)
+    pending = marker is not None and marker.get("reconciledVersion") != marker.get(
+        "version"
+    )
+    try:
+        built = redis_ops.leaderboard_exists(contest_id)
+    except RedisError:
+        # Can't trust Redis right now; rebuild straight from MongoDB below.
+        built = False
+    needs_rebuild = pending or not built
+
+    if needs_rebuild:
+        version = marker.get("version", 0) if marker is not None else 0
+        # Always pull every ranked submitter, not just `top`: the snapshot
+        # below replaces the *entire* cached ZSET, so a `top`-limited fetch
+        # would silently truncate it for every future read until a later
+        # rebuild happened to use a larger `top`.
+        rows = leaderboard_for_contest(db, contest_oid, limit=None)
+        try:
+            replaced = redis_ops.replace_leaderboard(
+                contest_id,
+                {str(row["refId"]): row["totalScore"] for row in rows},
+                version,
             )
-        if pending:
-            try:
-                replaced = redis_ops.replace_leaderboard(
-                    contest_id,
-                    {str(row["refId"]): row["totalScore"] for row in rows},
-                    marker.get("version", 0),
-                )
-            except RedisError:
-                pass  # Keep the marker pending and serve MongoDB data.
-            else:
-                if replaced:
-                    db["dirty_leaderboards"].update_one(
-                        {
-                            "_id": contest_oid,
-                            "version": marker.get("version", {"$exists": False}),
-                        },
-                        {"$set": {"reconciledVersion": marker.get("version")}},
-                    )
-        if not exists:
-            raise HTTPException(status_code=404, detail="Contest not found")
+        except RedisError:
+            replaced = False  # Keep the marker pending and serve MongoDB data.
+        if replaced and marker is not None:
+            db["dirty_leaderboards"].update_one(
+                {"_id": contest_oid, "version": version},
+                {"$set": {"reconciledVersion": version}},
+            )
         leaderboard = [
             {
                 "memberId": str(row["refId"]),
@@ -265,9 +270,21 @@ def get_leaderboard(
             for rank, row in enumerate(rows, 1)
         ][: max(top, 0)]
     else:
-        if not db["contests"].find_one({"_id": contest_oid}, {"_id": 1}):
-            raise HTTPException(status_code=404, detail="Contest not found")
-        leaderboard = redis_ops.get_leaderboard(contest_id, top)
+        try:
+            leaderboard = redis_ops.get_leaderboard(contest_id, top)
+        except RedisError:
+            # Redis died between the exists() check above and this read;
+            # serve this one request from MongoDB without touching the
+            # marker -- a transient blip, not evidence the cache is stale.
+            rows = leaderboard_for_contest(db, contest_oid, limit=max(top, 1))
+            leaderboard = [
+                {
+                    "memberId": str(row["refId"]),
+                    "score": row["totalScore"],
+                    "rank": rank,
+                }
+                for rank, row in enumerate(rows, 1)
+            ]
     member_ids = [row["memberId"] for row in leaderboard]
     counts = (
         {
