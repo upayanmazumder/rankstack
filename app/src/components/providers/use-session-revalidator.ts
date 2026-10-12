@@ -37,6 +37,15 @@ export function useSessionRevalidator() {
           profile.user &&
           !useAuthStore.getState().signedOut
         ) {
+          const previous = useAuthStore.getState().user;
+          if (
+            previous &&
+            (previous.id !== profile.user.id || previous.role !== profile.user.role)
+          ) {
+            await queryClient.cancelQueries();
+            if (!mounted || generation !== useAuthStore.getState().sessionGeneration) return;
+            queryClient.clear();
+          }
           useAuthStore.getState().setAuth(profile.user);
         }
       } catch {
