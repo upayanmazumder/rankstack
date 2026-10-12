@@ -63,3 +63,84 @@ def test_leaderboard_nonexistent_contest(client):
     res = client.get(f"/contests/{nonexistent}/leaderboard")
     assert res.status_code == 404
     assert res.json()["detail"] == "Contest not found"
+
+
+def test_leaderboard_and_aggregation_endpoint_rank_identically(
+    client, users, headers_for, contest_payload, mcq_problem
+):
+    """GET /contests/{id}/leaderboard and GET /aggregations/leaderboard/{id}
+    must agree on both the score and the tie-break: they share one ranking
+    pipeline (leaderboard_for_contest)."""
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    other = headers_for("other")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+
+    def submit_and_grade(headers, ref_id, score):
+        submission_id = client.post(
+            "/submissions",
+            json={
+                "contestId": contest_id,
+                "problemId": problem_id,
+                "submittedBy": {"refType": "user", "refId": ref_id},
+                "answer": "A",
+            },
+            headers=headers,
+        ).json()["id"]
+        client.patch(
+            f"/submissions/{submission_id}/status",
+            json={"status": "correct", "score": score},
+            headers=admin,
+        )
+
+    submit_and_grade(participant, users["participant"]["id"], 10)
+    submit_and_grade(other, users["other"]["id"], 5)
+    submit_and_grade(admin, users["admin"]["id"], 5)
+
+    # Delete a throwaway (never-graded) submission so a dirty_leaderboards
+    # marker exists; that is what routes get_leaderboard through the same
+    # MongoDB aggregation the standalone endpoint always uses.
+    throwaway_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    client.delete(f"/submissions/{throwaway_id}", headers=participant)
+
+    live = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    aggregated = client.get(f"/aggregations/leaderboard/{contest_id}").json()
+
+    # other and admin are tied at score 5; the pipeline breaks ties by
+    # refId descending, so compute the expected order from the actual
+    # ObjectIds rather than assuming which user id sorts higher.
+    tied_ids_desc = sorted(
+        [users["other"]["id"], users["admin"]["id"]],
+        key=ObjectId,
+        reverse=True,
+    )
+    expected_order = [users["participant"]["id"], *tied_ids_desc]
+    expected_score_by_member = {
+        users["participant"]["id"]: 10,
+        users["other"]["id"]: 5,
+        users["admin"]["id"]: 5,
+    }
+    expected_scores = [
+        expected_score_by_member[member_id] for member_id in expected_order
+    ]
+
+    assert [row["memberId"] for row in live] == expected_order
+    assert [row["score"] for row in live] == expected_scores
+    assert [str(row["refId"]) for row in aggregated] == expected_order
+    assert [row["totalScore"] for row in aggregated] == expected_scores
+
+    assert [row["memberId"] for row in live] == [
+        str(row["refId"]) for row in aggregated
+    ]
+    assert [row["score"] for row in live] == [row["totalScore"] for row in aggregated]

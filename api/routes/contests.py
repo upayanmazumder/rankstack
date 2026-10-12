@@ -7,6 +7,7 @@ from pymongo import ReturnDocument
 from redis.exceptions import RedisError
 
 from api import redis_ops, services
+from api.aggregations.pipelines import leaderboard_for_contest
 from api.db import get_db
 from api.dependencies import AdminUser, CurrentUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -232,24 +233,14 @@ def get_leaderboard(
         exists = db["contests"].find_one({"_id": contest_oid}, {"_id": 1}) is not None
         rows = []
         if exists:
-            pipeline = [
-                {
-                    "$match": {
-                        "contestId": contest_oid,
-                        "score": {"$exists": True, "$ne": 0},
-                    }
-                },
-                {"$group": {"_id": "$submittedBy.refId", "score": {"$sum": "$score"}}},
-                {"$sort": {"score": -1, "_id": -1}},
-            ]
-            if not pending:
-                pipeline.append({"$limit": max(top, 1)})
-            rows = list(db["submissions"].aggregate(pipeline))
+            rows = leaderboard_for_contest(
+                db, contest_oid, limit=None if pending else max(top, 1)
+            )
         if pending:
             try:
                 replaced = redis_ops.replace_leaderboard(
                     contest_id,
-                    {str(row["_id"]): row["score"] for row in rows},
+                    {str(row["refId"]): row["totalScore"] for row in rows},
                     marker.get("version", 0),
                 )
             except RedisError:
@@ -266,7 +257,11 @@ def get_leaderboard(
         if not exists:
             raise HTTPException(status_code=404, detail="Contest not found")
         leaderboard = [
-            {"memberId": str(row["_id"]), "score": row["score"], "rank": rank}
+            {
+                "memberId": str(row["refId"]),
+                "score": row["totalScore"],
+                "rank": rank,
+            }
             for rank, row in enumerate(rows, 1)
         ][: max(top, 0)]
     else:
