@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
-import { createQueryKeys } from '@/lib/query';
+import { createQueryKeys, fetchAllPages } from '@/lib/query';
 import type { Problem, ProblemCreate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
@@ -11,11 +11,13 @@ const problemKeys = createQueryKeys('problems');
 export function useProblems(contestId?: string) {
   return useQuery({
     queryKey: contestId ? problemKeys.list({ contestId }) : problemKeys.lists(),
-    queryFn: async () => {
-      const params = contestId ? { contestId, limit: 300 } : { limit: 300 };
-      const res = await api.get<Problem[]>('/problems', { params });
-      return res.data;
-    },
+    queryFn: async () =>
+      fetchAllPages<Problem>(async ({ limit, offset }) => {
+        const res = await api.get<Problem[]>('/problems', {
+          params: { ...(contestId ? { contestId } : {}), limit, offset },
+        });
+        return res.data;
+      }),
   });
 }
 
