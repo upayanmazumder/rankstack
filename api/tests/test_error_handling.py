@@ -1,9 +1,10 @@
 """Global exception handlers map backend failures to correct HTTP statuses."""
 
-from api.redis_ops import delete_session
 from bson import ObjectId
 from pymongo.errors import ConnectionFailure, DuplicateKeyError, WriteError
 from redis.exceptions import ConnectionError as RedisConnectionError
+
+from api.redis_ops import delete_session
 
 
 class _BoomCollection:
