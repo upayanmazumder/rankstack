@@ -18,7 +18,9 @@ def leaderboard_for_contest(db, contest_id, limit: int | None = 10) -> list[dict
     deterministic tie-break. The single source of ranking logic for both
     `GET /contests/{id}/leaderboard` and this aggregation endpoint;
     `limit=None` returns every ranked submitter (used to rebuild the
-    Redis cache)."""
+    Redis cache). `submissionCount` is every submission from a ranked
+    submitter, scored or not, counted separately so it matches
+    `GET /contests/{id}/leaderboard`."""
     pipeline = [
         {
             "$match": {
@@ -33,7 +35,6 @@ def leaderboard_for_contest(db, contest_id, limit: int | None = 10) -> list[dict
                     "refType": "$submittedBy.refType",
                 },
                 "totalScore": {"$sum": "$score"},
-                "submissionCount": {"$sum": 1},
             }
         },
         {
@@ -42,14 +43,38 @@ def leaderboard_for_contest(db, contest_id, limit: int | None = 10) -> list[dict
                 "refId": "$_id.refId",
                 "refType": "$_id.refType",
                 "totalScore": 1,
-                "submissionCount": 1,
             }
         },
         {"$sort": {"totalScore": -1, "refId": -1}},
     ]
     if limit is not None:
         pipeline.append({"$limit": max(limit, 1)})
-    return list(db["submissions"].aggregate(pipeline))
+    rows = list(db["submissions"].aggregate(pipeline))
+    if rows:
+        counts = {
+            row["_id"]: row["count"]
+            for row in db["submissions"].aggregate(
+                [
+                    {
+                        "$match": {
+                            "contestId": contest_id,
+                            "submittedBy.refId": {
+                                "$in": [row["refId"] for row in rows]
+                            },
+                        }
+                    },
+                    {
+                        "$group": {
+                            "_id": "$submittedBy.refId",
+                            "count": {"$sum": 1},
+                        }
+                    },
+                ]
+            )
+        }
+        for row in rows:
+            row["submissionCount"] = counts.get(row["refId"], 0)
+    return rows
 
 
 def avg_score_per_problem_by_difficulty(db) -> list[dict]:

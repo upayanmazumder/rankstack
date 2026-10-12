@@ -308,14 +308,18 @@ above). `GET /contests/{id}/leaderboard` calls it whenever that route
 rebuilds from MongoDB.
 
 ### 1. Contest Leaderboard Pipeline
-Calculates total scores and submission counts for a specific contest.
+Calculates total scores for a specific contest, filtering out ungraded or
+zero-score submissions, and breaks ties with the submitter's ID.
+`submissionCount` is counted separately across every submission from each
+ranked submitter, scored or not, so it matches `GET /contests/{id}/leaderboard`.
 ```
 Pipeline stages:
-$match (contestId)
-  -> $group (_id: {refId, refType}, totalScore: {$sum: "$score"}, count: {$sum: 1})
-  -> $sort (totalScore: -1)
-  -> $limit (limit)
-  -> $project (refId, refType, totalScore, submissionCount)
+$match (contestId, score exists and non-zero)
+  -> $group (_id: {refId, refType}, totalScore: {$sum: "$score"})
+  -> $project (refId, refType, totalScore)
+  -> $sort (totalScore: -1, refId: -1)
+  -> $limit (limit, only when a limit is requested; omitted to fetch every
+     ranked submitter for a full Redis cache rebuild)
 ```
 
 ### 2. Average Score by Difficulty Pipeline

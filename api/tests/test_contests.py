@@ -117,6 +117,29 @@ def test_leaderboard_and_aggregation_endpoint_rank_identically(
     live = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
     aggregated = client.get(f"/aggregations/leaderboard/{contest_id}").json()
 
+    # other and admin are tied at score 5; the pipeline breaks ties by
+    # refId descending, so compute the expected order from the actual
+    # ObjectIds rather than assuming which user id sorts higher.
+    tied_ids_desc = sorted(
+        [users["other"]["id"], users["admin"]["id"]],
+        key=ObjectId,
+        reverse=True,
+    )
+    expected_order = [users["participant"]["id"], *tied_ids_desc]
+    expected_score_by_member = {
+        users["participant"]["id"]: 10,
+        users["other"]["id"]: 5,
+        users["admin"]["id"]: 5,
+    }
+    expected_scores = [
+        expected_score_by_member[member_id] for member_id in expected_order
+    ]
+
+    assert [row["memberId"] for row in live] == expected_order
+    assert [row["score"] for row in live] == expected_scores
+    assert [str(row["refId"]) for row in aggregated] == expected_order
+    assert [row["totalScore"] for row in aggregated] == expected_scores
+
     assert [row["memberId"] for row in live] == [
         str(row["refId"]) for row in aggregated
     ]
