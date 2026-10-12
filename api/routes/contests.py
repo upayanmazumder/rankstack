@@ -8,6 +8,7 @@ from redis.exceptions import RedisError
 
 from api import redis_ops, services
 from api.aggregations.pipelines import leaderboard_for_contest
+from api.config import settings
 from api.db import get_db
 from api.dependencies import AdminUser, CurrentUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -146,6 +147,21 @@ def update_status(
     )
     if doc is None:
         raise HTTPException(status_code=404, detail="Contest not found")
+    try:
+        # Re-read status as late as possible instead of trusting `payload`:
+        # a concurrent status change (e.g. this request ending a contest
+        # racing another reopening it) must win if it lands first, so the
+        # cache's TTL always reflects whichever status is current, not
+        # necessarily this request's own.
+        current = db["contests"].find_one({"_id": oid(contest_id)}, {"status": 1})
+        if current is not None and current.get("status") == "ended":
+            redis_ops.expire_leaderboard(
+                contest_id, settings.leaderboard_ended_ttl_seconds
+            )
+        elif current is not None:
+            redis_ops.persist_leaderboard(contest_id)
+    except RedisError:
+        pass  # Best-effort: the cache still works, just without a TTL yet.
     return serialize_doc(doc)
 
 
@@ -261,6 +277,20 @@ def get_leaderboard(
                 {"_id": contest_oid, "version": version},
                 {"$set": {"reconciledVersion": version}},
             )
+        if replaced:
+            # Re-read status as late as possible instead of trusting a value
+            # read before the aggregation above: a status change racing this
+            # rebuild (e.g. a reopen landing mid-rebuild) must win, or the
+            # leaderboard just rebuilt for a live contest could be handed a
+            # stale "ended" TTL here.
+            current = db["contests"].find_one({"_id": contest_oid}, {"status": 1})
+            if current is not None and current.get("status") == "ended":
+                try:
+                    redis_ops.expire_leaderboard(
+                        contest_id, settings.leaderboard_ended_ttl_seconds
+                    )
+                except RedisError:
+                    pass
         leaderboard = [
             {
                 "memberId": str(row["refId"]),
