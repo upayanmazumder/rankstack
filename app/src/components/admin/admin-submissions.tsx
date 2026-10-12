@@ -31,6 +31,7 @@ export function AdminSubmissions() {
   const [contestId, setContestId] = useState('all');
   const [status, setStatus] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<Submission | null>(null);
+  const [pageError, setPageError] = useState(false);
   const submissions = useAdminSubmissions({
     contestId: contestId === 'all' ? undefined : contestId,
     status: status === 'all' ? undefined : status,
@@ -65,7 +66,10 @@ export function AdminSubmissions() {
             <Filter
               label="Contest"
               value={contestId}
-              onChange={setContestId}
+              onChange={value => {
+                setContestId(value);
+                setPageError(false);
+              }}
               options={[
                 { value: 'all', label: 'All contests' },
                 ...(contests.data ?? []).map(item => ({ value: item.id, label: item.title })),
@@ -74,7 +78,10 @@ export function AdminSubmissions() {
             <Filter
               label="Evaluation status"
               value={status}
-              onChange={value => setStatus(value as StatusFilter)}
+              onChange={value => {
+                setStatus(value as StatusFilter);
+                setPageError(false);
+              }}
               options={[
                 { value: 'all', label: 'All statuses' },
                 { value: 'pending', label: 'Pending' },
@@ -88,7 +95,7 @@ export function AdminSubmissions() {
             <p role="status" className="py-8 text-center text-sm text-muted-foreground">
               Loading submissions…
             </p>
-          ) : submissions.isError ? (
+          ) : submissions.isError && !submissions.data ? (
             <p role="alert" className="py-8 text-center text-sm text-destructive">
               Submissions could not be loaded.
             </p>
@@ -130,16 +137,16 @@ export function AdminSubmissions() {
                   type="button"
                   variant="outline"
                   disabled={submissions.isFetchingNextPage}
-                  onClick={() => void submissions.fetchNextPage()}
+                  onClick={() => {
+                    void submissions.fetchNextPage().then(result => setPageError(result.isError));
+                  }}
                 >
                   {submissions.isFetchingNextPage
                     ? 'Loading submissions…'
                     : 'Load more submissions'}
                 </Button>
               )}
-              {submissions.isFetchNextPageError && (
-                <p role="alert">Could not load more submissions. Try again.</p>
-              )}
+              {pageError && <p role="alert">Could not load more submissions. Try again.</p>}
             </>
           )}
         </CardContent>

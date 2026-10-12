@@ -85,4 +85,37 @@ describe('submission query hooks', () => {
       params: { status: 'pending', limit: 100, offset: 300 },
     });
   });
+
+  it('preserves earlier review pages and retries a failed later page', async () => {
+    const firstPage = Array.from({ length: 100 }, (_, index) => createSubmission(index));
+    let failNextPage = true;
+    apiMocks.get.mockImplementation((_url, config) => {
+      if (config.params.offset === 100 && failNextPage) {
+        return Promise.reject(new Error('Temporary failure'));
+      }
+      return Promise.resolve({
+        data: config.params.offset === 0 ? firstPage : [createSubmission(100)],
+      });
+    });
+
+    const { result } = renderHook(() => useAdminSubmissions({ status: 'pending' }), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.data?.pages).toHaveLength(1));
+    await waitFor(() => expect(result.current.hasNextPage).toBe(true));
+    let failedPage = false;
+    await act(async () => {
+      const fetchResult = await result.current.fetchNextPage();
+      failedPage = fetchResult.isError;
+    });
+    expect(failedPage).toBe(true);
+    expect(result.current.data?.pages.flat()).toEqual(firstPage);
+    expect(result.current.hasNextPage).toBe(true);
+
+    failNextPage = false;
+    await act(async () => {
+      await result.current.fetchNextPage();
+    });
+    await waitFor(() => expect(result.current.data?.pages.flat()).toHaveLength(101));
+  });
 });
