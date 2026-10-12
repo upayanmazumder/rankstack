@@ -241,24 +241,36 @@ def backfill_team_owners(db: Database) -> None:
     first member. `validationLevel="moderate"` lets this update run on
     documents that do not yet satisfy the current schema.
 
-    The write re-checks `ownerId` is still unset at update time, closing
-    the race where a concurrent membership change (e.g. the owner leaving)
-    assigns an owner between this function's read and write.
+    The write re-checks that `ownerId` is still unset AND that the chosen
+    member is still present, closing the race where a concurrent
+    membership change (e.g. that member leaving) could otherwise install a
+    departed member as owner between this function's read and write.
 
     Teams predating the invariant that a team is deleted rather than left
     without members (`remove_team_member`, `delete_user_transaction`) have
     no member to become owner; since `TeamOut.ownerId` is required, such
-    orphaned teams are deleted rather than exposed broken.
+    orphaned teams are removed through `delete_team_transaction`'s own
+    submission/contest/leaderboard cascade rather than exposed broken.
+    `require_empty=True` rechecks emptiness inside that transaction, so a
+    team that gains a member between this read and the delete is spared.
     """
+    from api.services import delete_team_transaction  # local import: api.services
+    # imports api.redis_ops, which imports api.db, so a module-level import
+    # here would be circular.
+
     for team in db["teams"].find({"ownerId": {"$exists": False}}, {"memberIds": 1}):
         member_ids = team.get("memberIds") or []
         if member_ids:
             db["teams"].update_one(
-                {"_id": team["_id"], "ownerId": {"$exists": False}},
+                {
+                    "_id": team["_id"],
+                    "ownerId": {"$exists": False},
+                    "memberIds": member_ids[0],
+                },
                 {"$set": {"ownerId": member_ids[0]}},
             )
         else:
-            db["teams"].delete_one({"_id": team["_id"]})
+            delete_team_transaction(db, team["_id"], require_empty=True)
 
 
 def init_db() -> Database:

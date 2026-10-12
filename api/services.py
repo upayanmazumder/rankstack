@@ -322,6 +322,12 @@ class LastTeamMemberError(Exception):
     """Raised when a removal would leave a team without members."""
 
 
+class TeamOwnershipChangedError(Exception):
+    """Raised when the caller's owner/admin authorization, checked by a
+    route dependency before the transaction started, no longer matches the
+    team's current owner by the time the transaction runs."""
+
+
 def remove_team_member(
     db: Database, team_id: ObjectId, user_id: ObjectId
 ) -> dict[str, Any] | None:
@@ -395,7 +401,11 @@ def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) 
 
 
 def delete_team_transaction(
-    db: Database, team_id: ObjectId, *, require_empty: bool = False
+    db: Database,
+    team_id: ObjectId,
+    *,
+    require_empty: bool = False,
+    authorized_user: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Delete a team and its submissions and references atomically.
 
@@ -403,6 +413,12 @@ def delete_team_transaction(
     `None`) if the team has gained a member since the caller decided to
     delete it, closing the race where an admin adds a member between
     that decision and this transaction running.
+
+    When `authorized_user` is given, non-admin callers are rechecked
+    against the team's current `ownerId` inside this transaction, raising
+    `TeamOwnershipChangedError` if a concurrent ownership change (e.g. the
+    owner leaving) invalidated the route-level `TeamOwnerOrAdmin` check
+    that ran before this call.
     """
     captured: dict[str, Any] = {}
 
@@ -412,6 +428,12 @@ def delete_team_transaction(
             return None
         if require_empty and team.get("memberIds"):
             return None
+        if (
+            authorized_user is not None
+            and authorized_user.get("role") != "admin"
+            and team.get("ownerId") != authorized_user["_id"]
+        ):
+            raise TeamOwnershipChangedError
         contest_docs = list(
             db["contests"].find(
                 {"participants.refType": "team", "participants.refId": team_id},

@@ -160,9 +160,15 @@ def remove_member(
 )
 def delete_team(
     team_id: Annotated[str, Path(description="Unique ID of the team to delete.")],
-    _: TeamOwnerOrAdmin,
+    current: TeamOwnerOrAdmin,
 ):
     """Delete a team and its membership references."""
     db = get_db()
-    if services.delete_team_transaction(db, oid(team_id)) is None:
+    try:
+        team = services.delete_team_transaction(
+            db, oid(team_id), authorized_user=current
+        )
+    except services.TeamOwnershipChangedError:
+        raise HTTPException(status_code=403, detail="Team owner privileges required")
+    if team is None:
         raise HTTPException(status_code=404, detail="Team not found")

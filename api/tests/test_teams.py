@@ -1,7 +1,9 @@
 """Team CRUD and bidirectional membership transactions."""
 
+import pytest
 from bson import ObjectId
 
+from api import services
 from api.db import init_db
 from api.models.common import utcnow
 
@@ -254,3 +256,23 @@ def test_backfill_team_owners_deletes_empty_legacy_teams(client, db, headers_for
     assert db.teams.find_one({"_id": empty_team_id}) is None
     response = client.get("/teams", headers=headers_for("participant"))
     assert response.status_code == 200
+
+
+def test_delete_team_rechecks_ownership_against_concurrent_change(db, users):
+    owner_id = ObjectId(users["participant"]["id"])
+    team = services.create_team(db, "Stale Auth", [owner_id])
+    stale_authorization = {"_id": owner_id, "role": "participant"}
+    # Simulate ownership changing after the route-level `TeamOwnerOrAdmin`
+    # dependency authorized this caller but before the deletion transaction
+    # runs (e.g. a concurrent request transferred ownership).
+    db.teams.update_one(
+        {"_id": team["_id"]},
+        {"$set": {"ownerId": ObjectId(users["other"]["id"])}},
+    )
+
+    with pytest.raises(services.TeamOwnershipChangedError):
+        services.delete_team_transaction(
+            db, team["_id"], authorized_user=stale_authorization
+        )
+
+    assert db.teams.find_one({"_id": team["_id"]}) is not None
