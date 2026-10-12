@@ -241,10 +241,13 @@ def backfill_team_owners(db: Database) -> None:
     first member. `validationLevel="moderate"` lets this update run on
     documents that do not yet satisfy the current schema.
 
-    The write re-checks that `ownerId` is still unset AND that the chosen
+    Each write re-checks that `ownerId` is still unset AND that the chosen
     member is still present, closing the race where a concurrent
     membership change (e.g. that member leaving) could otherwise install a
-    departed member as owner between this function's read and write.
+    departed member as owner. If that conditional write misses because
+    membership changed since the read, the team is re-read and retried
+    (bounded) against its current membership rather than silently left
+    without an owner for the rest of this process's lifetime.
 
     Teams predating the invariant that a team is deleted rather than left
     without members (`remove_team_member`, `delete_user_transaction`) have
@@ -258,19 +261,28 @@ def backfill_team_owners(db: Database) -> None:
     # imports api.redis_ops, which imports api.db, so a module-level import
     # here would be circular.
 
-    for team in db["teams"].find({"ownerId": {"$exists": False}}, {"memberIds": 1}):
-        member_ids = team.get("memberIds") or []
-        if member_ids:
-            db["teams"].update_one(
+    for stub in db["teams"].find({"ownerId": {"$exists": False}}, {"_id": 1}):
+        team_id = stub["_id"]
+        for _ in range(5):  # bounded retries against concurrent membership churn
+            team = db["teams"].find_one(
+                {"_id": team_id}, {"memberIds": 1, "ownerId": 1}
+            )
+            if team is None or "ownerId" in team:
+                break  # deleted, or already owned by this loop or a concurrent writer
+            member_ids = team.get("memberIds") or []
+            if not member_ids:
+                delete_team_transaction(db, team_id, require_empty=True)
+                break
+            result = db["teams"].update_one(
                 {
-                    "_id": team["_id"],
+                    "_id": team_id,
                     "ownerId": {"$exists": False},
                     "memberIds": member_ids[0],
                 },
                 {"$set": {"ownerId": member_ids[0]}},
             )
-        else:
-            delete_team_transaction(db, team["_id"], require_empty=True)
+            if result.matched_count:
+                break
 
 
 def init_db() -> Database:
