@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Sheet = DialogPrimitive.Root;
-const SheetTrigger = DialogPrimitive.Trigger;
 const SheetClose = DialogPrimitive.Close;
 
 function mergeClassName<T>(
@@ -80,15 +79,6 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-      {...props}
-    />
-  );
-}
-
 function SheetTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
@@ -98,27 +88,4 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof DialogP
   );
 }
 
-function SheetDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Description>) {
-  return (
-    <DialogPrimitive.Description
-      className={cn('text-sm text-muted-foreground', className)}
-      {...props}
-    />
-  );
-}
-
-export {
-  Sheet,
-  SheetTrigger,
-  SheetClose,
-  SheetPortal,
-  SheetOverlay,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription,
-};
+export { Sheet, SheetContent, SheetHeader, SheetTitle };

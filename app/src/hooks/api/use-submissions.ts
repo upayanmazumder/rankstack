@@ -7,7 +7,7 @@ import type { Submission, SubmissionCreate } from '@/types';
 import { leaderboardKeys } from './use-contests';
 import { userKeys } from './use-users';
 
-export const submissionKeys = createQueryKeys('submissions');
+const submissionKeys = createQueryKeys('submissions');
 
 interface SubmissionFilters extends Record<string, unknown> {
   contestId?: string;
@@ -48,17 +48,6 @@ export function useSubmissionHistory(userId: string) {
   });
 }
 
-export function useSubmission(id: string) {
-  return useQuery({
-    queryKey: submissionKeys.detail(id),
-    queryFn: async () => {
-      const res = await api.get<Submission>(`/submissions/${id}`);
-      return res.data;
-    },
-    enabled: !!id,
-  });
-}
-
 export function useCreateSubmission() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -83,15 +72,5 @@ export function useUpdateSubmissionStatus(id: string) {
       queryClient.invalidateQueries({ queryKey: leaderboardKeys.all() });
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
     },
-  });
-}
-
-export function useDeleteSubmission(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      await api.delete(`/submissions/${id}`);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: submissionKeys.all() }),
   });
 }

@@ -1,6 +1,6 @@
 export type CodingLanguage = 'python' | 'javascript' | 'cpp';
 
-export interface CodingSolutionAnswer {
+interface CodingSolutionAnswer {
   language: CodingLanguage;
   sourceCode: string;
 }

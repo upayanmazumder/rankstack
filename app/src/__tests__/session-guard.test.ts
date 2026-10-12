@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { GET as proxyGet, POST as proxyPost } from '@/app/api/proxy/[...path]/route';
-import { POST as loginPost } from '@/app/api/session/route';
+import { POST as loginPost, GET as sessionGet } from '@/app/api/session/route';
 import { proxy } from '@/proxy';
 
 const endpoint = 'http://localhost:3000';
@@ -53,6 +53,33 @@ describe('protected route guard', () => {
     expect(verify).toHaveBeenCalledWith(expect.stringContaining('/sessions/valid-token'), {
       cache: 'no-store',
     });
+  });
+
+  it.each([502, 503])(
+    'preserves the cookie on a transient %i verification response',
+    async status => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status })));
+      const request = new NextRequest(`${endpoint}/teams`, {
+        headers: { cookie: 'rankstack-session=valid-token' },
+      });
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(200);
+      expect(response.cookies.get('rankstack-session')).toBeUndefined();
+    }
+  );
+
+  it('preserves the cookie when verification is unreachable', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const request = new NextRequest(`${endpoint}/submissions`, {
+      headers: { cookie: 'rankstack-session=valid-token' },
+    });
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(200);
+    expect(response.cookies.get('rankstack-session')).toBeUndefined();
   });
 });
 
@@ -131,12 +158,15 @@ describe('session route and API proxy', () => {
   });
 
   it('forwards the rankstack-session cookie as a Bearer token through the server API proxy', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ id: 'sub-1' }), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    );
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 'sub-1' }), {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      )
+      .mockResolvedValueOnce(new Response('{}', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
     const request = new NextRequest(`${endpoint}/api/proxy/submissions`, {
@@ -153,11 +183,77 @@ describe('session route and API proxy', () => {
     });
 
     expect(response.status).toBe(201);
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toContain('/submissions');
     const headers = new Headers(init.headers);
     expect(headers.get('Authorization')).toBe('Bearer secret-session-token');
+    expect(response.cookies.get('rankstack-session')?.value).toBe('secret-session-token');
+  });
+
+  it('caches public contest reads without forwarding the session token', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const request = new NextRequest(`${endpoint}/api/proxy/contests/c1/leaderboard`, {
+      headers: { cookie: 'rankstack-session=secret-session-token' },
+    });
+
+    const response = await proxyGet(request, {
+      params: Promise.resolve({ path: ['contests', 'c1', 'leaderboard'] }),
+    });
+
+    expect(response.headers.get('Cache-Control')).toBe(
+      'public, s-maxage=5, stale-while-revalidate=10'
+    );
+    expect(new Headers(fetchMock.mock.calls[0]?.[1]?.headers).has('Authorization')).toBe(false);
+    expect(response.cookies.get('rankstack-session')).toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it('refreshes an active session cookie after its five-minute window', async () => {
+    const user = { id: 'u1', name: 'Current user', role: 'admin' };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ sessionId: 'sess-1', user }), { status: 200 })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const refreshedAt = Date.now() - 6 * 60_000;
+    const request = new NextRequest(`${endpoint}/api/session`, {
+      headers: { cookie: `rankstack-session=sess-1; rankstack-session-window=3600.${refreshedAt}` },
+    });
+
+    const response = await sessionGet(request);
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ user });
+    expect(response.cookies.get('rankstack-session')?.value).toBe('sess-1');
+    expect(response.cookies.get('rankstack-session')?.maxAge).toBe(3600);
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it('does not delete a session cookie on a temporary profile failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 503 })));
+    const request = new NextRequest(`${endpoint}/api/session`, {
+      headers: { cookie: 'rankstack-session=sess-1' },
+    });
+
+    const response = await sessionGet(request);
+
+    expect(response.status).toBe(502);
+    expect(response.cookies.get('rankstack-session')).toBeUndefined();
+  });
+
+  it('clears an expired session cookie after an authentication failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 404 })));
+    const request = new NextRequest(`${endpoint}/api/session`, {
+      headers: { cookie: 'rankstack-session=sess-1' },
+    });
+
+    const response = await sessionGet(request);
+
+    expect(response.status).toBe(401);
+    expect(response.cookies.get('rankstack-session')?.value).toBe('');
   });
 
   it('returns 401 from the proxy without mutating the rankstack-session cookie', async () => {
@@ -191,6 +287,6 @@ describe('session route and API proxy', () => {
     });
 
     expect(response.status).toBe(502);
-    await expect(response.json()).resolves.toEqual({ message: 'Upstream API unavailable' });
+    await expect(response.json()).resolves.toEqual({ detail: 'Upstream API unavailable' });
   });
 });

@@ -12,7 +12,7 @@ import {
 
 import type { SubmissionStatusFilter } from './submission-history-data';
 
-export interface ContestFilterOption {
+interface ContestFilterOption {
   id: string;
   title: string;
 }

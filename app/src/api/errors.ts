@@ -21,16 +21,48 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
+function responseMessage(data: unknown): string | undefined {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return undefined;
+  const body = data as Record<string, unknown>;
+
+  if (typeof body.detail === 'string' && body.detail) return body.detail;
+
+  if (Array.isArray(body.detail)) {
+    const first: unknown = body.detail[0];
+    if (first && typeof first === 'object' && !Array.isArray(first)) {
+      const issue = first as Record<string, unknown>;
+      if (typeof issue.msg === 'string') {
+        const location = Array.isArray(issue.loc)
+          ? issue.loc
+              .filter(
+                (part): part is string | number =>
+                  typeof part === 'string' || typeof part === 'number'
+              )
+              .filter(part => part !== 'body')
+              .join('.')
+          : '';
+        return location ? `${location}: ${issue.msg}` : issue.msg;
+      }
+    }
+  }
+
+  return typeof body.message === 'string' ? body.message : undefined;
+}
+
 export function toApiError(error: unknown): ApiError {
   if (isApiError(error)) return error;
 
   if (isAxiosError(error)) {
     const status = error.response?.status;
-    const data = error.response?.data as Record<string, unknown> | undefined;
+    const data: unknown = error.response?.data;
+    const body =
+      data && typeof data === 'object' && !Array.isArray(data)
+        ? (data as Record<string, unknown>)
+        : undefined;
     return new ApiError({
-      message: (data?.message as string | undefined) ?? error.message,
+      message: responseMessage(data) ?? error.message,
       status,
-      code: data?.code as string | undefined,
+      code: typeof body?.code === 'string' ? body.code : undefined,
       details: data,
     });
   }

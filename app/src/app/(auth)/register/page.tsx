@@ -36,15 +36,22 @@ export default function RegisterPage() {
   async function onSubmit({ name, email, password }: RegisterValues) {
     try {
       await register.mutateAsync({ name, email, password });
-      await login.mutateAsync({ email, password });
-      toast.success('Account created! Welcome to Rankstack.');
-      router.push('/contests');
     } catch (err) {
       if (isApiError(err) && err.status === 409) {
         toast.error('An account with that email already exists.');
       } else {
         toast.error(isApiError(err) ? err.message : 'Registration failed. Please try again.');
       }
+      return;
+    }
+
+    try {
+      await login.mutateAsync({ email, password });
+      toast.success('Account created! Welcome to Rankstack.');
+      router.push('/contests');
+    } catch {
+      toast.info('Account created. Sign in to continue.');
+      router.push('/login');
     }
   }
 

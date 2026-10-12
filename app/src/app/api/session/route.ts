@@ -1,9 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { env } from '@/env';
+import {
+  clearSessionCookies,
+  SESSION_COOKIE_NAME,
+  sessionNeedsRefresh,
+  sessionTtlSeconds,
+  setSessionCookies,
+} from '@/lib/session-cookie';
 import type { Session, User } from '@/types';
-
-const cookieName = 'rankstack-session';
 
 export async function POST(request: NextRequest) {
   const credentials = await request.text();
@@ -58,18 +63,45 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ user });
-  response.cookies.set(cookieName, session.sessionId, {
-    httpOnly: true,
-    secure: request.nextUrl.protocol === 'https:',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: session.expiresInSeconds,
-  });
+  setSessionCookies(response, request, session.sessionId, session.expiresInSeconds);
+  return response;
+}
+
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  if (!token) return NextResponse.json({ detail: 'Session not found' }, { status: 401 });
+
+  let profile: Response;
+  try {
+    profile = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`, {
+      cache: 'no-store',
+    });
+  } catch {
+    return NextResponse.json({ detail: 'Session service unavailable' }, { status: 502 });
+  }
+
+  if (profile.status === 401 || profile.status === 404) {
+    const response = NextResponse.json({ detail: 'Session expired' }, { status: 401 });
+    clearSessionCookies(response);
+    return response;
+  }
+  if (!profile.ok) {
+    return NextResponse.json({ detail: 'Session service unavailable' }, { status: 502 });
+  }
+
+  const detail = (await profile.json()) as { user?: User | null };
+  if (!detail.user) {
+    return NextResponse.json({ detail: 'Session profile unavailable' }, { status: 502 });
+  }
+  const response = NextResponse.json({ user: detail.user });
+  if (sessionNeedsRefresh(request)) {
+    setSessionCookies(response, request, token, sessionTtlSeconds(request));
+  }
   return response;
 }
 
 export async function DELETE(request: NextRequest) {
-  const token = request.cookies.get(cookieName)?.value;
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   let revoked = true;
   if (token) {
     try {
@@ -86,6 +118,6 @@ export async function DELETE(request: NextRequest) {
     }
   }
   const response = new NextResponse(null, { status: revoked ? 204 : 502 });
-  response.cookies.delete(cookieName);
+  clearSessionCookies(response);
   return response;
 }

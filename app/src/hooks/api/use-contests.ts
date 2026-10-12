@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
+import { contestRefetchInterval, LIVE_CONTEST_POLL_INTERVAL_MS } from '@/lib/contest-polling';
 import { createQueryKeys } from '@/lib/query';
 import type {
   Contest,
@@ -13,7 +14,7 @@ import type {
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
 
-export const contestKeys = createQueryKeys('contests');
+const contestKeys = createQueryKeys('contests');
 
 export const leaderboardKeys = {
   all: () => ['leaderboard'] as const,
@@ -47,13 +48,13 @@ export function useContest(id: string) {
       return res.data;
     },
     enabled: !!id,
-    refetchInterval: query => (query.state.data?.status === 'ended' ? false : 5_000),
+    refetchInterval: query => contestRefetchInterval(query.state.data),
   });
 }
 
 export function useLeaderboard(
   contestId: string,
-  refetchInterval: number | false = 5_000,
+  refetchInterval: number | false = LIVE_CONTEST_POLL_INTERVAL_MS,
   top = 10
 ) {
   return useQuery({

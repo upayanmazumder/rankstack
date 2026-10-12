@@ -6,7 +6,7 @@ import type { Problem, ProblemCreate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
 
-export const problemKeys = createQueryKeys('problems');
+const problemKeys = createQueryKeys('problems');
 
 export function useProblems(contestId?: string) {
   return useQuery({

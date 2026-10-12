@@ -11,6 +11,10 @@ import { createSelectors } from './create-selectors';
 interface AuthState {
   user: User | null;
   sessionGeneration: number;
+  // True once the user has explicitly signed out, even if the server-side
+  // cookie deletion failed. Blocks session revalidation from silently
+  // restoring auth until the next successful sign-in.
+  signedOut: boolean;
   setAuth: (userOrToken: User | string | null, legacyUser?: User | null) => void;
   clearAuth: () => void;
 }
@@ -20,17 +24,20 @@ const useAuthStoreBase = create<AuthState>()(
     set => ({
       user: null,
       sessionGeneration: 0,
+      signedOut: false,
       setAuth: (userOrToken, legacyUser) => {
         const nextUser = typeof userOrToken === 'string' ? (legacyUser ?? null) : userOrToken;
         set(state => ({
           user: nextUser,
           sessionGeneration: state.sessionGeneration + 1,
+          signedOut: false,
         }));
       },
       clearAuth: () =>
         set(state => ({
           user: null,
           sessionGeneration: state.sessionGeneration + 1,
+          signedOut: true,
         })),
     }),
     {

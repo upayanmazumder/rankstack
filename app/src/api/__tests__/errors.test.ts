@@ -53,6 +53,25 @@ describe('toApiError', () => {
     expect(result.code).toBe('NOT_FOUND');
   });
 
+  it('prefers a FastAPI detail string over the generic Axios message', () => {
+    const axiosErr = new AxiosError('Request failed with status code 401');
+    Object.defineProperty(axiosErr, 'response', {
+      value: { status: 401, data: { detail: 'Invalid email or password', message: 'Generic' } },
+    });
+    expect(toApiError(axiosErr).message).toBe('Invalid email or password');
+  });
+
+  it('formats the first FastAPI validation issue', () => {
+    const axiosErr = new AxiosError('Request failed with status code 422');
+    Object.defineProperty(axiosErr, 'response', {
+      value: {
+        status: 422,
+        data: { detail: [{ loc: ['body', 'email'], msg: 'Invalid email address' }] },
+      },
+    });
+    expect(toApiError(axiosErr).message).toBe('email: Invalid email address');
+  });
+
   it('converts AxiosError without response', () => {
     const axiosErr = new AxiosError('Network Error');
     const result = toApiError(axiosErr);
