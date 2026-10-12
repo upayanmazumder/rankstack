@@ -50,20 +50,7 @@ def list_problems(
     """List problems while withholding answer and evaluation fields from non-admins."""
     db = get_db()
     admin = user is not None and user.get("role") == "admin"
-    query: dict = {}
-    if contestId:
-        contest_oid = oid(contestId)
-        if not admin:
-            contest = db["contests"].find_one({"_id": contest_oid}, {"status": 1})
-            if contest is None or contest["status"] == "upcoming":
-                return []
-        query["contestId"] = contest_oid
-    elif not admin:
-        visible_contest_ids = [
-            doc["_id"]
-            for doc in db["contests"].find({"status": {"$ne": "upcoming"}}, {"_id": 1})
-        ]
-        query["contestId"] = {"$in": visible_contest_ids}
+    bounded_limit = min(limit, 300)
     projection = (
         None
         if admin
@@ -77,7 +64,39 @@ def list_problems(
             "createdAt": 1,
         }
     )
-    docs = db["problems"].find(query, projection).limit(min(limit, 300))
+    if contestId:
+        contest_oid = oid(contestId)
+        if not admin:
+            contest = db["contests"].find_one({"_id": contest_oid}, {"status": 1})
+            if contest is None or contest["status"] == "upcoming":
+                return []
+        docs = (
+            db["problems"]
+            .find({"contestId": contest_oid}, projection)
+            .limit(bounded_limit)
+        )
+        return [serialize_doc(d) for d in docs]
+    if admin:
+        docs = db["problems"].find({}, projection).limit(bounded_limit)
+        return [serialize_doc(d) for d in docs]
+    # Non-admin, unfiltered: join against `contests` per problem via an
+    # indexed `$lookup` on `contests._id` instead of first materializing
+    # every non-upcoming contest ID into an `$in` list, which would grow
+    # with contest history on every request regardless of `limit`.
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "contests",
+                "localField": "contestId",
+                "foreignField": "_id",
+                "as": "_contest",
+            }
+        },
+        {"$match": {"_contest": {"$elemMatch": {"status": {"$ne": "upcoming"}}}}},
+        {"$limit": bounded_limit},
+        {"$project": projection},
+    ]
+    docs = db["problems"].aggregate(pipeline)
     return [serialize_doc(d) for d in docs]
 
 

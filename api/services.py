@@ -118,6 +118,25 @@ def assert_contest_open_for(
         )
 
 
+def _insert_submission_and_bump_attempt_count(
+    db: Database,
+    session: ClientSession,
+    contest_id: ObjectId,
+    problem_id: ObjectId,
+    answer: Any,
+    doc: dict[str, Any],
+) -> ObjectId:
+    """Shared by `create_submission` and `create_seeded_submission`: validate
+    the problem, insert the submission, and bump `problems.attemptCount`,
+    all inside the caller's transaction."""
+    validate_submission_problem(db, contest_id, problem_id, answer, session=session)
+    result = db["submissions"].insert_one(doc, session=session)
+    db["problems"].update_one(
+        {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
+    )
+    return result.inserted_id
+
+
 def create_submission(
     db: Database,
     contest_id: ObjectId,
@@ -128,6 +147,8 @@ def create_submission(
     """Insert a submission and atomically bump the problem's `attemptCount`.
 
     Transaction #1: `submissions.insert_one` + `problems.update_one($inc)`.
+    Rejects via `assert_contest_open_for` unless the contest is live, inside
+    its time window, and the submitter has joined it.
     """
     doc: dict[str, Any] = {
         "contestId": contest_id,
@@ -141,12 +162,43 @@ def create_submission(
 
     def callback(session: ClientSession) -> ObjectId:
         assert_contest_open_for(db, contest_id, submitted_by, session=session)
-        validate_submission_problem(db, contest_id, problem_id, answer, session=session)
-        result = db["submissions"].insert_one(doc, session=session)
-        db["problems"].update_one(
-            {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
+        return _insert_submission_and_bump_attempt_count(
+            db, session, contest_id, problem_id, answer, doc
         )
-        return result.inserted_id
+
+    doc["_id"] = run_in_transaction(db, callback)
+    return doc
+
+
+def create_seeded_submission(
+    db: Database,
+    contest_id: ObjectId,
+    problem_id: ObjectId,
+    submitted_by: dict[str, Any],
+    answer: Any,
+) -> dict[str, Any]:
+    """Insert a submission and atomically bump the problem's `attemptCount`,
+    skipping the live-contest/participation gate in `assert_contest_open_for`.
+
+    For `scripts/seed.py` only, to backfill history on ended contests: a
+    real-time request must go through `create_submission` instead, whose
+    gate correctly rejects a submission to a contest that is not live. No
+    API route calls this.
+    """
+    doc: dict[str, Any] = {
+        "contestId": contest_id,
+        "problemId": problem_id,
+        "submittedBy": submitted_by,
+        "answer": answer,
+        "status": "pending",
+        "score": 0,
+        "submittedAt": utcnow(),
+    }
+
+    def callback(session: ClientSession) -> ObjectId:
+        return _insert_submission_and_bump_attempt_count(
+            db, session, contest_id, problem_id, answer, doc
+        )
 
     doc["_id"] = run_in_transaction(db, callback)
     return doc

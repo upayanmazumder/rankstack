@@ -9,7 +9,7 @@ contest realistically has zero submissions yet) and use the same
 `users/teams.totalScore`, and the Redis `leaderboard:<contestId>` sorted
 sets all come out consistent with the submission data. Ended contests are
 backdated history, not a live request, so seeding inserts their
-submissions directly (`_seed_submission`) rather than through
+submissions directly (`services.create_seeded_submission`) rather than through
 `services.create_submission`, whose `assert_contest_open_for` check
 correctly rejects a real request against a contest that is not live.
 
@@ -202,31 +202,6 @@ def make_answer(problem: dict):
     return fake.paragraph(nb_sentences=3)
 
 
-def _seed_submission(db, contest_id, problem_id, submitted_by, answer) -> dict:
-    """Insert a submission the same way services.create_submission does,
-    minus the live-contest gate: this is backdated demo history, not a
-    real-time request."""
-    doc = {
-        "contestId": contest_id,
-        "problemId": problem_id,
-        "submittedBy": submitted_by,
-        "answer": answer,
-        "status": "pending",
-        "score": 0,
-        "submittedAt": utcnow(),
-    }
-    with db.client.start_session() as session, session.start_transaction():
-        services.validate_submission_problem(
-            db, contest_id, problem_id, answer, session=session
-        )
-        result = db["submissions"].insert_one(doc, session=session)
-        db["problems"].update_one(
-            {"_id": problem_id}, {"$inc": {"attemptCount": 1}}, session=session
-        )
-    doc["_id"] = result.inserted_id
-    return doc
-
-
 def seed_submissions(db, redis_client, contests: list[dict]) -> int:
     count = 0
     for c in contests:
@@ -237,7 +212,7 @@ def seed_submissions(db, redis_client, contests: list[dict]) -> int:
             problems_sample = random.sample(c["problems"], k=min(2, len(c["problems"])))
             for problem in problems_sample:
                 answer = make_answer(problem)
-                submission = _seed_submission(
+                submission = services.create_seeded_submission(
                     db, c["_id"], problem["_id"], participant, answer
                 )
                 status = weighted_status()

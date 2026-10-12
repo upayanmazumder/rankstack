@@ -109,13 +109,11 @@ def test_submission_list_is_newest_first_and_offset_paginated(
 
 
 def test_concurrent_submissions_to_one_problem_do_not_500(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     """20 different users submit to the same problem at once. Every request
     must retry past MongoDB write conflicts instead of surfacing a 500."""
-    admin = headers_for("admin")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     password_hash = db.users.find_one(
         {"_id": ObjectId(users["participant"]["id"])}, {"passwordHash": 1}
@@ -138,6 +136,11 @@ def test_concurrent_submissions_to_one_problem_do_not_500(
         token = client.post(
             "/sessions", json={"email": email, "password": "Passw0rd!"}
         ).json()["sessionId"]
+        client.post(
+            f"/contests/{contest_id}/participants",
+            json={"refType": "user", "refId": str(user_id)},
+            headers={"Authorization": f"Bearer {token}"},
+        )
         submitters.append((str(user_id), token))
 
     def submit(entry: tuple[str, str]) -> int:
@@ -162,15 +165,14 @@ def test_concurrent_submissions_to_one_problem_do_not_500(
 
 
 def test_concurrent_grades_keep_redis_in_sync_with_mongo(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """Two admins grade the same submission at once. Redis must end up with
     whichever score Mongo actually committed, not a double-counted sum of
     both admins' stale pre-read deltas."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -225,7 +227,7 @@ def test_concurrent_grades_keep_redis_in_sync_with_mongo(
 
 
 def test_submission_status_redis_failure_marks_leaderboard_dirty(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """A Redis outage during grading must not lose the score delta: Mongo is
     updated and the leaderboard is marked dirty. A later successful grade
@@ -233,8 +235,7 @@ def test_submission_status_redis_failure_marks_leaderboard_dirty(
     score and catch `reconciledVersion` up to `version`."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -306,7 +307,7 @@ def test_submission_status_redis_failure_marks_leaderboard_dirty(
 
 
 def test_rebuild_during_grading_does_not_double_count_delta(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """A leaderboard read that rebuilds from MongoDB can race a concurrent
     grade's direct Redis delta write: the grade's MongoDB transaction (and
@@ -318,8 +319,7 @@ def test_rebuild_during_grading_does_not_double_count_delta(
     snapshot that already includes it."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     submission_id = client.post(
         "/submissions",
@@ -373,6 +373,8 @@ def test_rebuild_during_grading_does_not_double_count_delta(
         leaderboard_key(contest_id), users["participant"]["id"]
     )
     assert redis_score == 10
+
+
 def test_submission_create_requires_live_contest_and_participation(
     client, users, headers_for, contest_payload, mcq_problem
 ):

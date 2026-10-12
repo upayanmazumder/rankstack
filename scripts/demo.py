@@ -99,13 +99,23 @@ def main() -> None:
     section(
         "3. Multi-document transaction: create submission + bump problem.attemptCount"
     )
-    problem = db["problems"].find_one({"contestId": any_contest["_id"]})
+    demo_contest = db["contests"].find_one(
+        {"status": "live", "participants.refType": "user"}
+    )
+    if demo_contest is None:
+        raise RuntimeError(
+            "No live contest with a joined user participant found; run scripts/seed.py first"
+        )
+    participant_ref = next(
+        p for p in demo_contest["participants"] if p["refType"] == "user"
+    )
+    demo_user = db["users"].find_one({"_id": participant_ref["refId"]})
+    problem = db["problems"].find_one({"contestId": demo_contest["_id"]})
     before = db["problems"].find_one({"_id": problem["_id"]})["attemptCount"]
-    demo_user = db["users"].find_one({"role": "participant"})
     answer = problem["options"][0] if problem["type"] == "mcq" else "demo-answer"
     sub = services.create_submission(
         db,
-        any_contest["_id"],
+        demo_contest["_id"],
         problem["_id"],
         {"refType": "user", "refId": demo_user["_id"]},
         answer,
