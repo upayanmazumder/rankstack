@@ -1,6 +1,7 @@
 """CRUD routes for `submissions`, backed by the create/status-update transactions
 and Redis rate limiting / leaderboard sync."""
 
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -15,6 +16,8 @@ from api.models.submissions import (
     SubmissionOut,
     SubmissionStatusUpdate,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/submissions", tags=["submissions"])
 
@@ -156,9 +159,25 @@ def update_status(
         and db["dirty_leaderboards"].find_one({"_id": doc["contestId"]}, {"_id": 1})
         is None
     ):
-        redis_ops.update_leaderboard_score(
-            str(doc["contestId"]), str(doc["submittedBy"]["refId"]), delta
-        )
+        try:
+            redis_ops.update_leaderboard_score(
+                str(doc["contestId"]), str(doc["submittedBy"]["refId"]), delta
+            )
+        except RedisError as exc:
+            # Mongo already has the correct score; mark the leaderboard dirty
+            # so a later read rebuilds the ZSET from Mongo instead of
+            # serving a Redis score that silently missed this delta.
+            logger.warning(
+                "Redis leaderboard update failed for contest %s, member %s: %s",
+                doc["contestId"],
+                doc["submittedBy"]["refId"],
+                exc,
+            )
+            db["dirty_leaderboards"].update_one(
+                {"_id": doc["contestId"]},
+                {"$set": {"dirty": True}, "$inc": {"version": 1}},
+                upsert=True,
+            )
     return serialize_doc(doc)
 
 
