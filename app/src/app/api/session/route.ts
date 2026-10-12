@@ -14,10 +14,18 @@ export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') ?? '';
   const origin = request.headers.get('origin');
   const sameSite = request.headers.get('sec-fetch-site');
-  const isSameOrigin = !!origin && new URL(origin).origin === request.nextUrl.origin;
+  let isSameOrigin = false;
+  if (origin) {
+    try {
+      isSameOrigin = new URL(origin).origin === request.nextUrl.origin;
+    } catch {
+      // Opaque or malformed origins cannot authorize a login.
+    }
+  }
   const isSameSiteRequest = sameSite === 'same-origin';
+  const isJson = contentType.split(';', 1)[0]?.trim().toLowerCase() === 'application/json';
 
-  if (!contentType.includes('application/json') || (!isSameOrigin && !isSameSiteRequest)) {
+  if (!isJson || (!isSameOrigin && !isSameSiteRequest)) {
     return new NextResponse(JSON.stringify({ detail: 'Forbidden' }), {
       status: 403,
       headers: { 'Content-Type': 'application/json' },

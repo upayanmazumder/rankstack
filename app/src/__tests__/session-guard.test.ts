@@ -114,6 +114,24 @@ describe('session route and API proxy', () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
+  it.each([
+    ['null', 'application/json'],
+    [endpoint, 'text/plain; x=application/json'],
+  ])('rejects a login with origin %s and media type %s', async (origin, contentType) => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const request = new NextRequest(`${endpoint}/api/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': contentType, origin },
+      body: '{}',
+    });
+
+    const response = await loginPost(request);
+
+    expect(response.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('sets the HttpOnly session cookie and omits sessionId from the login response body', async () => {
     const user = {
       id: 'u1',

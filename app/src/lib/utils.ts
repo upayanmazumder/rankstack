@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 export function mergeClassName<T>(
   className: string | ((state: T) => string | undefined) | undefined,
   staticClassName: string
-) {
+): string | ((state: T) => string) {
   if (typeof className === 'function') {
     return (state: T) => cn(staticClassName, className(state));
   }
