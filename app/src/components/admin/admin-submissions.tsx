@@ -31,7 +31,7 @@ export function AdminSubmissions() {
   const [contestId, setContestId] = useState('all');
   const [status, setStatus] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<Submission | null>(null);
-  const [pageError, setPageError] = useState(false);
+  const [failedPageAt, setFailedPageAt] = useState<number | null>(null);
   const submissions = useAdminSubmissions({
     contestId: contestId === 'all' ? undefined : contestId,
     status: status === 'all' ? undefined : status,
@@ -68,7 +68,7 @@ export function AdminSubmissions() {
               value={contestId}
               onChange={value => {
                 setContestId(value);
-                setPageError(false);
+                setFailedPageAt(null);
               }}
               options={[
                 { value: 'all', label: 'All contests' },
@@ -80,7 +80,7 @@ export function AdminSubmissions() {
               value={status}
               onChange={value => {
                 setStatus(value as StatusFilter);
-                setPageError(false);
+                setFailedPageAt(null);
               }}
               options={[
                 { value: 'all', label: 'All statuses' },
@@ -138,7 +138,11 @@ export function AdminSubmissions() {
                   variant="outline"
                   disabled={submissions.isFetchingNextPage}
                   onClick={() => {
-                    void submissions.fetchNextPage().then(result => setPageError(result.isError));
+                    void submissions
+                      .fetchNextPage()
+                      .then(result =>
+                        setFailedPageAt(result.isError ? result.dataUpdatedAt : null)
+                      );
                   }}
                 >
                   {submissions.isFetchingNextPage
@@ -146,7 +150,17 @@ export function AdminSubmissions() {
                     : 'Load more submissions'}
                 </Button>
               )}
-              {pageError && <p role="alert">Could not load more submissions. Try again.</p>}
+              {failedPageAt !== null && submissions.dataUpdatedAt <= failedPageAt && (
+                <p role="alert">Could not load more submissions. Try again.</p>
+              )}
+              {submissions.isRefetchError && (
+                <p role="alert">
+                  Submission updates failed.{' '}
+                  <Button type="button" variant="link" onClick={() => void submissions.refetch()}>
+                    Retry
+                  </Button>
+                </p>
+              )}
             </>
           )}
         </CardContent>
