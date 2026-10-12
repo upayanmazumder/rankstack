@@ -2,20 +2,10 @@ import * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { X } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn, mergeClassName } from '@/lib/utils';
 
 const Sheet = DialogPrimitive.Root;
 const SheetClose = DialogPrimitive.Close;
-
-function mergeClassName<T>(
-  className: string | ((state: T) => string | undefined) | undefined,
-  staticClassName: string
-) {
-  if (typeof className === 'function') {
-    return (state: T) => cn(staticClassName, className(state));
-  }
-  return cn(staticClassName, className);
-}
 
 function SheetPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
-import { createQueryKeys } from '@/lib/query';
+import { createQueryKeys, fetchAllPages } from '@/lib/query';
 import type { User, UserUpdate } from '@/types';
 
 import { removeFromCachedLists, restoreCachedLists } from './optimistic-delete';
@@ -11,10 +11,11 @@ export const userKeys = createQueryKeys('users');
 export function useUsers() {
   return useQuery({
     queryKey: userKeys.lists(),
-    queryFn: async () => {
-      const res = await api.get<User[]>('/users');
-      return res.data;
-    },
+    queryFn: async () =>
+      fetchAllPages<User>(async ({ limit, offset }) => {
+        const res = await api.get<User[]>('/users', { params: { limit, offset } });
+        return res.data;
+      }),
   });
 }
 

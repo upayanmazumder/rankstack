@@ -12,6 +12,7 @@ export {
 export { useProblems, useProblem, useCreateProblem, useDeleteProblem } from './use-problems';
 export {
   useSubmissions,
+  useAdminSubmissions,
   useSubmissionHistory,
   useCreateSubmission,
   useUpdateSubmissionStatus,

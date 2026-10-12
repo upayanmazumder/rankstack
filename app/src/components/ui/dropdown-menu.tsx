@@ -1,23 +1,13 @@
 import * as React from 'react';
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 
-import { cn } from '@/lib/utils';
+import { cn, mergeClassName } from '@/lib/utils';
 
 const DropdownMenu = MenuPrimitive.Root;
 const DropdownMenuTrigger = MenuPrimitive.Trigger;
 
 function DropdownMenuPortal({ ...props }: React.ComponentProps<typeof MenuPrimitive.Portal>) {
   return <MenuPrimitive.Portal {...props} />;
-}
-
-function mergeClassName<T>(
-  className: string | ((state: T) => string | undefined) | undefined,
-  staticClassName: string
-) {
-  if (typeof className === 'function') {
-    return (state: T) => cn(staticClassName, className(state));
-  }
-  return cn(staticClassName, className);
 }
 
 function DropdownMenuContent({

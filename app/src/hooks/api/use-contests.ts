@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { contestRefetchInterval, LIVE_CONTEST_POLL_INTERVAL_MS } from '@/lib/contest-polling';
-import { createQueryKeys } from '@/lib/query';
+import { createQueryKeys, fetchAllPages } from '@/lib/query';
 import type {
   Contest,
   ContestCreate,
@@ -33,10 +33,13 @@ export interface AddParticipantInput {
 export function useContests(filters?: ContestFilters) {
   return useQuery({
     queryKey: contestKeys.list(filters),
-    queryFn: async () => {
-      const res = await api.get<Contest[]>('/contests', { params: filters });
-      return res.data;
-    },
+    queryFn: async () =>
+      fetchAllPages<Contest>(async ({ limit, offset }) => {
+        const res = await api.get<Contest[]>('/contests', {
+          params: { ...filters, limit, offset },
+        });
+        return res.data;
+      }),
   });
 }
 

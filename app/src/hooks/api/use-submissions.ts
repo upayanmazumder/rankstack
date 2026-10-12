@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api';
 import { createQueryKeys } from '@/lib/query';
@@ -16,6 +16,25 @@ interface SubmissionFilters extends Record<string, unknown> {
 }
 
 const SUBMISSION_HISTORY_PAGE_SIZE = 100;
+
+const ADMIN_SUBMISSION_PAGE_SIZE = 100;
+
+export function useAdminSubmissions(filters: SubmissionFilters) {
+  return useInfiniteQuery({
+    queryKey: submissionKeys.list({ ...filters, scope: 'admin-review' }),
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const response = await api.get<Submission[]>('/submissions', {
+        params: { ...filters, limit: ADMIN_SUBMISSION_PAGE_SIZE, offset: pageParam },
+      });
+      return response.data;
+    },
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.length === ADMIN_SUBMISSION_PAGE_SIZE
+        ? pages.length * ADMIN_SUBMISSION_PAGE_SIZE
+        : undefined,
+  });
+}
 
 export function useSubmissions(filters?: SubmissionFilters) {
   return useQuery({

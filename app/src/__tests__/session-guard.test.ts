@@ -50,8 +50,9 @@ describe('protected route guard', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('location')).toBeNull();
-    expect(verify).toHaveBeenCalledWith(expect.stringContaining('/sessions/valid-token'), {
+    expect(verify).toHaveBeenCalledWith(expect.stringContaining('/sessions/current'), {
       cache: 'no-store',
+      headers: { Authorization: 'Bearer valid-token' },
     });
   });
 
@@ -102,7 +103,7 @@ describe('session route and API proxy', () => {
 
     const request = new NextRequest(`${endpoint}/api/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', origin: endpoint },
       body: JSON.stringify({ email: 'ada@example.com', password: 'secret' }),
     });
 
@@ -111,6 +112,24 @@ describe('session route and API proxy', () => {
     expect(response.status).toBe(500);
     expect(response.cookies.get('rankstack-session')).toBeUndefined();
     expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it.each([
+    ['null', 'application/json'],
+    [endpoint, 'text/plain; x=application/json'],
+  ])('rejects a login with origin %s and media type %s', async (origin, contentType) => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const request = new NextRequest(`${endpoint}/api/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': contentType, origin },
+      body: '{}',
+    });
+
+    const response = await loginPost(request);
+
+    expect(response.status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('sets the HttpOnly session cookie and omits sessionId from the login response body', async () => {
@@ -144,7 +163,7 @@ describe('session route and API proxy', () => {
 
     const request = new NextRequest(`${endpoint}/api/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', origin: endpoint },
       body: JSON.stringify({ email: 'ada@example.com', password: 'secret' }),
     });
 

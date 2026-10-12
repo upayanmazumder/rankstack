@@ -35,3 +35,22 @@ export function createQueryKeys<K extends string>(entity: K) {
     detail: (id: string | number) => [entity, id] as const,
   };
 }
+
+// Loop a bounded, offset-paginated list endpoint until a short page signals
+// the end, returning every record. Used by directory-style queries (e.g. the
+// user and team catalogs) whose callers expect the complete collection for
+// client-side search and member-selection, not just the first page.
+export async function fetchAllPages<T>(
+  fetchPage: (params: { limit: number; offset: number }) => Promise<T[]>,
+  pageSize = 200
+): Promise<T[]> {
+  const results: T[] = [];
+  let offset = 0;
+  for (;;) {
+    const page = await fetchPage({ limit: pageSize, offset });
+    results.push(...page);
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+  return results;
+}

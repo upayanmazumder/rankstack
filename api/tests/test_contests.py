@@ -64,6 +64,30 @@ def test_contest_lifecycle(client, db, users, headers_for, contest_payload):
     assert client.get(f"/contests/{contest_id}").status_code == 404
 
 
+def test_contest_list_is_bounded_and_stable(client, db, users, headers_for):
+    admin = headers_for("admin")
+    created = []
+    for idx in range(3):
+        response = client.post(
+            "/contests",
+            json={
+                "title": f"Contest {idx}",
+                "description": f"desc {idx}",
+                "startTime": "2026-01-01T00:00:00Z",
+                "endTime": "2026-01-02T00:00:00Z",
+                "createdBy": users["admin"]["id"],
+                "problemIds": [],
+            },
+            headers=admin,
+        )
+        assert response.status_code == 201
+        created.append(response.json()["id"])
+
+    first_page = client.get("/contests", params={"limit": 2, "offset": 1}).json()
+    assert [item["id"] for item in first_page] == [created[1], created[2]]
+    assert client.get("/contests", params={"limit": 0}).status_code == 422
+
+
 def test_leaderboard_nonexistent_contest(client):
     nonexistent = str(ObjectId())
     res = client.get(f"/contests/{nonexistent}/leaderboard")

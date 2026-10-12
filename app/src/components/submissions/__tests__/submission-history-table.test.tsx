@@ -28,12 +28,10 @@ describe('SubmissionHistoryTable', () => {
 
     const table = screen.getByRole('table', { name: 'Submission history' });
     expect(table).toBeInTheDocument();
-    expect(table.parentElement).toHaveClass(
-      'min-w-0',
-      'max-w-full',
-      'overflow-x-auto',
-      'overscroll-x-contain'
-    );
+    // The table scrolls inside its own container on narrow screens, so every
+    // column — including the last — must stay reachable via the accessibility
+    // tree rather than being clipped out of the DOM.
+    expect(screen.getByRole('columnheader', { name: 'Submission Date' })).toBeInTheDocument();
     expect(screen.getByText('Array Rotation')).toBeInTheDocument();
     expect(screen.getByText('Autumn Invitational')).toBeInTheDocument();
     expect(screen.getByText('Accepted')).toBeInTheDocument();

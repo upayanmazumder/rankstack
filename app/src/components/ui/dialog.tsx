@@ -1,20 +1,10 @@
 import * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
-import { cn } from '@/lib/utils';
+import { cn, mergeClassName } from '@/lib/utils';
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
-
-function mergeClassName<T>(
-  className: string | ((state: T) => string | undefined) | undefined,
-  staticClassName: string
-) {
-  if (typeof className === 'function') {
-    return (state: T) => cn(staticClassName, className(state));
-  }
-  return cn(staticClassName, className);
-}
 
 function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal {...props} />;

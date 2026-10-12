@@ -95,8 +95,10 @@ def test_team_and_user_catalogs_are_complete_by_default(client, db, users, heade
     )
 
     headers = headers_for("participant")
-    assert len(client.get("/teams", headers=headers).json()) == 55
-    assert len(client.get("/users", headers=headers).json()) == 58
+    assert len(client.get("/teams", headers=headers, params={"limit": 20}).json()) == 20
+    assert len(client.get("/users", headers=headers, params={"limit": 20}).json()) == 20
+    assert client.get("/teams", headers=headers, params={"limit": 0}).status_code == 422
+    assert client.get("/users", headers=headers, params={"limit": 0}).status_code == 422
 
 
 def test_team_create_rejects_nonexistent_member_id(client, db, headers_for):

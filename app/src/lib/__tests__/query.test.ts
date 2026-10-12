@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { QUERY_STALE_TIME_MS } from '@/constants';
 
-import { getQueryClient, makeQueryClient } from '../query';
+import { fetchAllPages, getQueryClient, makeQueryClient } from '../query';
 
 describe('makeQueryClient', () => {
   it('returns a QueryClient', () => {
@@ -30,5 +30,30 @@ describe('getQueryClient', () => {
 
   it('returns a QueryClient', () => {
     expect(getQueryClient()).toBeInstanceOf(QueryClient);
+  });
+});
+
+describe('fetchAllPages', () => {
+  it('continues through full pages and returns records from the last short page', async () => {
+    const offsets: number[] = [];
+    const records = await fetchAllPages(async ({ limit, offset }) => {
+      offsets.push(offset);
+      expect(limit).toBe(2);
+      return [1, 2, 3, 4, 5].slice(offset, offset + limit);
+    }, 2);
+
+    expect(records).toEqual([1, 2, 3, 4, 5]);
+    expect(offsets).toEqual([0, 2, 4]);
+  });
+
+  it('stops after an empty page when the last data page is full', async () => {
+    const offsets: number[] = [];
+    const records = await fetchAllPages(async ({ limit, offset }) => {
+      offsets.push(offset);
+      return [1, 2].slice(offset, offset + limit);
+    }, 2);
+
+    expect(records).toEqual([1, 2]);
+    expect(offsets).toEqual([0, 2]);
   });
 });

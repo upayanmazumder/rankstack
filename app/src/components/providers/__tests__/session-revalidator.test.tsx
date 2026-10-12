@@ -51,6 +51,22 @@ describe('SessionRevalidator', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/session', { cache: 'no-store' });
   });
 
+  it('removes private account data when revalidation changes the user role', async () => {
+    const current = { ...participant, role: 'admin' as const };
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(new Response(JSON.stringify({ user: participant }), { status: 200 }))
+    );
+    useAuthStore.getState().setAuth(current);
+    const queryClient = renderRevalidator();
+    queryClient.setQueryData(['users', 'list'], [{ email: 'private@example.com' }]);
+
+    await waitFor(() => expect(useAuthStore.getState().user?.role).toBe('participant'));
+    expect(queryClient.getQueryData(['users', 'list'])).toBeUndefined();
+  });
+
   it('clears stale profile and private queries when the cookie is invalid', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 401 })));
     const queryClient = renderRevalidator();

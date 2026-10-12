@@ -16,10 +16,10 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (token) {
     try {
-      const result = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`,
-        { cache: 'no-store' }
-      );
+      const result = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
+        cache: 'no-store',
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (result.ok) return NextResponse.next();
       if (result.status !== 401 && result.status !== 404) return NextResponse.next();
     } catch {

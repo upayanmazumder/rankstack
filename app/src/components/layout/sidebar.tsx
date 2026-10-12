@@ -7,7 +7,8 @@ import { FileText, LayoutDashboard, ListOrdered, Shield, Trophy, Users } from 'l
 
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useAuthStore, useUiStore } from '@/stores';
+import { useHydratedUser } from '@/hooks/use-hydrated-user';
+import { useUiStore } from '@/stores';
 
 const MAIN_LINKS = [
   { href: '/contests', label: 'Contests', icon: Trophy },
@@ -27,7 +28,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const sidebarOpen = useUiStore(state => state.sidebarOpen);
   const setSidebarOpen = useUiStore(state => state.setSidebarOpen);
-  const user = useAuthStore(state => state.user);
+  const user = useHydratedUser();
   const focusFirstLink = useCallback(
     (node: HTMLAnchorElement | null) => {
       if (sidebarOpen) node?.focus();

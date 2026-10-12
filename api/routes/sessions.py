@@ -2,15 +2,19 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Path, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict
 
 from api import redis_ops
 from api.config import settings
 from api.db import get_db
-from api.models.common import oid, serialize_doc
+from api.dependencies import get_current_user
+from api.models.common import serialize_doc
 from api.models.users import UserOut
 from api.security import DUMMY_PASSWORD_HASH, new_session_token, verify_password
+
+bearer_scheme = HTTPBearer(auto_error=False)
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -110,36 +114,37 @@ def login(payload: LoginRequest, request: Request):
 
 
 @router.get(
-    "/{session_id}",
+    "/current",
     response_model=SessionDetail,
-    summary="Get the session profile",
-    description="Validate and refresh a session, then return its user profile. Treat `session_id` as a secret credential. Returns 200; errors: 404 when the session is missing or expired.",
+    summary="Get the current session profile",
+    description="Validate the bearer session token in the Authorization header and return its public user profile. Returns 200; errors: 401 when the session is missing or expired.",
 )
 def get_session(
-    session_id: Annotated[
-        str, Path(description="Opaque session ID returned at login.")
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(bearer_scheme),
     ],
 ):
-    """Validate a session token and return its public user profile."""
-    user_id = redis_ops.get_session_user(session_id)
-    if user_id is None:
-        raise HTTPException(status_code=404, detail="Session not found or expired")
-    db = get_db()
-    user = db["users"].find_one({"_id": oid(user_id)})
-    if user is None:
-        raise HTTPException(status_code=404, detail="Session not found or expired")
-    redis_ops.touch_session(session_id)
-    return {"sessionId": session_id, "user": serialize_doc(user)}
+    """Validate the current bearer token and return its user profile."""
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
+    user = get_current_user(credentials)
+    return {"sessionId": credentials.credentials, "user": serialize_doc(user)}
 
 
 @router.delete(
-    "/{session_id}",
+    "/current",
     status_code=204,
-    summary="Delete a session",
-    description="Revoke the session identified by its opaque ID. Returns 204 with no response body.",
+    summary="Delete the current session",
+    description="Revoke the bearer session token in the Authorization header. Returns 204 with no response body.",
 )
 def logout(
-    session_id: Annotated[str, Path(description="Opaque session ID to revoke.")],
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(bearer_scheme),
+    ],
 ):
-    """Revoke a session token; successful logout has no response body."""
-    redis_ops.delete_session(session_id)
+    """Revoke the current session token; successful logout has no response body."""
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
+    redis_ops.delete_session(credentials.credentials)

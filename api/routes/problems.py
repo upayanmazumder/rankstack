@@ -44,8 +44,9 @@ def list_problems(
     user: OptionalUser,
     contestId: str | None = Query(default=None, description="Filter by contest ID."),
     limit: int = Query(
-        default=100, description="Maximum results to return; capped at 300."
+        default=100, ge=1, le=300, description="Maximum results to return."
     ),
+    offset: int = Query(default=0, ge=0, description="Number of problems to skip."),
 ):
     """List problems while withholding answer and evaluation fields from non-admins."""
     db = get_db()
@@ -73,11 +74,19 @@ def list_problems(
         docs = (
             db["problems"]
             .find({"contestId": contest_oid}, projection)
+            .sort([("_id", 1)])
+            .skip(offset)
             .limit(bounded_limit)
         )
         return [serialize_doc(d) for d in docs]
     if admin:
-        docs = db["problems"].find({}, projection).limit(bounded_limit)
+        docs = (
+            db["problems"]
+            .find({}, projection)
+            .sort([("_id", 1)])
+            .skip(offset)
+            .limit(bounded_limit)
+        )
         return [serialize_doc(d) for d in docs]
     # Non-admin, unfiltered: join against `contests` per problem via an
     # indexed `$lookup` on `contests._id` instead of first materializing
@@ -93,6 +102,8 @@ def list_problems(
             }
         },
         {"$match": {"_contest": {"$elemMatch": {"status": {"$ne": "upcoming"}}}}},
+        {"$sort": {"_id": 1}},
+        {"$skip": offset},
         {"$limit": bounded_limit},
         {"$project": projection},
     ]

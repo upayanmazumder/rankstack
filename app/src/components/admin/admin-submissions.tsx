@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { AdminPageShell } from '@/components/admin/admin-page-shell';
 import {
+  Button,
   Card,
   CardContent,
   Label,
@@ -18,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui';
-import { useContests, useProblems, useSubmissions, useTeams, useUsers } from '@/hooks/api';
+import { useAdminSubmissions, useContests, useProblems, useTeams, useUsers } from '@/hooks/api';
 import type { Submission, SubmissionStatus } from '@/types';
 
 import { SubmissionAdminRow } from './submission-admin-row';
@@ -30,7 +31,11 @@ export function AdminSubmissions() {
   const [contestId, setContestId] = useState('all');
   const [status, setStatus] = useState<StatusFilter>('pending');
   const [selected, setSelected] = useState<Submission | null>(null);
-  const submissions = useSubmissions();
+  const [failedPageAt, setFailedPageAt] = useState<number | null>(null);
+  const submissions = useAdminSubmissions({
+    contestId: contestId === 'all' ? undefined : contestId,
+    status: status === 'all' ? undefined : status,
+  });
   const contests = useContests();
   const problems = useProblems();
   const users = useUsers();
@@ -46,13 +51,7 @@ export function AdminSubmissions() {
     }),
     [contests.data, problems.data, teams.data, users.data]
   );
-  const visible = (submissions.data ?? [])
-    .filter(
-      item =>
-        (contestId === 'all' || item.contestId === contestId) &&
-        (status === 'all' || item.status === status)
-    )
-    .sort((a, b) => Date.parse(b.submittedAt) - Date.parse(a.submittedAt));
+  const visible = submissions.data?.pages.flat() ?? [];
   const selectedProblem = problems.data?.find(problem => problem.id === selected?.problemId);
 
   return (
@@ -67,7 +66,10 @@ export function AdminSubmissions() {
             <Filter
               label="Contest"
               value={contestId}
-              onChange={setContestId}
+              onChange={value => {
+                setContestId(value);
+                setFailedPageAt(null);
+              }}
               options={[
                 { value: 'all', label: 'All contests' },
                 ...(contests.data ?? []).map(item => ({ value: item.id, label: item.title })),
@@ -76,7 +78,10 @@ export function AdminSubmissions() {
             <Filter
               label="Evaluation status"
               value={status}
-              onChange={value => setStatus(value as StatusFilter)}
+              onChange={value => {
+                setStatus(value as StatusFilter);
+                setFailedPageAt(null);
+              }}
               options={[
                 { value: 'all', label: 'All statuses' },
                 { value: 'pending', label: 'Pending' },
@@ -90,7 +95,7 @@ export function AdminSubmissions() {
             <p role="status" className="py-8 text-center text-sm text-muted-foreground">
               Loading submissions…
             </p>
-          ) : submissions.isError ? (
+          ) : submissions.isError && !submissions.data ? (
             <p role="alert" className="py-8 text-center text-sm text-destructive">
               Submissions could not be loaded.
             </p>
@@ -99,33 +104,64 @@ export function AdminSubmissions() {
               No submissions match these filters.
             </p>
           ) : (
-            <Table aria-label="Submission review queue" className="min-w-[900px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Submitter</TableHead>
-                  <TableHead>Problem</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {visible.map(item => (
-                  <SubmissionAdminRow
-                    key={item.id}
-                    submission={item}
-                    submitterName={
-                      lookups.submitters.get(item.submittedBy.refId) ??
-                      item.submittedBy.refId.slice(0, 8)
-                    }
-                    contestTitle={lookups.contests.get(item.contestId) ?? 'Unknown contest'}
-                    problemTitle={lookups.problems.get(item.problemId) ?? 'Unknown problem'}
-                    onReview={setSelected}
-                  />
-                ))}
-              </TableBody>
-            </Table>
+            <>
+              <Table aria-label="Submission review queue" className="min-w-[900px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Submitter</TableHead>
+                    <TableHead>Problem</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Score</TableHead>
+                    <TableHead>Submitted</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visible.map(item => (
+                    <SubmissionAdminRow
+                      key={item.id}
+                      submission={item}
+                      submitterName={
+                        lookups.submitters.get(item.submittedBy.refId) ??
+                        item.submittedBy.refId.slice(0, 8)
+                      }
+                      contestTitle={lookups.contests.get(item.contestId) ?? 'Unknown contest'}
+                      problemTitle={lookups.problems.get(item.problemId) ?? 'Unknown problem'}
+                      onReview={setSelected}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+              {submissions.hasNextPage && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={submissions.isFetchingNextPage}
+                  onClick={() => {
+                    void submissions
+                      .fetchNextPage()
+                      .then(result =>
+                        setFailedPageAt(result.isError ? result.dataUpdatedAt : null)
+                      );
+                  }}
+                >
+                  {submissions.isFetchingNextPage
+                    ? 'Loading submissions…'
+                    : 'Load more submissions'}
+                </Button>
+              )}
+              {failedPageAt !== null && submissions.dataUpdatedAt <= failedPageAt && (
+                <p role="alert">Could not load more submissions. Try again.</p>
+              )}
+              {submissions.isRefetchError && (
+                <p role="alert">
+                  Submission updates failed.{' '}
+                  <Button type="button" variant="link" onClick={() => void submissions.refetch()}>
+                    Retry
+                  </Button>
+                </p>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

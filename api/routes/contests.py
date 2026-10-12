@@ -11,7 +11,7 @@ from api.aggregations.pipelines import leaderboard_for_contest
 from api.config import settings
 from api.db import get_db
 from api.dependencies import AdminUser, CurrentUser
-from api.models.common import oid, serialize_doc, utcnow
+from api.models.common import oid, paginate_collection, serialize_doc, utcnow
 from api.models.contests import (
     ContestAddParticipant,
     ContestCreate,
@@ -61,13 +61,20 @@ def create_contest(payload: ContestCreate, _: AdminUser):
 def list_contests(
     status: str | None = Query(default=None, description="Filter by contest status."),
     limit: int = Query(
-        default=50, description="Maximum results to return; capped at 200."
+        default=50, ge=1, le=200, description="Maximum results to return."
     ),
+    offset: int = Query(default=0, ge=0, description="Number of contests to skip."),
 ):
-    """List contests with optional status filtering and a bounded result limit."""
+    """List contests with optional status filtering and a stable bounded page."""
     db = get_db()
     query = {"status": status} if status else {}
-    docs = db["contests"].find(query).limit(min(limit, 200))
+    docs = paginate_collection(
+        db["contests"],
+        query=query,
+        limit=limit,
+        offset=offset,
+        sort=[("_id", 1)],
+    )
     return [serialize_doc(d) for d in docs]
 
 

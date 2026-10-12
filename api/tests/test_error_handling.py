@@ -81,14 +81,15 @@ def test_schema_validation_write_error_returns_422(client, headers_for, monkeypa
     assert response.status_code == 422
 
 
-def test_session_for_deleted_user_returns_404(client, db, users, headers_for):
-    token = headers_for("participant")["Authorization"].removeprefix("Bearer ")
+def test_session_for_deleted_user_returns_401(client, db, users, headers_for):
+    headers = headers_for("participant")
+    token = headers["Authorization"].removeprefix("Bearer ")
     db.users.delete_one({"_id": ObjectId(users["participant"]["id"])})
 
     try:
-        response = client.get(f"/sessions/{token}")
+        response = client.get("/sessions/current", headers=headers)
 
-        assert response.status_code == 404
+        assert response.status_code == 401
     finally:
         delete_session(token)
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { cn } from '../utils';
+import { cn, mergeClassName } from '../utils';
 
 describe('cn', () => {
   it('concatenates class names', () => {
@@ -21,5 +21,23 @@ describe('cn', () => {
 
   it('handles conditional objects', () => {
     expect(cn({ active: true, disabled: false })).toBe('active');
+  });
+});
+
+describe('mergeClassName', () => {
+  it('merges a static class with caller classes', () => {
+    expect(mergeClassName('p-2 text-sm', 'p-4')).toBe('p-2 text-sm');
+  });
+
+  it('passes component state to a dynamic class callback', () => {
+    const classes = mergeClassName(
+      (state: { selected: boolean }) => (state.selected ? 'text-red-500' : 'text-blue-500'),
+      'text-sm'
+    );
+    expect(typeof classes).toBe('function');
+    if (typeof classes === 'function') {
+      expect(classes({ selected: true })).toBe('text-sm text-red-500');
+      expect(classes({ selected: false })).toBe('text-sm text-blue-500');
+    }
   });
 });

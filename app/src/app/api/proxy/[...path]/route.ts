@@ -69,10 +69,11 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
 
   if (token && !publicContestRead && upstream.ok && sessionNeedsRefresh(request)) {
     try {
-      const session = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`,
-        { cache: 'no-store', signal: AbortSignal.timeout(SESSION_REFRESH_FETCH_TIMEOUT_MS) }
-      );
+      const session = await fetch(`${env.NEXT_PUBLIC_API_URL}/sessions/current`, {
+        cache: 'no-store',
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(SESSION_REFRESH_FETCH_TIMEOUT_MS),
+      });
       if (session.status === 200) {
         setSessionCookies(response, request, token, sessionTtlSeconds(request));
       }

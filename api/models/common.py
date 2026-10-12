@@ -44,3 +44,20 @@ def serialize_doc(doc: dict[str, Any] | None) -> dict[str, Any] | None:
         key = "id" if k == "_id" else k
         out[key] = serialize_value(v)
     return out
+
+
+def paginate_collection(
+    collection: Any,
+    *,
+    query: dict[str, Any] | None = None,
+    limit: int,
+    offset: int = 0,
+    sort: list[tuple[str, int]] | tuple[str, int] | None = None,
+):
+    """Apply a stable sort, skip/limit window, and return the Mongo cursor."""
+    cursor = collection.find(query or {})
+    if sort is not None:
+        cursor = cursor.sort(sort)
+    if offset > 0:
+        cursor = cursor.skip(offset)
+    return cursor.limit(limit)
