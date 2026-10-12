@@ -57,7 +57,7 @@ class UserOut(BaseModel):
 
     id: str
     name: str
-    email: str
+    email: str | None = None
     role: Role
     totalScore: float = 0
     teamIds: list[str] = []

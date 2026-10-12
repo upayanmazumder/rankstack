@@ -49,7 +49,7 @@ export function UserAdminRow({ user, currentUserId }: UserAdminRowProps) {
       <TableRow>
         <TableCell>
           <p className="font-medium">{user.name}</p>
-          <p className="text-xs text-muted-foreground">{user.email}</p>
+          <p className="text-xs text-muted-foreground">{user.email ?? '—'}</p>
         </TableCell>
         <TableCell>
           <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>

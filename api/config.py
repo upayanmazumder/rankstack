@@ -33,5 +33,8 @@ class Settings(BaseSettings):
     rate_limit_max_submissions: int = 10
     leaderboard_ended_ttl_seconds: int = 604800  # 7 days
 
+    login_rate_limit_window_seconds: int = 60
+    login_rate_limit_max_attempts: int = 5
+
 
 settings = Settings()

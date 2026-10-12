@@ -7,6 +7,7 @@ Key layout:
   user_sessions:<userId>           -> SET    sessionIds, for bulk revocation on account deletion
   rate_limit:<userId>              -> STRING counter, TTL sliding window
   rate_limit_window:<userId>       -> STRING opaque token identifying the current window
+  login_attempts:<email|ip>        -> STRING counter, TTL fixed window
 """
 
 import secrets
@@ -226,6 +227,47 @@ if count == 1 then
 end
 return {count, redis.call('GET', KEYS[2])}
 """
+
+
+_INCR_WITH_EXPIRY = """
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+    redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+return count
+"""
+
+
+def _increment_with_expiry(key: str, window_seconds: int) -> int:
+    """Atomically increment a fixed-window counter and set its TTL on first use.
+
+    A Lua script keeps the increment and the TTL set in one Redis round trip,
+    so a crash or race between two clients can never leave the counter
+    without an expiry.
+    """
+    return get_redis_client().eval(_INCR_WITH_EXPIRY, 1, key, window_seconds)
+
+
+def login_attempt_key(identifier: str) -> str:
+    return f"login_attempts:{identifier}"
+
+
+def check_and_increment_login_attempts(email: str, client_ip: str) -> tuple[bool, int]:
+    """Throttle login attempts per client IP and per email; the busier key
+    wins. Checks the IP first and only touches the email key if the IP is
+    still within budget, so a blocked IP cannot keep creating new email
+    counters by varying the email on every request."""
+    window = settings.login_rate_limit_window_seconds
+    ip_count = _increment_with_expiry(login_attempt_key(f"ip:{client_ip}"), window)
+    if ip_count > settings.login_rate_limit_max_attempts:
+        return False, ip_count
+    normalized_email = email.strip().lower()[:254]  # RFC 5321 max mailbox length
+    email_count = _increment_with_expiry(
+        login_attempt_key(f"email:{normalized_email}"), window
+    )
+    count = max(email_count, ip_count)
+    allowed = count <= settings.login_rate_limit_max_attempts
+    return allowed, count
 
 
 def check_and_increment_rate_limit(user_id: str) -> tuple[bool, int, str]:
