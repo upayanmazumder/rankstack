@@ -140,11 +140,15 @@ def user_sessions_key(user_id: str) -> str:
 
 def create_session(session_id: str, user_id: str) -> None:
     """Store the session and track it against the owning user so every
-    session can be revoked at once (see `revoke_user_sessions`)."""
+    session can be revoked at once (see `revoke_user_sessions`). The
+    tracking set's TTL mirrors the session TTL so an entry for a session
+    that later expires without an explicit logout does not linger in the
+    set forever."""
     r = get_redis_client()
     with r.pipeline() as pipe:
         pipe.set(session_key(session_id), user_id, ex=settings.session_ttl_seconds)
         pipe.sadd(user_sessions_key(user_id), session_id)
+        pipe.expire(user_sessions_key(user_id), settings.session_ttl_seconds)
         pipe.execute()
 
 
@@ -154,9 +158,19 @@ def get_session_user(session_id: str) -> str | None:
 
 
 def touch_session(session_id: str) -> bool:
-    """Refresh a session's TTL (inactivity expiry). Returns False if it's gone."""
+    """Refresh a session's TTL (inactivity expiry), and the owning user's
+    session-tracking set TTL alongside it so the set stays alive for as
+    long as any of the user's sessions are active. Returns False if the
+    session is already gone."""
     r = get_redis_client()
-    return bool(r.expire(session_key(session_id), settings.session_ttl_seconds))
+    user_id = r.get(session_key(session_id))
+    if user_id is None:
+        return False
+    with r.pipeline() as pipe:
+        pipe.expire(session_key(session_id), settings.session_ttl_seconds)
+        pipe.expire(user_sessions_key(user_id), settings.session_ttl_seconds)
+        results = pipe.execute()
+    return bool(results[0])
 
 
 def delete_session(session_id: str) -> None:

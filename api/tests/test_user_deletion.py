@@ -3,6 +3,9 @@ leaderboards, and active sessions."""
 
 from bson import ObjectId
 
+from api.db import get_redis_client
+from api.redis_ops import session_key, user_sessions_key
+
 
 def test_delete_user_cascades_team_contest_and_submission_references(
     client, db, users, headers_for, contest_payload, mcq_problem
@@ -43,6 +46,9 @@ def test_delete_user_cascades_team_contest_and_submission_references(
         json={"userId": users["participant"]["id"]},
         headers=admin,
     )
+    second_session_headers = headers_for("participant")
+    first_session_id = participant["Authorization"].removeprefix("Bearer ")
+    second_session_id = second_session_headers["Authorization"].removeprefix("Bearer ")
 
     assert (
         client.delete(
@@ -61,7 +67,10 @@ def test_delete_user_cascades_team_contest_and_submission_references(
 
     reloaded_contest = db.contests.find_one({"_id": ObjectId(contest_id)})
     assert all(p["refId"] != participant_id for p in reloaded_contest["participants"])
-
+    redis = get_redis_client()
+    assert redis.get(session_key(first_session_id)) is None
+    assert redis.get(session_key(second_session_id)) is None
+    assert redis.smembers(user_sessions_key(str(participant_id))) == set()
     assert client.get("/teams", headers=participant).status_code == 401
 
 
