@@ -192,7 +192,7 @@ def _serialize_rows(rows: list[dict]) -> list[dict]:
 @router.get(
     "/leaderboard/{contest_id}",
     summary="Aggregate a contest leaderboard",
-    description="Group submissions by user or team, sum scores, and return the top-ranked participants. `limit` defaults to 10. Returns 200; errors: 400 for an invalid contest ID.",
+    description="Group submissions by user or team, sum scores, and return the top-ranked participants. `limit` defaults to 10 and must be at least 1. Returns 200; errors: 400 for an invalid contest ID and 422 for a non-positive limit.",
     responses={
         200: {
             "content": {
@@ -215,7 +215,7 @@ def api_leaderboard(
         str, Path(description="Unique ID of the contest to aggregate.")
     ],
     limit: int = Query(
-        default=10, description="Maximum ranked participants to return."
+        default=10, ge=1, description="Maximum ranked participants to return."
     ),
 ):
     """Aggregate scored submissions into a ranked contest leaderboard."""

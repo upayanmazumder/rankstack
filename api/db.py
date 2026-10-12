@@ -181,7 +181,12 @@ COLLECTION_VALIDATORS = {
 
 @lru_cache
 def get_mongo_client() -> MongoClient:
-    return MongoClient(settings.mongo_uri)
+    return MongoClient(
+        settings.mongo_uri,
+        serverSelectionTimeoutMS=settings.mongo_server_selection_timeout_ms,
+        connectTimeoutMS=settings.mongo_connect_timeout_ms,
+        socketTimeoutMS=settings.mongo_socket_timeout_ms,
+    )
 
 
 def get_db() -> Database:
@@ -190,7 +195,12 @@ def get_db() -> Database:
 
 @lru_cache
 def get_redis_client() -> redis.Redis:
-    return redis.from_url(settings.redis_uri, decode_responses=True)
+    return redis.from_url(
+        settings.redis_uri,
+        decode_responses=True,
+        socket_timeout=settings.redis_socket_timeout_seconds,
+        socket_connect_timeout=settings.redis_socket_connect_timeout_seconds,
+    )
 
 
 def ensure_collections(db: Database) -> None:
