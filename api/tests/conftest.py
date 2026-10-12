@@ -10,7 +10,12 @@ from api.config import settings
 from api.db import get_mongo_client, get_redis_client, init_db
 from api.main import app
 from api.models.common import utcnow
-from api.redis_ops import leaderboard_key, rate_limit_key, rate_limit_window_key
+from api.redis_ops import (
+    leaderboard_key,
+    rate_limit_key,
+    rate_limit_window_key,
+    user_sessions_key,
+)
 from api.security import hash_password
 
 
@@ -34,6 +39,7 @@ def db(monkeypatch):
             }
             keys = [rate_limit_key(user_id) for user_id in user_ids]
             keys.extend(rate_limit_window_key(user_id) for user_id in user_ids)
+            keys.extend(user_sessions_key(user_id) for user_id in user_ids)
             for contest_id in contest_ids:
                 keys.extend(
                     (leaderboard_key(contest_id), f"leaderboard_revision:{contest_id}")

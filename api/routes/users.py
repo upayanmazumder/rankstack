@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Path, Query
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
+from api import services
 from api.db import get_db
 from api.dependencies import CurrentUser
 from api.models.common import oid, serialize_doc, utcnow
@@ -124,7 +125,7 @@ def update_user(
     "/{user_id}",
     status_code=204,
     summary="Delete a user",
-    description="Delete a user account. Requires a Bearer token; participants may delete only themselves. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no user exists.",
+    description="Delete a user account and cascade the deletion to their team membership, contest participation, their own submissions, and their active sessions. Requires a Bearer token; participants may delete only themselves. Returns 204; errors: 400 for an invalid ID, 401/403 for authentication or authorization, and 404 when no user exists.",
 )
 def delete_user(
     user_id: Annotated[str, Path(description="Unique ID of the user to delete.")],
@@ -135,6 +136,5 @@ def delete_user(
     target_id = oid(user_id)
     if current.get("role") != "admin" and current["_id"] != target_id:
         raise HTTPException(status_code=403, detail="Cannot delete another user")
-    result = db["users"].delete_one({"_id": target_id})
-    if result.deleted_count == 0:
+    if services.delete_user_transaction(db, target_id) is None:
         raise HTTPException(status_code=404, detail="User not found")

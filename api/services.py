@@ -299,13 +299,23 @@ def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) 
         )
 
 
-def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] | None:
-    """Delete a team and its submissions and references atomically."""
+def delete_team_transaction(
+    db: Database, team_id: ObjectId, *, require_empty: bool = False
+) -> dict[str, Any] | None:
+    """Delete a team and its submissions and references atomically.
+
+    When `require_empty` is set, the deletion is skipped (returning
+    `None`) if the team has gained a member since the caller decided to
+    delete it, closing the race where an admin adds a member between
+    that decision and this transaction running.
+    """
     captured: dict[str, Any] = {}
 
     def callback(session: ClientSession) -> dict[str, Any] | None:
         team = db["teams"].find_one({"_id": team_id}, session=session)
         if team is None:
+            return None
+        if require_empty and team.get("memberIds"):
             return None
         contest_docs = list(
             db["contests"].find(
@@ -355,6 +365,73 @@ def delete_team_transaction(db: Database, team_id: ObjectId) -> dict[str, Any] |
     except RedisError:
         pass  # MongoDB serves this leaderboard until Redis is available again.
     return team
+
+
+def delete_user_transaction(db: Database, user_id: ObjectId) -> dict[str, Any] | None:
+    """Delete a user and scrub every reference to them, atomically: their
+    own submissions (with score and attempt-count reversal), team
+    membership, and contest participation.
+
+    A team left with zero members is also deleted, in a second transaction
+    after this one commits, reusing `delete_team_transaction`'s own
+    submission/leaderboard cascade. This is the documented choice for
+    issue #227: an empty team is deleted rather than kept memberless.
+    """
+    with db.client.start_session() as session:  # noqa: SIM117
+        with session.start_transaction():
+            user = db["users"].find_one({"_id": user_id}, session=session)
+            if user is None:
+                return None
+            own_submissions = list(
+                db["submissions"].find(
+                    {"submittedBy.refType": "user", "submittedBy.refId": user_id},
+                    session=session,
+                )
+            )
+            for submission in own_submissions:
+                db["problems"].update_one(
+                    {"_id": submission["problemId"]},
+                    {"$inc": {"attemptCount": -1}},
+                    session=session,
+                )
+            _reverse_submission_scores(db, own_submissions, session)
+            db["submissions"].delete_many(
+                {"submittedBy.refType": "user", "submittedBy.refId": user_id},
+                session=session,
+            )
+            affected_teams = list(
+                db["teams"].find(
+                    {"memberIds": user_id}, {"memberIds": 1}, session=session
+                )
+            )
+            db["teams"].update_many(
+                {"memberIds": user_id},
+                {"$pull": {"memberIds": user_id}},
+                session=session,
+            )
+            emptied_team_ids = [
+                team["_id"] for team in affected_teams if team["memberIds"] == [user_id]
+            ]
+            db["contests"].update_many(
+                {"participants.refType": "user", "participants.refId": user_id},
+                {"$pull": {"participants": {"refType": "user", "refId": user_id}}},
+                session=session,
+            )
+            contest_ids = {submission["contestId"] for submission in own_submissions}
+            _mark_leaderboards_dirty(db, contest_ids, session)
+            db["users"].delete_one({"_id": user_id}, session=session)
+    for team_id in emptied_team_ids:
+        delete_team_transaction(db, team_id, require_empty=True)
+    try:
+        for contest_id in contest_ids:
+            redis_ops.remove_leaderboard_member(str(contest_id), str(user_id))
+    except RedisError:
+        pass  # MongoDB serves this leaderboard until Redis is available again.
+    try:
+        redis_ops.revoke_user_sessions(str(user_id))
+    except RedisError:
+        pass  # The account is already deleted; sessions expire on their own TTL.
+    return user
 
 
 def delete_contest_transaction(
