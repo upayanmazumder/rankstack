@@ -38,7 +38,7 @@ def create_problem(payload: ProblemCreate, _: AdminUser):
     response_model=list[ProblemOut],
     response_model_exclude_none=True,
     summary="List problems",
-    description="List problems, optionally filtered by `contestId`. Administrators receive full problem data; unauthenticated and participant responses omit answers and evaluation details. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid contest ID.",
+    description="List problems, optionally filtered by `contestId`. Administrators receive full problem data; unauthenticated and participant responses omit answers and evaluation details, and problems of `upcoming` contests are excluded. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid contest ID.",
 )
 def list_problems(
     user: OptionalUser,
@@ -49,8 +49,8 @@ def list_problems(
 ):
     """List problems while withholding answer and evaluation fields from non-admins."""
     db = get_db()
-    query = {"contestId": oid(contestId)} if contestId else {}
     admin = user is not None and user.get("role") == "admin"
+    bounded_limit = min(limit, 300)
     projection = (
         None
         if admin
@@ -64,7 +64,39 @@ def list_problems(
             "createdAt": 1,
         }
     )
-    docs = db["problems"].find(query, projection).limit(min(limit, 300))
+    if contestId:
+        contest_oid = oid(contestId)
+        if not admin:
+            contest = db["contests"].find_one({"_id": contest_oid}, {"status": 1})
+            if contest is None or contest["status"] == "upcoming":
+                return []
+        docs = (
+            db["problems"]
+            .find({"contestId": contest_oid}, projection)
+            .limit(bounded_limit)
+        )
+        return [serialize_doc(d) for d in docs]
+    if admin:
+        docs = db["problems"].find({}, projection).limit(bounded_limit)
+        return [serialize_doc(d) for d in docs]
+    # Non-admin, unfiltered: join against `contests` per problem via an
+    # indexed `$lookup` on `contests._id` instead of first materializing
+    # every non-upcoming contest ID into an `$in` list, which would grow
+    # with contest history on every request regardless of `limit`.
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "contests",
+                "localField": "contestId",
+                "foreignField": "_id",
+                "as": "_contest",
+            }
+        },
+        {"$match": {"_contest": {"$elemMatch": {"status": {"$ne": "upcoming"}}}}},
+        {"$limit": bounded_limit},
+        {"$project": projection},
+    ]
+    docs = db["problems"].aggregate(pipeline)
     return [serialize_doc(d) for d in docs]
 
 

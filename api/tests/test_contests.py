@@ -72,7 +72,7 @@ def test_leaderboard_nonexistent_contest(client):
 
 
 def test_leaderboard_and_aggregation_endpoint_rank_identically(
-    client, users, headers_for, contest_payload, mcq_problem
+    client, users, headers_for, live_contest, mcq_problem
 ):
     """GET /contests/{id}/leaderboard and GET /aggregations/leaderboard/{id}
     must agree on both the score and the tie-break: they share one ranking
@@ -80,8 +80,12 @@ def test_leaderboard_and_aggregation_endpoint_rank_identically(
     admin = headers_for("admin")
     participant = headers_for("participant")
     other = headers_for("other")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest(
+        extra_participants=[
+            ("user", users["other"]["id"]),
+            ("user", users["admin"]["id"]),
+        ]
+    )
     problem_id = str(mcq_problem(contest_id))
 
     def submit_and_grade(headers, ref_id, score):
@@ -161,12 +165,11 @@ def _grade(client, admin, submission_id, score):
 
 
 def test_leaderboard_rebuilds_after_redis_flush(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     submission_id = client.post(
         "/submissions",
@@ -197,13 +200,12 @@ def test_leaderboard_rebuilds_after_redis_flush(
 
 
 def test_leaderboard_reads_return_to_redis_after_reconciliation(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     admin = headers_for("admin")
     participant = headers_for("participant")
     other = headers_for("other")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest(extra_participants=[("user", users["other"]["id"])])
     problem_id = str(mcq_problem(contest_id))
     top_submission = client.post(
         "/submissions",
@@ -277,7 +279,7 @@ def test_leaderboard_reads_return_to_redis_after_reconciliation(
 
 
 def test_leaderboard_read_falls_back_to_mongo_during_redis_outage(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """A full Redis outage while reading an already-reconciled leaderboard
     must still return correct MongoDB-sourced rankings, not a 500: every
@@ -285,8 +287,7 @@ def test_leaderboard_read_falls_back_to_mongo_during_redis_outage(
     rebuild's replacement write) has to fail closed to MongoDB."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     submission_id = client.post(
         "/submissions",

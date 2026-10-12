@@ -7,7 +7,11 @@ Submissions are only generated for "live"/"ended" contests (an "upcoming"
 contest realistically has zero submissions yet) and use the same
 `app.services` transactions the API uses, so `problems.attemptCount`,
 `users/teams.totalScore`, and the Redis `leaderboard:<contestId>` sorted
-sets all come out consistent with the submission data.
+sets all come out consistent with the submission data. Ended contests are
+backdated history, not a live request, so seeding inserts their
+submissions directly (`services.create_seeded_submission`) rather than through
+`services.create_submission`, whose `assert_contest_open_for` check
+correctly rejects a real request against a contest that is not live.
 
 Usage: python scripts/seed.py
 """
@@ -208,7 +212,7 @@ def seed_submissions(db, redis_client, contests: list[dict]) -> int:
             problems_sample = random.sample(c["problems"], k=min(2, len(c["problems"])))
             for problem in problems_sample:
                 answer = make_answer(problem)
-                submission = services.create_submission(
+                submission = services.create_seeded_submission(
                     db, c["_id"], problem["_id"], participant, answer
                 )
                 status = weighted_status()

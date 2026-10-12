@@ -8,20 +8,14 @@ from api.redis_ops import session_key, user_sessions_key
 
 
 def test_delete_user_cascades_team_contest_and_submission_references(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     admin = headers_for("admin")
     participant = headers_for("participant")
     participant_id = ObjectId(users["participant"]["id"])
 
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
-    client.post(
-        f"/contests/{contest_id}/participants",
-        json={"refType": "user", "refId": users["participant"]["id"]},
-        headers=participant,
-    )
     submission_id = client.post(
         "/submissions",
         json={

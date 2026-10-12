@@ -16,12 +16,11 @@ from api.redis_ops import leaderboard_key
 
 
 def test_submission_scoring_and_rate_limit(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -76,7 +75,9 @@ def test_submission_scoring_and_rate_limit(
     assert db.submissions.count_documents({"problemId": ObjectId(problem_id)}) == 10
 
 
-def test_submission_list_is_newest_first_and_offset_paginated(client, db, users):
+def test_submission_list_is_newest_first_and_offset_paginated(
+    client, db, users, headers_for
+):
     participant_id = ObjectId(users["participant"]["id"])
     now = utcnow()
     submission_ids = db.submissions.insert_many(
@@ -96,7 +97,8 @@ def test_submission_list_is_newest_first_and_offset_paginated(client, db, users)
 
     response = client.get(
         "/submissions",
-        params={"userId": str(participant_id), "limit": 2, "offset": 2},
+        params={"limit": 2, "offset": 2},
+        headers=headers_for("participant"),
     )
 
     assert response.status_code == 200
@@ -107,13 +109,11 @@ def test_submission_list_is_newest_first_and_offset_paginated(client, db, users)
 
 
 def test_concurrent_submissions_to_one_problem_do_not_500(
-    client, db, users, headers_for, contest_payload, mcq_problem
+    client, db, users, headers_for, live_contest, mcq_problem
 ):
     """20 different users submit to the same problem at once. Every request
     must retry past MongoDB write conflicts instead of surfacing a 500."""
-    admin = headers_for("admin")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     password_hash = db.users.find_one(
         {"_id": ObjectId(users["participant"]["id"])}, {"passwordHash": 1}
@@ -136,6 +136,11 @@ def test_concurrent_submissions_to_one_problem_do_not_500(
         token = client.post(
             "/sessions", json={"email": email, "password": "Passw0rd!"}
         ).json()["sessionId"]
+        client.post(
+            f"/contests/{contest_id}/participants",
+            json={"refType": "user", "refId": str(user_id)},
+            headers={"Authorization": f"Bearer {token}"},
+        )
         submitters.append((str(user_id), token))
 
     def submit(entry: tuple[str, str]) -> int:
@@ -160,15 +165,14 @@ def test_concurrent_submissions_to_one_problem_do_not_500(
 
 
 def test_concurrent_grades_keep_redis_in_sync_with_mongo(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """Two admins grade the same submission at once. Redis must end up with
     whichever score Mongo actually committed, not a double-counted sum of
     both admins' stale pre-read deltas."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -223,7 +227,7 @@ def test_concurrent_grades_keep_redis_in_sync_with_mongo(
 
 
 def test_submission_status_redis_failure_marks_leaderboard_dirty(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """A Redis outage during grading must not lose the score delta: Mongo is
     updated and the leaderboard is marked dirty. A later successful grade
@@ -231,8 +235,7 @@ def test_submission_status_redis_failure_marks_leaderboard_dirty(
     score and catch `reconciledVersion` up to `version`."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     payload = {
         "contestId": contest_id,
@@ -304,7 +307,7 @@ def test_submission_status_redis_failure_marks_leaderboard_dirty(
 
 
 def test_rebuild_during_grading_does_not_double_count_delta(
-    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+    client, db, users, headers_for, live_contest, mcq_problem, monkeypatch
 ):
     """A leaderboard read that rebuilds from MongoDB can race a concurrent
     grade's direct Redis delta write: the grade's MongoDB transaction (and
@@ -316,8 +319,7 @@ def test_rebuild_during_grading_does_not_double_count_delta(
     snapshot that already includes it."""
     admin = headers_for("admin")
     participant = headers_for("participant")
-    contest = client.post("/contests", json=contest_payload, headers=admin).json()
-    contest_id = contest["id"]
+    contest_id = live_contest()
     problem_id = str(mcq_problem(contest_id))
     submission_id = client.post(
         "/submissions",
@@ -371,3 +373,78 @@ def test_rebuild_during_grading_does_not_double_count_delta(
         leaderboard_key(contest_id), users["participant"]["id"]
     )
     assert redis_score == 10
+
+
+def test_submission_create_requires_live_contest_and_participation(
+    client, users, headers_for, contest_payload, mcq_problem
+):
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    payload = {
+        "contestId": contest_id,
+        "problemId": problem_id,
+        "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+        "answer": "A",
+    }
+
+    not_live = client.post("/submissions", json=payload, headers=participant)
+    assert not_live.status_code == 409
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "live"}, headers=admin
+    )
+    not_joined = client.post("/submissions", json=payload, headers=participant)
+    assert not_joined.status_code == 403
+
+    client.post(
+        f"/contests/{contest_id}/participants",
+        json={"refType": "user", "refId": users["participant"]["id"]},
+        headers=participant,
+    )
+    joined = client.post("/submissions", json=payload, headers=participant)
+    assert joined.status_code == 201
+
+    client.patch(
+        f"/contests/{contest_id}/status", json={"status": "ended"}, headers=admin
+    )
+    ended = client.post("/submissions", json=payload, headers=participant)
+    assert ended.status_code == 409
+
+
+def test_submission_read_and_delete_are_scoped_to_owner(
+    client, users, headers_for, live_contest, mcq_problem
+):
+    participant = headers_for("participant")
+    other = headers_for("other")
+    admin = headers_for("admin")
+    contest_id = live_contest()
+    problem_id = str(mcq_problem(contest_id))
+    payload = {
+        "contestId": contest_id,
+        "problemId": problem_id,
+        "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+        "answer": "A",
+    }
+    submission_id = client.post(
+        "/submissions", json=payload, headers=participant
+    ).json()["id"]
+
+    assert client.get("/submissions").status_code == 401
+    assert client.get(f"/submissions/{submission_id}").status_code == 401
+    assert client.get("/submissions", headers=other).json() == []
+    assert client.get(f"/submissions/{submission_id}", headers=other).status_code == 404
+    assert (
+        client.delete(f"/submissions/{submission_id}", headers=other).status_code == 403
+    )
+
+    assert client.get(f"/submissions/{submission_id}", headers=participant).json()[
+        "id"
+    ] == (submission_id)
+    assert len(client.get("/submissions", headers=admin).json()) == 1
+    assert (
+        client.delete(f"/submissions/{submission_id}", headers=participant).status_code
+        == 204
+    )

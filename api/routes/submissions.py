@@ -4,6 +4,7 @@ and Redis rate limiting / leaderboard sync."""
 import logging
 from typing import Annotated
 
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Path, Query
 from redis.exceptions import RedisError
 
@@ -27,7 +28,7 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
     response_model=SubmissionOut,
     status_code=201,
     summary="Create a submission",
-    description="Submit an answer for a contest problem as the authenticated user or a team they belong to. Requires a Bearer token. Returns 201; errors: 400 for invalid IDs or answers, 401/403 for authentication or submitter authorization, 404 when the contest or problem does not exist, and 429 when rate limited.",
+    description="Submit an answer for a contest problem as the authenticated user or a team they belong to. The contest must be live and the submitter must have joined it. Requires a Bearer token. Returns 201; errors: 400 for invalid IDs or answers, 401/403 for authentication, submitter, or participation authorization, 404 when the contest or problem does not exist, 409 when the contest is not live, and 429 when rate limited.",
 )
 def create_submission(payload: SubmissionCreate, current: CurrentUser):
     """Create an authorized submission and enforce the per-user rate limit."""
@@ -48,6 +49,8 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
     ):
         raise HTTPException(status_code=403, detail="Team membership required")
 
+    submitted_by = {"refType": payload.submittedBy.refType, "refId": submitter_id}
+    services.assert_contest_open_for(db, contest_id, submitted_by)
     services.validate_submission_problem(db, contest_id, problem_id, payload.answer)
     allowed, count, window_token = redis_ops.check_and_increment_rate_limit(
         str(current["_id"])
@@ -62,7 +65,7 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
             db,
             contest_id,
             problem_id,
-            {"refType": payload.submittedBy.refType, "refId": submitter_id},
+            submitted_by,
             payload.answer,
         )
     except Exception:
@@ -74,16 +77,41 @@ def create_submission(payload: SubmissionCreate, current: CurrentUser):
     return serialize_doc(doc)
 
 
+def _visible_ref_ids(db, user_id: ObjectId) -> list[ObjectId]:
+    """Return the submitter IDs the current user may read: themself and their teams."""
+    team_ids = [
+        team["_id"] for team in db["teams"].find({"memberIds": user_id}, {"_id": 1})
+    ]
+    return [user_id, *team_ids]
+
+
+def _can_view_submission(db, doc: dict, current: dict) -> bool:
+    """Allow administrators, the submitting user, and members of the submitting team."""
+    if current.get("role") == "admin":
+        return True
+    submitted_by = doc["submittedBy"]
+    if submitted_by["refType"] == "user":
+        return submitted_by["refId"] == current["_id"]
+    return (
+        db["teams"].find_one(
+            {"_id": submitted_by["refId"], "memberIds": current["_id"]}, {"_id": 1}
+        )
+        is not None
+    )
+
+
 @router.get(
     "",
     response_model=list[SubmissionOut],
     summary="List submissions",
-    description="List submissions, optionally filtered by contest, user, or status. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid ID filter.",
+    description="List the current user's submissions and submissions of their teams, optionally filtered by contest or status. Administrators see every submission and may filter by `userId`. Requires a Bearer token. `limit` defaults to 100 and is capped at 300. Returns 200; errors: 400 for an invalid ID filter and 401 for an invalid session.",
 )
 def list_submissions(
+    current: CurrentUser,
     contestId: str | None = Query(default=None, description="Filter by contest ID."),
     userId: str | None = Query(
-        default=None, description="Filter by submitter user or team ID."
+        default=None,
+        description="Filter by submitter user or team ID. Administrators only; ignored for other callers.",
     ),
     status: str | None = Query(
         default=None, description="Filter by evaluation status."
@@ -96,15 +124,18 @@ def list_submissions(
     ),
     offset: int = Query(default=0, ge=0, description="Number of submissions to skip."),
 ):
-    """List submissions matching the supplied filters."""
+    """List submissions matching the supplied filters, scoped to the caller."""
     db = get_db()
     query: dict = {}
     if contestId:
         query["contestId"] = oid(contestId)
-    if userId:
-        query["submittedBy.refId"] = oid(userId)
     if status:
         query["status"] = status
+    if current.get("role") == "admin":
+        if userId:
+            query["submittedBy.refId"] = oid(userId)
+    else:
+        query["submittedBy.refId"] = {"$in": _visible_ref_ids(db, current["_id"])}
     docs = (
         db["submissions"].find(query).sort("submittedAt", -1).skip(offset).limit(limit)
     )
@@ -115,17 +146,18 @@ def list_submissions(
     "/{submission_id}",
     response_model=SubmissionOut,
     summary="Get a submission",
-    description="Return the submission identified by `submission_id`. Returns 200; errors: 400 for an invalid ID and 404 when no submission exists.",
+    description="Return the submission identified by `submission_id` when the caller owns it, belongs to the submitting team, or is an administrator. Requires a Bearer token. Returns 200; errors: 400 for an invalid ID and 401/404 for authentication or when the submission is missing or not visible to the caller.",
 )
 def get_submission(
     submission_id: Annotated[
         str, Path(description="Unique ID of the submission to retrieve.")
     ],
+    current: CurrentUser,
 ):
-    """Fetch one submission by ID."""
+    """Fetch one submission by ID, scoped to the caller."""
     db = get_db()
     doc = db["submissions"].find_one({"_id": oid(submission_id)})
-    if doc is None:
+    if doc is None or not _can_view_submission(db, doc, current):
         raise HTTPException(status_code=404, detail="Submission not found")
     return serialize_doc(doc)
 
@@ -215,18 +247,7 @@ def delete_submission(
     submission = db["submissions"].find_one({"_id": sub_id})
     if submission is None:
         raise HTTPException(status_code=404, detail="Submission not found")
-    submitted_by = submission["submittedBy"]
-    is_owner = (
-        submitted_by["refType"] == "user" and submitted_by["refId"] == current["_id"]
-    )
-    is_team_member = (
-        submitted_by["refType"] == "team"
-        and db["teams"].find_one(
-            {"_id": submitted_by["refId"], "memberIds": current["_id"]}, {"_id": 1}
-        )
-        is not None
-    )
-    if current.get("role") != "admin" and not is_owner and not is_team_member:
+    if not _can_view_submission(db, submission, current):
         raise HTTPException(status_code=403, detail="Cannot delete this submission")
     if services.delete_submission_transaction(db, sub_id) is None:
         raise HTTPException(status_code=404, detail="Submission not found")
