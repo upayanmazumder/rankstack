@@ -193,6 +193,7 @@ def test_concurrent_grades_keep_redis_in_sync_with_mongo(
             self.name == "submissions"
             and isinstance(filter, dict)
             and filter.get("_id") == ObjectId(submission_id)
+            and kwargs.get("session") is not None
             and not getattr(already_waited, "done", False)
         ):
             already_waited.done = True
