@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { contestRefetchInterval, LIVE_CONTEST_POLL_INTERVAL_MS } from '../contest-polling';
+import {
+  contestRefetchInterval,
+  LIVE_CONTEST_POLL_INTERVAL_MS,
+  UPCOMING_GRACE_POLL_INTERVAL_MS,
+} from '../contest-polling';
 
 describe('contestRefetchInterval', () => {
   const now = new Date('2026-10-12T10:00:00.000Z').getTime();
@@ -17,9 +21,18 @@ describe('contestRefetchInterval', () => {
     expect(
       contestRefetchInterval({ status: 'upcoming', startTime: '2026-10-12T10:10:00.000Z' }, now)
     ).toBe(600_000);
+  });
+
+  it('falls back to a short grace interval once an upcoming start time has passed', () => {
     expect(
       contestRefetchInterval({ status: 'upcoming', startTime: '2026-10-12T09:00:00.000Z' }, now)
-    ).toBe(false);
+    ).toBe(UPCOMING_GRACE_POLL_INTERVAL_MS);
+  });
+
+  it('stops polling for an invalid start time', () => {
+    expect(contestRefetchInterval({ status: 'upcoming', startTime: 'not-a-date' }, now)).toBe(
+      false
+    );
   });
 
   it('caps a distant start time at the maximum browser timer interval', () => {

@@ -69,4 +69,22 @@ describe('SessionRevalidator', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
     expect(useAuthStore.getState().user).toEqual(participant);
   });
+
+  it('does not restore auth after an explicit sign-out, even if the cookie is still valid', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ user: participant }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    // Simulates a logout whose DELETE request failed before clearing the cookie server-side.
+    useAuthStore.getState().clearAuth();
+
+    renderRevalidator();
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(useAuthStore.getState().user).toBeNull();
+
+    useAuthStore.getState().setAuth(participant);
+    expect(useAuthStore.getState().user).toEqual(participant);
+  });
 });

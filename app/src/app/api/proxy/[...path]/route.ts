@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { SESSION_REFRESH_FETCH_TIMEOUT_MS } from '@/constants/session';
 import { env } from '@/env';
 import {
   SESSION_COOKIE_NAME,
@@ -70,13 +71,13 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
     try {
       const session = await fetch(
         `${env.NEXT_PUBLIC_API_URL}/sessions/${encodeURIComponent(token)}`,
-        { cache: 'no-store' }
+        { cache: 'no-store', signal: AbortSignal.timeout(SESSION_REFRESH_FETCH_TIMEOUT_MS) }
       );
       if (session.status === 200) {
         setSessionCookies(response, request, token, sessionTtlSeconds(request));
       }
     } catch {
-      // Preserve the upstream result if session refresh is temporarily unavailable.
+      // Preserve the upstream result if session refresh is temporarily unavailable or times out.
     }
   }
 

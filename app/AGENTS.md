@@ -101,18 +101,19 @@ Feature-specific hooks, types, and helpers should be colocated with their featur
 
 ## Commands
 
-| Script              | What it does                 |
-| ------------------- | ---------------------------- |
-| `pnpm dev`          | Start dev server (Turbopack) |
-| `pnpm build`        | Production build             |
-| `pnpm start`        | Serve production build       |
-| `pnpm lint`         | ESLint                       |
-| `pnpm lint:fix`     | ESLint with auto-fix         |
-| `pnpm format`       | Prettier write               |
-| `pnpm format:check` | Prettier check (used in CI)  |
-| `pnpm type-check`   | `tsc --noEmit`               |
-| `pnpm test`         | Vitest run (single pass)     |
-| `pnpm test:watch`   | Vitest in watch mode         |
+| Script              | What it does                            |
+| ------------------- | --------------------------------------- |
+| `pnpm dev`          | Start dev server (Turbopack)            |
+| `pnpm build`        | Production build                        |
+| `pnpm start`        | Serve production build                  |
+| `pnpm lint`         | ESLint                                  |
+| `pnpm lint:fix`     | ESLint with auto-fix                    |
+| `pnpm knip`         | Unused files/exports check (used in CI) |
+| `pnpm format`       | Prettier write                          |
+| `pnpm format:check` | Prettier check (used in CI)             |
+| `pnpm type-check`   | `tsc --noEmit`                          |
+| `pnpm test`         | Vitest run (single pass)                |
+| `pnpm test:watch`   | Vitest in watch mode                    |
 
 ---
 
@@ -273,12 +274,12 @@ Scope is optional, lowercase, single word.
 
 `.github/workflows/`
 
-| File                       | Trigger                         | Jobs                                                                  |
-| -------------------------- | ------------------------------- | --------------------------------------------------------------------- |
-| `ci.yml`                   | Push to any branch; PR → `main` | `lint` + `typecheck` + `test` in parallel → `build` (needs all three) |
-| `release.yml`              | Push tag `v*`                   | Full CI → GitHub Release (auto release notes)                         |
-| `commit.yml`               | PR → `main`                     | commitlint                                                            |
-| `dependabot_bot_issue.yml` | Dependabot PR                   | Creates tracking issue                                                |
+| File                       | Trigger                         | Jobs                                                                                               |
+| -------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `ci.yml`                   | Push to any branch; PR → `main` | `lint` (ESLint + `knip` + Prettier) + `typecheck` + `test` in parallel → `build` (needs all three) |
+| `release.yml`              | Push tag `v*`                   | Full CI → GitHub Release (auto release notes)                                                      |
+| `commit.yml`               | PR → `main`                     | commitlint                                                                                         |
+| `dependabot_bot_issue.yml` | Dependabot PR                   | Creates tracking issue                                                                             |
 
 All CI jobs set `SKIP_ENV_VALIDATION=true` — no secrets required in the pipeline.
 Concurrency groups cancel in-progress runs on new pushes (except release).

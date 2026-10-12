@@ -13,6 +13,8 @@ import { useContest, useLeaderboard } from '@/hooks/api/use-contests';
 import { LIVE_CONTEST_POLL_INTERVAL_MS } from '@/lib/contest-polling';
 import { useAuthStore } from '@/stores';
 
+import { useLeaderboardFinalization } from './use-leaderboard-finalization';
+
 interface ContestLeaderboardRouteParams {
   id: string;
 }
@@ -24,9 +26,12 @@ interface ContestLeaderboardPageProps {
 export default function ContestLeaderboardPage({ params }: ContestLeaderboardPageProps) {
   const { id } = use(params);
   const contest = useContest(id);
-  const isLive = contest.data?.status === 'live';
+  const status = contest.data?.status;
+  const isLive = status === 'live';
   const leaderboard = useLeaderboard(id, isLive ? LIVE_CONTEST_POLL_INTERVAL_MS : false, 100);
   const user = useAuthStore(state => state.user);
+
+  useLeaderboardFinalization(status, leaderboard.refetch);
 
   if (contest.isPending || leaderboard.isPending) {
     return (

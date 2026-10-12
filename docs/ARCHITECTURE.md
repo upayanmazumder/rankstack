@@ -248,7 +248,7 @@ graph LR
     subgraph Redis Keys
         Leaderboard["leaderboard:contestId<br/>(ZSET: member -> score)"]
         Revision["leaderboard_revision:contestId<br/>(STRING: version)"]
-        Session["session:sessionId<br/>(STRING: userId, TTL 24h)"]
+        Session["session:sessionId<br/>(STRING: userId, configured TTL, default 3600s)"]
         RateLimit["rate_limit:userId<br/>(STRING: count, TTL window)"]
     end
 
