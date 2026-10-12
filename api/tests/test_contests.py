@@ -1,6 +1,7 @@
 """Contest CRUD, status changes, and membership boundaries."""
 
 from bson import ObjectId
+from redis.exceptions import RedisError
 
 from api import redis_ops
 from api.db import get_redis_client
@@ -272,3 +273,50 @@ def test_leaderboard_reads_return_to_redis_after_reconciliation(
         "leaderboard"
     ]
     assert [row["score"] for row in served_from_cache] == [5]
+
+
+def test_leaderboard_read_falls_back_to_mongo_during_redis_outage(
+    client, db, users, headers_for, contest_payload, mcq_problem, monkeypatch
+):
+    """A full Redis outage while reading an already-reconciled leaderboard
+    must still return correct MongoDB-sourced rankings, not a 500: every
+    Redis call on this path (the revision check, the cached read, and the
+    rebuild's replacement write) has to fail closed to MongoDB."""
+    admin = headers_for("admin")
+    participant = headers_for("participant")
+    contest = client.post("/contests", json=contest_payload, headers=admin).json()
+    contest_id = contest["id"]
+    problem_id = str(mcq_problem(contest_id))
+    submission_id = client.post(
+        "/submissions",
+        json={
+            "contestId": contest_id,
+            "problemId": problem_id,
+            "submittedBy": {"refType": "user", "refId": users["participant"]["id"]},
+            "answer": "A",
+        },
+        headers=participant,
+    ).json()["id"]
+    _grade(client, admin, submission_id, 10)
+
+    # Reconcile: the leaderboard is now built and non-pending, so a normal
+    # read would take the fast Redis path.
+    reconciled = client.get(f"/contests/{contest_id}/leaderboard").json()["leaderboard"]
+    assert reconciled[0]["score"] == 10
+    marker = db.dirty_leaderboards.find_one({"_id": ObjectId(contest_id)})
+    assert marker["reconciledVersion"] == marker["version"]
+
+    def unavailable(*args, **kwargs):
+        raise RedisError("redis is down")
+
+    monkeypatch.setattr("api.routes.contests.redis_ops.leaderboard_exists", unavailable)
+    monkeypatch.setattr("api.routes.contests.redis_ops.get_leaderboard", unavailable)
+    monkeypatch.setattr(
+        "api.routes.contests.redis_ops.replace_leaderboard", unavailable
+    )
+
+    res = client.get(f"/contests/{contest_id}/leaderboard")
+    assert res.status_code == 200
+    leaderboard = res.json()["leaderboard"]
+    assert leaderboard[0]["memberId"] == users["participant"]["id"]
+    assert leaderboard[0]["score"] == 10
