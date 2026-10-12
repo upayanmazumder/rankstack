@@ -173,8 +173,8 @@ Public routes do not require an authorization header.
 | Category | Method | Path | Access Control | Description |
 |---|---|---|---|---|
 | **Sessions** | `POST` | `/sessions` | Public | Authenticate user and create Redis session token |
-| | `GET` | `/sessions/{id}` | Public | Resolve session token to public user profile |
-| | `DELETE` | `/sessions/{id}` | Public | Invalidate and delete Redis session token |
+| | `GET` | `/sessions/current` | Current User | Return the current user profile from a Bearer token |
+| | `DELETE` | `/sessions/current` | Current User | Revoke the session supplied as a Bearer token |
 | **Users** | `POST` | `/users` | Public | Register new user account |
 | | `GET` | `/users` | Public | List users with pagination |
 | | `GET` | `/users/{id}` | Public | Get user details by user ID |
@@ -200,9 +200,9 @@ Public routes do not require an authorization header.
 | | `GET` | `/problems/{id}` | Public (Filtered) / Admin | Get problem details |
 | | `PATCH` | `/problems/{id}` | Admin | Update problem statement or test data |
 | | `DELETE` | `/problems/{id}` | Admin | Delete problem and related submissions |
-| **Submissions** | `POST` | `/submissions` | Current User (Rate Limited) | Submit answer for evaluation |
-| | `GET` | `/submissions` | Public | List submissions filtered by contest, user, or status |
-| | `GET` | `/submissions/{id}` | Public | Get submission details by submission ID |
+| **Submissions** | `POST` | `/submissions` | Current User (Rate Limited) | Submit an answer during a live contest after joining |
+| | `GET` | `/submissions` | Current User or Admin | List authorized submissions with `limit` and `offset` pagination |
+| | `GET` | `/submissions/{id}` | Submitter, Team Member, or Admin | Get an authorized submission by ID |
 | | `PATCH` | `/submissions/{id}/status` | Admin | Update submission status and award score |
 | | `DELETE` | `/submissions/{id}` | Submitter or Admin | Delete submission |
 | **Aggregations** | `GET` | `/aggregations/leaderboard/{contestId}` | Public | Calculate contest leaderboard using MongoDB aggregation |
@@ -243,5 +243,5 @@ The backend coordinates multi-document mutations inside database transactions in
 
 Redis provides high-performance ephemeral storage:
 - **Live Leaderboard:** Stored in sorted sets (`ZSET`) keyed by `leaderboard:<contestId>`. Updates use `ZINCRBY`. Reads use `ZREVRANGE` with scores.
-- **Session Store:** Opaque 32-byte tokens stored in string keys (`session:<token>`) with a 24-hour expiration time.
+- **Session Store:** Opaque 32-byte tokens stored in string keys (`session:<token>`) with a configured expiration time (default 3600 seconds).
 - **Submission Rate Limiting:** Enforces submission limits using atomic keys (`rate_limit:<userId>`) with short expiration windows.
