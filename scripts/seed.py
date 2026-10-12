@@ -96,6 +96,7 @@ def seed_teams(db, users: list[dict], n: int = 5, team_size: int = 3) -> list[di
         doc = {
             "name": f"Team {fake.color_name().title()} {fake.word().title()}",
             "memberIds": member_ids,
+            "ownerId": member_ids[0],
             "totalScore": 0,
             "createdAt": utcnow(),
         }

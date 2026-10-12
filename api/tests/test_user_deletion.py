@@ -82,3 +82,36 @@ def test_delete_sole_team_member_deletes_the_team(client, db, users, headers_for
     )
 
     assert db.teams.find_one({"_id": ObjectId(team_id)}) is None
+
+
+def test_delete_team_owner_transfers_ownership_to_remaining_member(
+    client, db, users, headers_for
+):
+    owner = headers_for("participant")
+    admin = headers_for("admin")
+    owner_id = ObjectId(users["participant"]["id"])
+    other_id = ObjectId(users["other"]["id"])
+    team_id = client.post("/teams", json={"name": "Succession"}, headers=owner).json()[
+        "id"
+    ]
+    client.post(
+        f"/teams/{team_id}/members",
+        json={"userId": users["other"]["id"]},
+        headers=admin,
+    )
+
+    assert (
+        client.delete(f"/users/{users['participant']['id']}", headers=owner).status_code
+        == 204
+    )
+
+    team = db.teams.find_one({"_id": ObjectId(team_id)})
+    assert team is not None
+    assert owner_id not in team["memberIds"]
+    assert team["ownerId"] == other_id
+
+    # The new owner, not the deleted account, can now delete the team.
+    assert (
+        client.delete(f"/teams/{team_id}", headers=headers_for("other")).status_code
+        == 204
+    )

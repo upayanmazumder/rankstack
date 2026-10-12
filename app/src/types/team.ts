@@ -2,6 +2,7 @@ export interface Team {
   id: string;
   name: string;
   memberIds: string[];
+  ownerId: string;
   totalScore: number;
   createdAt: string;
 }

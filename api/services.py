@@ -322,10 +322,20 @@ class LastTeamMemberError(Exception):
     """Raised when a removal would leave a team without members."""
 
 
+class TeamOwnershipChangedError(Exception):
+    """Raised when the caller's owner/admin authorization, checked by a
+    route dependency before the transaction started, no longer matches the
+    team's current owner by the time the transaction runs."""
+
+
 def remove_team_member(
     db: Database, team_id: ObjectId, user_id: ObjectId
 ) -> dict[str, Any] | None:
-    """Remove a member from a team and atomically drop the back-reference."""
+    """Remove a member from a team and atomically drop the back-reference.
+
+    If the departing member is the owner, ownership passes to another
+    remaining member so the team is never left owned by a non-member.
+    """
 
     def callback(session: ClientSession) -> bool:
         team = db["teams"].find_one({"_id": team_id}, session=session)
@@ -334,9 +344,12 @@ def remove_team_member(
         member_ids = team.get("memberIds", [])
         if user_id in member_ids and len(member_ids) == 1:
             raise LastTeamMemberError
-        db["teams"].update_one(
-            {"_id": team_id}, {"$pull": {"memberIds": user_id}}, session=session
-        )
+        update: dict[str, Any] = {"$pull": {"memberIds": user_id}}
+        if team.get("ownerId") == user_id:
+            remaining = [member_id for member_id in member_ids if member_id != user_id]
+            if remaining:
+                update["$set"] = {"ownerId": remaining[0]}
+        db["teams"].update_one({"_id": team_id}, update, session=session)
         db["users"].update_one(
             {"_id": user_id}, {"$pull": {"teamIds": team_id}}, session=session
         )
@@ -388,7 +401,11 @@ def _mark_leaderboards_dirty(db: Database, contest_ids: set[ObjectId], session) 
 
 
 def delete_team_transaction(
-    db: Database, team_id: ObjectId, *, require_empty: bool = False
+    db: Database,
+    team_id: ObjectId,
+    *,
+    require_empty: bool = False,
+    authorized_user: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Delete a team and its submissions and references atomically.
 
@@ -396,6 +413,12 @@ def delete_team_transaction(
     `None`) if the team has gained a member since the caller decided to
     delete it, closing the race where an admin adds a member between
     that decision and this transaction running.
+
+    When `authorized_user` is given, non-admin callers are rechecked
+    against the team's current `ownerId` inside this transaction, raising
+    `TeamOwnershipChangedError` if a concurrent ownership change (e.g. the
+    owner leaving) invalidated the route-level `TeamOwnerOrAdmin` check
+    that ran before this call.
     """
     captured: dict[str, Any] = {}
 
@@ -405,6 +428,12 @@ def delete_team_transaction(
             return None
         if require_empty and team.get("memberIds"):
             return None
+        if (
+            authorized_user is not None
+            and authorized_user.get("role") != "admin"
+            and team.get("ownerId") != authorized_user["_id"]
+        ):
+            raise TeamOwnershipChangedError
         contest_docs = list(
             db["contests"].find(
                 {"participants.refType": "team", "participants.refId": team_id},
@@ -460,6 +489,10 @@ def delete_user_transaction(db: Database, user_id: ObjectId) -> dict[str, Any] |
     own submissions (with score and attempt-count reversal), team
     membership, and contest participation.
 
+    If the user owned a team that keeps other members, ownership passes
+    to another remaining member, mirroring `remove_team_member`'s
+    succession so a deleted account never leaves a team ownerless.
+
     A team left with zero members is also deleted, in a second transaction
     after this one commits, reusing `delete_team_transaction`'s own
     submission/leaderboard cascade. This is the documented choice for
@@ -489,17 +522,23 @@ def delete_user_transaction(db: Database, user_id: ObjectId) -> dict[str, Any] |
             )
             affected_teams = list(
                 db["teams"].find(
-                    {"memberIds": user_id}, {"memberIds": 1}, session=session
+                    {"memberIds": user_id},
+                    {"memberIds": 1, "ownerId": 1},
+                    session=session,
                 )
             )
-            db["teams"].update_many(
-                {"memberIds": user_id},
-                {"$pull": {"memberIds": user_id}},
-                session=session,
-            )
-            emptied_team_ids = [
-                team["_id"] for team in affected_teams if team["memberIds"] == [user_id]
-            ]
+            emptied_team_ids = []
+            for team in affected_teams:
+                remaining = [
+                    member_id for member_id in team["memberIds"] if member_id != user_id
+                ]
+                update: dict[str, Any] = {"$pull": {"memberIds": user_id}}
+                if remaining:
+                    if team.get("ownerId") == user_id:
+                        update["$set"] = {"ownerId": remaining[0]}
+                else:
+                    emptied_team_ids.append(team["_id"])
+                db["teams"].update_one({"_id": team["_id"]}, update, session=session)
             db["contests"].update_many(
                 {"participants.refType": "user", "participants.refId": user_id},
                 {"$pull": {"participants": {"refType": "user", "refId": user_id}}},

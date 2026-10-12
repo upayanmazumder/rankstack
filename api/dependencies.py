@@ -2,6 +2,7 @@
 
 from typing import Annotated, Any
 
+from bson import ObjectId
 from fastapi import Depends, HTTPException, Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -73,3 +74,37 @@ def get_team_member_or_admin(
 
 
 TeamMemberOrAdmin = Annotated[dict[str, Any], Depends(get_team_member_or_admin)]
+
+
+def _is_team_owner(team_id: ObjectId, user_id: ObjectId) -> bool:
+    team = get_db()["teams"].find_one({"_id": team_id}, {"ownerId": 1})
+    return team is not None and team.get("ownerId") == user_id
+
+
+def get_team_owner_or_admin(
+    team_id: Annotated[str, Path(description="Unique ID of the team being accessed.")],
+    user: CurrentUser,
+) -> dict[str, Any]:
+    """Require an administrator or the team's owner."""
+    if user.get("role") == "admin" or _is_team_owner(oid(team_id), user["_id"]):
+        return user
+    raise HTTPException(status_code=403, detail="Team owner privileges required")
+
+
+TeamOwnerOrAdmin = Annotated[dict[str, Any], Depends(get_team_owner_or_admin)]
+
+
+def get_team_removal_authorizer(
+    team_id: Annotated[str, Path(description="Unique ID of the team being accessed.")],
+    user_id: Annotated[str, Path(description="Unique ID of the member to remove.")],
+    user: CurrentUser,
+) -> dict[str, Any]:
+    """Require an administrator, the team's owner, or the member removing themself."""
+    if oid(user_id) == user["_id"]:
+        return user
+    if user.get("role") == "admin" or _is_team_owner(oid(team_id), user["_id"]):
+        return user
+    raise HTTPException(status_code=403, detail="Team owner privileges required")
+
+
+TeamRemovalAuthorizer = Annotated[dict[str, Any], Depends(get_team_removal_authorizer)]

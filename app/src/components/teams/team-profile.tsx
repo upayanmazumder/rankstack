@@ -53,9 +53,8 @@ export function TeamProfile({ teamId }: TeamProfileProps) {
 
   const members = (usersQuery.data ?? []).filter(user => team.memberIds.includes(user.id));
   const candidates = (usersQuery.data ?? []).filter(user => !team.memberIds.includes(user.id));
-  const canManage = Boolean(
-    currentUser && (currentUser.role === 'admin' || team.memberIds.includes(currentUser.id))
-  );
+  const isOwner = Boolean(currentUser && team.ownerId === currentUser.id);
+  const canManage = Boolean(currentUser && (currentUser.role === 'admin' || isOwner));
   const canAddMembers = currentUser?.role === 'admin';
 
   return (
