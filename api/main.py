@@ -3,11 +3,15 @@
 Run with: uvicorn api.main:app --reload
 """
 
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from pymongo.errors import ConnectionFailure, DuplicateKeyError, WriteError
+from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.exceptions import RedisError
+from redis.exceptions import TimeoutError as RedisTimeoutError
 
 from api.aggregations.pipelines import router as aggregations_router
 from api.config import settings
@@ -18,6 +22,8 @@ from api.routes.sessions import router as sessions_router
 from api.routes.submissions import router as submissions_router
 from api.routes.teams import router as teams_router
 from api.routes.users import router as users_router
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Rankstack — Contest Platform API",
@@ -33,11 +39,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# MongoDB write error code for $jsonSchema validation failures.
+_MONGO_DOCUMENT_VALIDATION_CODE = 121
+
 
 @app.exception_handler(RedisError)
 def handle_redis_error(request: Request, exc: RedisError) -> JSONResponse:
-    """Redis is unreachable, timed out, or refused a command. Covers
-    ConnectionError and TimeoutError, both subclasses of RedisError."""
+    """Redis is unreachable or timed out. Other RedisError subtypes (e.g.
+    command/auth errors) are not transient dependency failures and are
+    re-raised for the default handler instead of being reported as 503."""
+    if not isinstance(exc, (RedisConnectionError, RedisTimeoutError)):
+        raise exc
+    logger.error(
+        "Redis connection/timeout error on %s %s", request.method, request.url.path
+    )
     return JSONResponse(
         status_code=503,
         content={"detail": "A dependent service is temporarily unavailable."},
@@ -52,6 +67,9 @@ def handle_mongo_connection_failure(
     """MongoDB is unreachable or took too long to select a server. Covers
     AutoReconnect and ServerSelectionTimeoutError, both subclasses of
     ConnectionFailure."""
+    logger.error(
+        "MongoDB connection failure on %s %s", request.method, request.url.path
+    )
     return JSONResponse(
         status_code=503,
         content={"detail": "A dependent service is temporarily unavailable."},
@@ -68,8 +86,10 @@ def handle_duplicate_key(request: Request, exc: DuplicateKeyError) -> JSONRespon
 
 @app.exception_handler(WriteError)
 def handle_write_error(request: Request, exc: WriteError) -> JSONResponse:
-    """$jsonSchema validation failures and other single-document write
-    errors that are not a duplicate key."""
+    """Only $jsonSchema document validation failures (Mongo error code 121)
+    are reported as a client error. Other write errors are server errors."""
+    if exc.code != _MONGO_DOCUMENT_VALIDATION_CODE:
+        raise exc
     return JSONResponse(
         status_code=422, content={"detail": "The request failed document validation."}
     )

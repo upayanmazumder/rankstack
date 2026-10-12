@@ -1,8 +1,9 @@
 """Global exception handlers map backend failures to correct HTTP statuses."""
 
+from api.redis_ops import delete_session
 from bson import ObjectId
 from pymongo.errors import ConnectionFailure, DuplicateKeyError, WriteError
-from redis.exceptions import RedisError
+from redis.exceptions import ConnectionError as RedisConnectionError
 
 
 class _BoomCollection:
@@ -32,7 +33,7 @@ def test_redis_outage_returns_503_on_authenticated_routes(
     headers = headers_for("participant")
 
     def unavailable(*args, **kwargs):
-        raise RedisError("redis is down")
+        raise RedisConnectionError("redis is down")
 
     monkeypatch.setattr("api.dependencies.redis_ops.get_session_user", unavailable)
 
@@ -83,9 +84,12 @@ def test_session_for_deleted_user_returns_404(client, db, users, headers_for):
     token = headers_for("participant")["Authorization"].removeprefix("Bearer ")
     db.users.delete_one({"_id": ObjectId(users["participant"]["id"])})
 
-    response = client.get(f"/sessions/{token}")
+    try:
+        response = client.get(f"/sessions/{token}")
 
-    assert response.status_code == 404
+        assert response.status_code == 404
+    finally:
+        delete_session(token)
 
 
 def test_aggregation_leaderboard_rejects_non_positive_limit(client):
