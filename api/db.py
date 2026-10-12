@@ -283,6 +283,10 @@ def backfill_team_owners(db: Database) -> None:
             )
             if result.matched_count:
                 break
+        else:
+            raise RuntimeError(
+                f"Could not backfill ownerId for team {team_id} after five attempts"
+            )
 
 
 def init_db() -> Database:
