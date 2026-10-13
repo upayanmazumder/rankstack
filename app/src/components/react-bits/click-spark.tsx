@@ -9,11 +9,11 @@ import {
   type ReactNode,
 } from 'react';
 
-export type ClickSparkShape = 'line' | 'streak' | 'dot' | 'star';
+type ClickSparkShape = 'line' | 'streak' | 'dot' | 'star';
 
-export type ClickSparkEasing = 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'spring';
+type ClickSparkEasing = 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'spring';
 
-export interface ClickSparkProps {
+interface ClickSparkProps {
   sparkColor?: string | string[];
   sparkSize?: number;
   sparkRadius?: number;
@@ -36,7 +36,7 @@ export interface ClickSparkProps {
   children?: ReactNode;
 }
 
-export interface ClickSparkHandle {
+interface ClickSparkHandle {
   spark: (x?: number, y?: number) => void;
 }
 

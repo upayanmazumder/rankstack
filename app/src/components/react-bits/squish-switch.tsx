@@ -20,7 +20,7 @@ import {
   useVelocity,
 } from 'motion/react';
 
-export interface SquishSwitchProps {
+interface SquishSwitchProps {
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;

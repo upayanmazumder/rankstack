@@ -2,9 +2,9 @@
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
-export type StarBorderTheme = 'dark' | 'light';
+type StarBorderTheme = 'dark' | 'light';
 
-export type StarBorderHover = 'lap' | 'brighten' | 'reveal' | 'none';
+type StarBorderHover = 'lap' | 'brighten' | 'reveal' | 'none';
 
 type StarBorderOwnProps = {
   children?: React.ReactNode;
@@ -28,7 +28,7 @@ type StarBorderOwnProps = {
   borderColor?: string;
 };
 
-export type StarBorderProps<T extends React.ElementType = 'button'> = StarBorderOwnProps & {
+type StarBorderProps<T extends React.ElementType = 'button'> = StarBorderOwnProps & {
   as?: T;
 } & Omit<React.ComponentPropsWithoutRef<T>, keyof StarBorderOwnProps | 'as'>;
 

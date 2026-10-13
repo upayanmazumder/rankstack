@@ -2,19 +2,19 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 
-export type LatticeStatus = 'working' | 'done' | 'error';
-export type LatticePatternName =
+type LatticeStatus = 'working' | 'done' | 'error';
+type LatticePatternName =
   'arrow' | 'dots' | 'orbit' | 'ripple' | 'snake' | 'spiral' | 'sweep' | 'spin' | 'rain' | 'pulse';
-export type LatticeGrid = 3 | 4;
+type LatticeGrid = 3 | 4;
 
-export interface LatticePattern {
+interface LatticePattern {
   cells: (number | null)[];
   loop?: number;
   scale?: number;
   lit?: 0.25 | 0.35 | 0.45 | 0.62;
 }
 
-export interface LatticeLoaderProps {
+interface LatticeLoaderProps {
   label?: string;
   doneLabel?: string;
   errorLabel?: string;

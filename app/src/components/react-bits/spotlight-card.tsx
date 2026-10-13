@@ -2,9 +2,9 @@
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
-export type SpotlightShape = 'circle' | 'beam';
+type SpotlightShape = 'circle' | 'beam';
 
-export type SpotlightCardProps = React.HTMLAttributes<HTMLDivElement> & {
+type SpotlightCardProps = React.HTMLAttributes<HTMLDivElement> & {
   spotlightColor?: string;
   intensity?: number;
   spotlightSize?: number;

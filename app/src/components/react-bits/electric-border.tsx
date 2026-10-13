@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 
-export interface ElectricBorderProps {
+interface ElectricBorderProps {
   children?: ReactNode;
   color?: string;
   glowColor?: string;

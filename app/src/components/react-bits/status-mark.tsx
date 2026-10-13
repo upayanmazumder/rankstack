@@ -9,9 +9,9 @@ import React, {
 } from 'react';
 import { animate, useMotionValue, useReducedMotion } from 'motion/react';
 
-export type StatusMarkStatus = 'pending' | 'running' | 'done' | 'failed' | 'cancelled';
+type StatusMarkStatus = 'pending' | 'running' | 'done' | 'failed' | 'cancelled';
 
-export interface StatusMarkProps {
+interface StatusMarkProps {
   status?: StatusMarkStatus;
   progress?: number;
   label?: ReactNode;
