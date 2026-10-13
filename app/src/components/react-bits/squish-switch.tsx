@@ -40,6 +40,8 @@ export interface SquishSwitchProps {
   ariaLabel?: string;
   className?: string;
   id?: string;
+  /** Rendered centered inside the thumb, for example an icon. */
+  thumbContent?: React.ReactNode;
 }
 
 interface Grip {
@@ -79,6 +81,7 @@ const SquishSwitch: React.FC<SquishSwitchProps> = ({
   ariaLabel,
   className = '',
   id,
+  thumbContent,
 }) => {
   const reduce = useReducedMotion();
   const inset = Math.max(3, Math.round(height * 0.11));
@@ -242,10 +245,12 @@ const SquishSwitch: React.FC<SquishSwitchProps> = ({
           className="relative block [height:var(--ss-h)] [width:var(--ss-w)] [border-radius:var(--ss-r)] [background:var(--ss-track)] [transition:background-color_var(--ss-fade)_ease] group-data-[on]:[background:var(--ss-track-on)] motion-reduce:[transition-duration:1ms]"
         >
           <motion.span
-            className="absolute [top:var(--ss-inset)] left-0 [height:var(--ss-thumb)] [width:var(--ss-thumb)] [border-radius:var(--ss-thumb-r)] [background:var(--ss-thumb-color)] [transition:background-color_var(--ss-fade)_ease] group-data-[on]:[background:var(--ss-thumb-on)] motion-reduce:[transition-duration:1ms]"
+            className="absolute [top:var(--ss-inset)] left-0 flex [height:var(--ss-thumb)] [width:var(--ss-thumb)] items-center justify-center [border-radius:var(--ss-thumb-r)] [background:var(--ss-thumb-color)] [transition:background-color_var(--ss-fade)_ease] group-data-[on]:[background:var(--ss-thumb-on)] motion-reduce:[transition-duration:1ms]"
             aria-hidden="true"
             style={{ x, scaleX, scaleY }}
-          />
+          >
+            {thumbContent}
+          </motion.span>
         </span>
       </button>
       {label ? (

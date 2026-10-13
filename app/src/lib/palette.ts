@@ -27,7 +27,7 @@ export const PALETTES: Record<'dark' | 'light', Palette> = {
     accent: '#3e9f24',
     accentHsl: '107 63 38',
     ink: '#0d0d0d',
-    faint: '#dedede',
+    faint: '#cfcfcf',
     surface: '#ffffff',
   },
 };

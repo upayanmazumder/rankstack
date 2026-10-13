@@ -13,7 +13,7 @@ interface SurfaceProps {
   className?: string;
 }
 
-const BORDER = { dark: 'rgba(255, 255, 255, 0.12)', light: '#dedede' } as const;
+const BORDER = { dark: 'rgba(255, 255, 255, 0.12)', light: '#dadada' } as const;
 
 /** Card face lit by a soft accent spotlight that follows the pointer. */
 export function SpotlightSurface({ children, className }: SurfaceProps) {
