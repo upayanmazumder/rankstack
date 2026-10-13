@@ -12,24 +12,25 @@ const entries: LeaderboardEntry[] = [
 ];
 
 describe('LeaderboardTable', () => {
-  it('renders ranked participants with distinct podium styles', () => {
+  it('lists participants in rank order with their scores', () => {
     render(<LeaderboardTable entries={entries} />);
 
-    const first = screen.getByRole('row', { name: /Ada Lovelace/ });
-    const second = screen.getByRole('row', { name: /Grace Hopper/ });
-    const third = screen.getByRole('row', { name: /Katherine Johnson/ });
-
-    expect(within(first).getByText('1')).toHaveClass('text-amber-500');
-    expect(within(second).getByText('2')).toHaveClass('text-zinc-400');
-    expect(within(third).getByText('3')).toHaveClass('text-amber-700');
-    expect(within(first).getByText('300')).toBeInTheDocument();
+    const rows = screen.getAllByRole('row').slice(1);
+    expect(rows.map(row => within(row).getAllByRole('cell')[0].textContent)).toEqual([
+      '1',
+      '2',
+      '3',
+    ]);
+    expect(within(rows[0]).getByText('Ada Lovelace')).toBeInTheDocument();
+    expect(within(rows[0]).getByText('300')).toBeInTheDocument();
   });
 
   it('highlights the current user row', () => {
     render(<LeaderboardTable entries={entries} currentUserId="user-2" />);
 
     const currentUserRow = screen.getByRole('row', { name: /Grace Hopper/ });
-    expect(currentUserRow).toHaveClass('bg-primary/10');
+    expect(currentUserRow).toHaveAttribute('aria-current', 'true');
+    expect(screen.getByRole('row', { name: /Ada Lovelace/ })).not.toHaveAttribute('aria-current');
     expect(within(currentUserRow).getByText('You')).toBeInTheDocument();
   });
 });

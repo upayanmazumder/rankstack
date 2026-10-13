@@ -2,7 +2,6 @@
 
 import { use } from 'react';
 import Link from 'next/link';
-import { Radio } from 'lucide-react';
 
 import { EmptyState } from '@/components/common/empty-state';
 import { ContestStatusBadge } from '@/components/contests/contest-status-badge';
@@ -48,7 +47,11 @@ export default function ContestLeaderboardPage({ params }: ContestLeaderboardPag
           title="Leaderboard unavailable"
           description="The contest rankings could not be loaded."
           action={
-            <Button variant="outline" render={<Link href={`/contests/${id}`} />}>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href={`/contests/${id}`} />}
+            >
               Back to contest
             </Button>
           }
@@ -58,30 +61,22 @@ export default function ContestLeaderboardPage({ params }: ContestLeaderboardPag
   }
 
   return (
-    <section className="mx-auto w-full max-w-6xl flex-1 space-y-7 px-4 py-8 sm:px-6">
+    <section className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-8 sm:px-6">
       <Link
         href={`/contests/${id}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="rounded-sm text-sm text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
-        ← {contest.data.title}
+        Back to contest
       </Link>
-      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <ContestStatusBadge status={contest.data.status} />
-            {contest.data.status === 'live' && (
-              <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest text-emerald-700 uppercase dark:text-emerald-400">
-                <Radio className="size-3.5 animate-pulse" />
-                Live updates
-              </span>
-            )}
-          </div>
-          <h1 className="text-3xl font-semibold">Leaderboard</h1>
-          <p className="text-sm text-muted-foreground">{contest.data.title}</p>
+          <ContestStatusBadge status={contest.data.status} />
+          <h1 className="text-4xl leading-tight font-bold sm:text-5xl">{contest.data.title}</h1>
+          <p className="text-muted-foreground">Leaderboard</p>
         </div>
-        <p role="status" className="text-sm text-muted-foreground">
+        <p role="status" className="shrink-0 text-sm text-muted-foreground sm:text-right">
           {isLive
-            ? 'Refreshing every 30 seconds'
+            ? `Refreshes every ${LIVE_CONTEST_POLL_INTERVAL_MS / 1_000} seconds`
             : contest.data.status === 'ended'
               ? 'Final standings'
               : 'Updates begin when the contest goes live'}

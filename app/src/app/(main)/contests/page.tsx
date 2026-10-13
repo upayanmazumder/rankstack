@@ -39,14 +39,11 @@ export default function ContestsPage() {
 
   return (
     <section className="mx-auto w-full max-w-6xl flex-1 space-y-7 px-4 py-8 sm:px-6">
-      <div className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-            Competition desk
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold">Contest calendar</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Find your next challenge and follow the field.
+          <h1 className="text-4xl leading-tight font-bold">Contests</h1>
+          <p className="mt-2 text-muted-foreground">
+            Join a live contest, or plan for the next one.
           </p>
         </div>
         <label className="relative w-full sm:max-w-xs">
@@ -65,7 +62,7 @@ export default function ContestsPage() {
         value={status}
         onValueChange={value => setStatus(value as (typeof FILTERS)[number]['value'])}
       >
-        <TabsList className="h-auto max-w-full justify-start overflow-x-auto">
+        <TabsList className="w-full overflow-x-auto">
           {FILTERS.map(filter => (
             <TabsTrigger key={filter.value} value={filter.value}>
               {filter.label}
@@ -81,7 +78,7 @@ export default function ContestsPage() {
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton key={index} className="h-40" />
+            <Skeleton key={index} className="h-48" />
           ))}
         </div>
       ) : isError ? (

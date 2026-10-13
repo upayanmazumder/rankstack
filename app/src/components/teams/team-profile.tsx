@@ -65,15 +65,14 @@ export function TeamProfile({ teamId }: TeamProfileProps) {
       </Link>
 
       <div className="rounded-xl border bg-gradient-to-br from-primary/10 via-background to-background p-6 sm:p-8">
-        <p className="text-xs font-semibold tracking-widest text-primary uppercase">Team profile</p>
-        <h1 className="mt-2 text-3xl font-semibold">{team.name}</h1>
+        <h1 className="text-4xl leading-tight font-bold">{team.name}</h1>
         <div className="mt-5 flex flex-wrap gap-5 text-sm">
           <span className="flex items-center gap-2">
-            <Trophy className="size-4 text-primary" />
-            <strong className="font-mono">{team.totalScore.toLocaleString()}</strong> points
+            <Trophy className="size-4 text-muted-foreground" />
+            <strong className="tabular-nums">{team.totalScore.toLocaleString()}</strong> points
           </span>
           <span className="flex items-center gap-2">
-            <Users className="size-4 text-primary" />
+            <Users className="size-4 text-muted-foreground" />
             {team.memberIds.length} member{team.memberIds.length !== 1 ? 's' : ''}
           </span>
         </div>

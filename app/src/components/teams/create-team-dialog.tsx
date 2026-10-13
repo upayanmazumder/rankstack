@@ -88,7 +88,7 @@ export function CreateTeamDialog() {
       />
       <DialogContent>
         <DialogHeader>
-          <div className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="mb-2 flex size-10 items-center justify-center rounded-md bg-muted text-foreground">
             <Users className="size-5" />
           </div>
           <DialogTitle>Create a competitive team</DialogTitle>

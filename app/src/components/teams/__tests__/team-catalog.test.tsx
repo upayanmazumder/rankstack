@@ -36,7 +36,7 @@ describe('TeamCatalog', () => {
   it('ranks teams by score and links cards to their profiles', () => {
     render(<TeamCatalog />);
 
-    expect(screen.getByText('#1 by score')).toBeInTheDocument();
+    expect(screen.getByText('Rank 1')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Quantum Core/i })).toHaveAttribute(
       'href',
       '/teams/team-high'
@@ -54,7 +54,7 @@ describe('TeamCatalog', () => {
     await user.type(screen.getByLabelText('Search teams'), 'lambda');
 
     expect(screen.getByText('Lambda League')).toBeInTheDocument();
-    expect(screen.getByText('#2 by score')).toBeInTheDocument();
+    expect(screen.getByText('Rank 2')).toBeInTheDocument();
     expect(screen.queryByText('Quantum Core')).not.toBeInTheDocument();
   });
 });

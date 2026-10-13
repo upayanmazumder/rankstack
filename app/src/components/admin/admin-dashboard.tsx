@@ -43,14 +43,14 @@ export function AdminDashboard() {
         <MetricCard
           title="Registered users"
           value={allUsers.length}
-          detail={`${allUsers.filter(user => user.role === 'admin').length} admins · ${allUsers.filter(user => user.role === 'participant').length} participants`}
+          detail={`${allUsers.filter(user => user.role === 'admin').length} admins, ${allUsers.filter(user => user.role === 'participant').length} participants`}
           icon={Users}
           loading={loading}
         />
         <MetricCard
           title="Active contests"
           value={allContests.filter(contest => contest.status === 'live').length}
-          detail={`${allContests.filter(contest => contest.status === 'upcoming').length} upcoming · ${allContests.filter(contest => contest.status === 'ended').length} ended`}
+          detail={`${allContests.filter(contest => contest.status === 'upcoming').length} upcoming, ${allContests.filter(contest => contest.status === 'ended').length} ended`}
           icon={Trophy}
           loading={loading}
         />
@@ -83,8 +83,8 @@ export function AdminDashboard() {
                 className="flex items-center justify-between rounded-lg bg-muted/50 p-3"
               >
                 <span className="capitalize">{row.difficulty}</span>
-                <span className="font-mono text-sm">
-                  {row.avgScorePerProblem.toFixed(1)} avg · {row.problemCount} problems
+                <span className="text-sm tabular-nums">
+                  {row.avgScorePerProblem.toFixed(1)} avg, {row.problemCount} problems
                 </span>
               </div>
             ))}
@@ -129,10 +129,10 @@ export function AdminDashboard() {
           <Link
             key={href}
             href={href}
-            className="group flex items-center justify-between rounded-xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-muted/40"
+            className="group flex items-center justify-between rounded-xl border bg-card p-4 transition-colors hover:border-foreground/30 hover:bg-muted/40"
           >
             <span className="font-medium">{label}</span>
-            <Icon className="size-5 text-muted-foreground transition-colors group-hover:text-primary" />
+            <Icon className="size-5 text-muted-foreground transition-colors group-hover:text-foreground" />
           </Link>
         ))}
       </section>
@@ -158,16 +158,14 @@ function MetricCard({
   accent = false,
 }: MetricCardProps) {
   return (
-    <Card className={accent ? 'border-amber-500/40' : undefined}>
+    <Card className={accent ? 'border-warning/40' : undefined}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-              {title}
-            </p>
-            <p className="mt-3 font-mono text-3xl font-semibold">{loading ? '—' : value}</p>
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="mt-3 text-3xl font-semibold tabular-nums">{loading ? '—' : value}</p>
           </div>
-          <div className="rounded-lg bg-primary/10 p-2 text-primary">
+          <div className="rounded-md bg-muted p-2 text-foreground">
             <Icon className="size-5" />
           </div>
         </div>

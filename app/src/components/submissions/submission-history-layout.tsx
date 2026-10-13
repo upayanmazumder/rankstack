@@ -17,17 +17,14 @@ export function SubmissionHistoryPageShell({ children, total }: SubmissionHistor
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground uppercase">
-                Activity
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight">Submission history</h1>
+              <h1 className="text-4xl leading-tight font-bold">Submission history</h1>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Review your attempts, evaluation outcomes, and awarded scores.
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
               <ListOrdered className="size-4 text-muted-foreground" />
-              <span className="font-mono font-semibold">{total}</span>
+              <span className="font-semibold tabular-nums">{total}</span>
               <span className="text-muted-foreground">total</span>
             </div>
           </div>

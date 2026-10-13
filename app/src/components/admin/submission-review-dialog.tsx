@@ -51,20 +51,16 @@ export function SubmissionReviewDialog({
         <div className="grid gap-4 lg:grid-cols-2">
           <section className="space-y-3 rounded-lg border bg-muted/30 p-4">
             <div>
-              <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                Problem
-              </p>
+              <p className="text-sm text-muted-foreground">Problem</p>
               <h2 className="mt-1 font-semibold">{problem?.title ?? 'Unknown problem'}</h2>
             </div>
             <p className="text-sm leading-6 text-muted-foreground">
               {problem?.description || 'Problem statement unavailable.'}
             </p>
-            <p className="font-mono text-xs">Maximum: {maxPoints} points</p>
+            <p className="text-xs tabular-nums">Maximum: {maxPoints} points</p>
           </section>
           <section className="space-y-2 rounded-lg border p-4">
-            <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
-              Submitted answer
-            </p>
+            <p className="text-sm text-muted-foreground">Submitted answer</p>
             <pre className="max-h-64 overflow-auto rounded-md bg-muted p-3 font-mono text-xs whitespace-pre-wrap">
               {formatAnswer(submission.answer)}
             </pre>

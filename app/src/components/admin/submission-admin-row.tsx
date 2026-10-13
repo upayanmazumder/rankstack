@@ -31,7 +31,7 @@ export function SubmissionAdminRow({
       <TableCell>
         <SubmissionStatusBadge status={submission.status} />
       </TableCell>
-      <TableCell className="font-mono">{submission.score}</TableCell>
+      <TableCell className="tabular-nums">{submission.score}</TableCell>
       <TableCell className="whitespace-nowrap">{formatDateTime(submission.submittedAt)}</TableCell>
       <TableCell className="text-right">
         <Button size="sm" variant="outline" onClick={() => onReview(submission)}>

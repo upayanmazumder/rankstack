@@ -1,161 +1,138 @@
 'use client';
 
-import { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowUpRight, Code2, Medal, Radio, UsersRound } from 'lucide-react';
 
+import { ContestStatusBadge } from '@/components/contests/contest-status-badge';
+import { HeroBackdrop } from '@/components/home/hero-backdrop';
+import { HeroCta } from '@/components/home/hero-cta';
+import { HeroHeadline } from '@/components/home/hero-headline';
+import { LiveStack } from '@/components/home/live-stack';
 import { Button } from '@/components/ui/button';
 import { useContests } from '@/hooks/api/use-contests';
-import { useAuthStore } from '@/stores';
+import { useHydratedUser } from '@/hooks/use-hydrated-user';
+import { pickFeaturedContest } from '@/lib/featured-contest';
+import { formatDateTime } from '@/utils';
 
-const FEATURES = [
+const STEPS = [
+  { title: 'Join a contest', description: 'Enter alone or with your team before the start time.' },
   {
-    icon: Radio,
-    title: 'Scores in motion',
-    description: 'Follow standings as submissions are evaluated, without refreshing the page.',
+    title: 'Solve the problems',
+    description: 'Each contest lists its problems by letter. Some ask for code, some for a choice.',
   },
+  { title: 'Get a verdict', description: 'A judge marks each submission and awards its points.' },
   {
-    icon: Code2,
-    title: 'More than one format',
-    description: 'Move between coding, multiple-choice, and written challenges.',
-  },
-  {
-    icon: UsersRound,
-    title: 'Compete together',
-    description: 'Enter as an individual or bring your team into the arena.',
+    title: 'Move up the board',
+    description: 'Points go to the leaderboard at once. Everyone in the contest sees the change.',
   },
 ];
 
 export default function Home() {
-  const router = useRouter();
-  const user = useAuthStore(state => state.user);
-  const { data: contests = [] } = useContests();
+  const user = useHydratedUser();
+  const { data: contests = [], isPending } = useContests();
 
-  useEffect(() => {
-    if (user) router.replace('/contests');
-  }, [router, user]);
-
-  const competitors = new Set(
-    contests.flatMap(contest => contest.participants.map(item => item.refId))
-  ).size;
-  const liveContests = contests.filter(contest => contest.status === 'live').length;
+  const featured = pickFeaturedContest(contests);
+  const schedule = contests
+    .filter(contest => contest.status !== 'ended')
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
   return (
-    <main className="flex-1">
-      <section className="relative isolate overflow-hidden border-b border-border bg-[radial-gradient(ellipse_at_82%_12%,color-mix(in_oklch,var(--primary)_10%,transparent),transparent_42%),linear-gradient(135deg,var(--background)_0%,color-mix(in_oklch,var(--background),var(--muted)_50%)_100%)]">
-        <div className="mx-auto grid min-h-[540px] w-full max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:py-20">
-          <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              <span className="size-2 rounded-full bg-emerald-500" />
-              The competition platform
-            </p>
-            <h1 className="mt-6 max-w-2xl text-5xl leading-[1.04] font-semibold sm:text-6xl">
-              Rankstack is where skill finds its rank.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-              Run focused contests, solve problems that reward different strengths, and watch the
-              leaderboard move in real time.
+    <div className="flex-1">
+      <section className="relative isolate overflow-hidden">
+        <HeroBackdrop />
+        <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 pt-16 pb-20 sm:px-8 lg:grid-cols-[1fr_minmax(0,28rem)] lg:gap-20 lg:pt-24">
+          <div className="flex flex-col justify-center">
+            <HeroHeadline
+              text="Contests that rank you as you solve."
+              className="max-w-[15ch] text-4xl leading-[1.08] font-bold sm:text-5xl lg:text-6xl"
+            />
+            <p className="mt-6 max-w-[34rem] text-lg leading-8 text-muted-foreground">
+              Join a programming contest, answer coding, multiple-choice, and written problems, and
+              see your place on the leaderboard after each judged submission.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                size="lg"
-                render={
-                  <Link href="/contests">
-                    Explore contests <ArrowUpRight />
-                  </Link>
-                }
-              />
+              <HeroCta />
               <Button
                 size="lg"
                 variant="outline"
-                render={<Link href="/register">Create account</Link>}
+                nativeButton={false}
+                render={
+                  user ? (
+                    <Link href="/submissions">Your submissions</Link>
+                  ) : (
+                    <Link href="/register">Create account</Link>
+                  )
+                }
               />
             </div>
           </div>
-          <div
-            aria-label="Live contest standings preview"
-            className="relative border-l border-border pl-6 sm:pl-9"
-          >
-            <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
-              <div>
-                <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-                  Rankings / 01
-                </p>
-                <p className="mt-1 font-semibold">Current standings</p>
-              </div>
-              <span className="inline-flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-                <span className="size-2 rounded-full bg-emerald-500" />
-                LIVE
-              </span>
-            </div>
-            {[
-              { rank: '01', name: 'A. Chen', points: '2,840', icon: Medal },
-              { rank: '02', name: 'M. Okafor', points: '2,610', icon: null },
-              { rank: '03', name: 'S. Patel', points: '2,430', icon: null },
-            ].map(({ rank, name, points, icon: Icon }) => (
-              <div
-                key={rank}
-                className="grid grid-cols-[2.5rem_1fr_auto] items-center gap-4 border-b border-border/70 py-4"
-              >
-                <span className="font-mono text-sm text-muted-foreground">{rank}</span>
-                <span className="flex items-center gap-2 font-medium">
-                  {Icon && <Icon className="size-4 text-amber-500" />}
-                  {name}
-                </span>
-                <span className="font-mono text-sm tabular-nums">{points}</span>
-              </div>
+
+          <div className="rounded-lg border border-border bg-card/90 p-5 backdrop-blur-sm lg:mt-2">
+            <LiveStack contest={featured} isPending={isPending} />
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="steps-heading" className="border-t border-border">
+        <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
+          <h2 id="steps-heading" className="text-2xl font-semibold">
+            How a contest runs
+          </h2>
+          <ol className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map(({ title, description }, index) => (
+              <li key={title} className="space-y-2">
+                <p className="text-sm text-muted-foreground tabular-nums">{index + 1}</p>
+                <h3 className="font-semibold">{title}</h3>
+                <p className="max-w-xs leading-7 text-muted-foreground">{description}</p>
+              </li>
             ))}
-            <p className="mt-4 text-xs text-muted-foreground">
-              Standings update as results are verified.
-            </p>
-          </div>
+          </ol>
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-7xl grid-cols-3 divide-x divide-border border-b border-border px-5 py-7 sm:px-8">
-        <div className="pr-3">
-          <p className="text-2xl font-semibold tabular-nums">{contests.length}</p>
-          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">Contests</p>
-        </div>
-        <div className="px-3 sm:px-6">
-          <p className="text-2xl font-semibold tabular-nums">{competitors}</p>
-          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">Competitors</p>
-        </div>
-        <div className="pl-3 sm:pl-6">
-          <p className="text-2xl font-semibold tabular-nums">{liveContests}</p>
-          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">Live now</p>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
-        <div className="mb-7 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-              Built for the whole contest
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold">One arena. Every kind of problem.</h2>
+      <section aria-labelledby="schedule-heading" className="border-t border-border">
+        <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <h2 id="schedule-heading" className="text-2xl font-semibold">
+              On the schedule
+            </h2>
+            <Link
+              href="/contests"
+              className="rounded-sm font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              See every contest
+            </Link>
           </div>
-          <Link
-            href="/contests"
-            className="hidden items-center gap-1 text-sm font-medium hover:underline sm:inline-flex"
-          >
-            Browse contests <ArrowUpRight className="size-4" />
-          </Link>
-        </div>
-        <div className="grid divide-y divide-border border-y border-border md:grid-cols-3 md:divide-x md:divide-y-0">
-          {FEATURES.map(({ icon: Icon, title, description }, index) => (
-            <article key={title} className="py-6 md:px-6 md:first:pl-0 md:last:pr-0">
-              <span className="flex size-9 items-center justify-center border border-border bg-muted/50">
-                <Icon className="size-4 text-primary" />
-              </span>
-              <p className="mt-5 font-mono text-xs text-muted-foreground">0{index + 1}</p>
-              <h3 className="mt-2 font-semibold">{title}</h3>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">{description}</p>
-            </article>
-          ))}
+          {schedule.length === 0 ? (
+            <p className="mt-6 text-muted-foreground">
+              {isPending
+                ? 'Loading the schedule.'
+                : 'No contest is live or scheduled at the moment.'}
+            </p>
+          ) : (
+            <ul className="mt-6 border-t border-border">
+              {schedule.map(contest => (
+                <li key={contest.id}>
+                  <Link
+                    href={`/contests/${contest.id}`}
+                    className="grid gap-x-6 gap-y-1 border-b border-border py-4 transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset sm:grid-cols-[1fr_auto_auto] sm:items-center sm:px-3"
+                  >
+                    <span className="truncate font-medium">{contest.title}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {contest.status === 'live' ? 'Ends' : 'Starts'}{' '}
+                      {formatDateTime(
+                        contest.status === 'live' ? contest.endTime : contest.startTime
+                      )}
+                    </span>
+                    <span className="sm:w-24 sm:text-right">
+                      <ContestStatusBadge status={contest.status} />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

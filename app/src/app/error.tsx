@@ -18,7 +18,7 @@ export default function Error({ error, retry }: AppErrorProps) {
   return (
     <main className="mx-auto flex min-h-[60vh] w-full max-w-3xl flex-1 flex-col items-center justify-center px-5 py-16 text-center">
       <AlertTriangle className="size-10 text-destructive" strokeWidth={1.5} />
-      <h1 className="mt-6 text-3xl font-semibold">Something went wrong.</h1>
+      <h1 className="mt-6 text-3xl font-bold">Something went wrong.</h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
         The page hit an unexpected error. Try loading it again.
       </p>
