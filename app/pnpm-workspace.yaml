@@ -8,3 +8,7 @@ overrides:
   # dependency can be bumped to move it. Pin the 5.x line to the release that
   # carries the CVE-2026-14257 mitigation bypass fix (GHSA 4.0.0 <5.0.9).
   'brace-expansion@^5.0.0': '5.0.12'
+  # seroval reaches the tree via solid-js and @tanstack/react-query-devtools.
+  # Override to >=1.6.9 to resolve GHSA-p6vx-979v-rg4c and GHSA-jp82-f5mq-hwhp.
+  seroval: '>=1.6.9'
+  seroval-plugins: '>=1.6.9'
