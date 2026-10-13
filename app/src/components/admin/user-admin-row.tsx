@@ -54,7 +54,7 @@ export function UserAdminRow({ user, currentUserId }: UserAdminRowProps) {
         <TableCell>
           <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
         </TableCell>
-        <TableCell className="font-mono">{user.totalScore}</TableCell>
+        <TableCell className="tabular-nums">{user.totalScore}</TableCell>
         <TableCell>{formatDate(user.createdAt)}</TableCell>
         <TableCell>
           <div className="flex justify-end gap-2">

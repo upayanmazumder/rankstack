@@ -45,7 +45,7 @@ export function ProblemAdminRow({ problem, contestTitle }: ProblemAdminRowProps)
         <TableCell>
           <DifficultyBadge difficulty={problem.difficulty} />
         </TableCell>
-        <TableCell className="font-mono">{problem.points}</TableCell>
+        <TableCell className="tabular-nums">{problem.points}</TableCell>
         <TableCell className="text-right">
           <Button
             size="icon-sm"

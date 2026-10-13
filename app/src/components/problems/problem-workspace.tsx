@@ -96,7 +96,7 @@ export function ProblemWorkspace({ contestId, problemId }: ProblemWorkspaceProps
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="font-mono text-xs text-muted-foreground">Problem {problem.id}</p>
-              <h1 className="mt-1 text-lg font-semibold sm:text-xl">{problem.title}</h1>
+              <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{problem.title}</h1>
             </div>
             <div className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
               <Clock3 className="size-4" />
@@ -108,8 +108,8 @@ export function ProblemWorkspace({ contestId, problemId }: ProblemWorkspaceProps
 
       <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
         {latestSubmission && (
-          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm">
-            <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />
+          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-success/30 bg-success/12 px-4 py-3 text-sm">
+            <CheckCircle2 className="size-5 text-success" />
             <span className="font-medium">Latest submission received</span>
             <SubmissionStatusBadge status={latestSubmission.status} />
             <span className="ml-auto text-xs text-muted-foreground">

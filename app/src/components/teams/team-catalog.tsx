@@ -28,10 +28,7 @@ export function TeamCatalog() {
     <section className="mx-auto w-full max-w-6xl flex-1 space-y-7 px-4 py-8 sm:px-6">
       <div className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-            Squad registry
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold">Teams &amp; Guilds</h1>
+          <h1 className="text-4xl leading-tight font-bold">Teams</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Discover competitive squads, compare collective scores, and assemble your roster.
           </p>
@@ -52,11 +49,11 @@ export function TeamCatalog() {
         </label>
         <div className="flex items-center gap-4 px-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="size-4 text-primary" />
+            <ShieldCheck className="size-4 text-muted-foreground" />
             Score ranked
           </span>
           <span className="flex items-center gap-1.5">
-            <Users className="size-4 text-primary" />
+            <Users className="size-4 text-muted-foreground" />
             {teamsQuery.data?.length ?? 0} registered
           </span>
         </div>

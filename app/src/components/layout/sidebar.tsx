@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FileText, LayoutDashboard, ListOrdered, Shield, Trophy, Users } from 'lucide-react';
 
+import { BrandMark } from '@/components/layout/brand-mark';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useHydratedUser } from '@/hooks/use-hydrated-user';
@@ -40,8 +41,8 @@ export function Sidebar() {
     <Sheet open={sidebarOpen} onOpenChange={open => setSidebarOpen(open)}>
       <SheetContent side="left" className="w-72 p-0">
         <SheetHeader className="border-b border-border px-4 py-3">
-          <SheetTitle className="flex items-center gap-2 text-base">
-            <Trophy className="size-4 text-primary" />
+          <SheetTitle className="flex items-center gap-2 font-display text-lg font-bold">
+            <BrandMark />
             Rankstack
           </SheetTitle>
         </SheetHeader>
@@ -67,9 +68,7 @@ export function Sidebar() {
           {user?.role === 'admin' && (
             <>
               <Separator className="my-2" />
-              <p className="mb-1 px-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                Admin
-              </p>
+              <p className="mb-1 px-3 text-sm text-muted-foreground">Admin</p>
               {ADMIN_LINKS.map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}

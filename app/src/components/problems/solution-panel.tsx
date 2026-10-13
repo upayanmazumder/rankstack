@@ -11,6 +11,7 @@ import { CodingSolution } from './coding-solution';
 import { McqSolution } from './mcq-solution';
 import { countWords, type CodingLanguage, type SolutionAnswer } from './solution-types';
 import { SubjectiveSolution } from './subjective-solution';
+import { SubmitSpark } from './submit-spark';
 
 interface SolutionPanelProps {
   problem: Problem;
@@ -74,9 +75,7 @@ export function SolutionPanel({
       <CardHeader className="border-b bg-muted/30">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="mb-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Your solution
-            </p>
+            <p className="mb-1 text-sm text-muted-foreground">Your solution</p>
             <CardTitle className="text-lg">Submit for evaluation</CardTitle>
           </div>
           <ShieldCheck className="size-5 text-muted-foreground" aria-hidden="true" />
@@ -129,10 +128,12 @@ export function SolutionPanel({
             <p className="text-xs text-muted-foreground">
               Submissions are final records, but you can submit another attempt.
             </p>
-            <Button type="submit" size="lg" disabled={disabled || isSubmitting}>
-              <Send data-icon="inline-start" />
-              {isSubmitting ? 'Submitting...' : 'Submit solution'}
-            </Button>
+            <SubmitSpark disabled={disabled || isSubmitting}>
+              <Button type="submit" size="lg" disabled={disabled || isSubmitting}>
+                <Send data-icon="inline-start" />
+                {isSubmitting ? 'Submitting...' : 'Submit solution'}
+              </Button>
+            </SubmitSpark>
           </div>
         </form>
       </CardContent>

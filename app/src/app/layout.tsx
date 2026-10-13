@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Montserrat, Montserrat_Alternates, Red_Hat_Mono, Red_Hat_Text } from 'next/font/google';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import './globals.css';
@@ -14,15 +14,26 @@ import {
 import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+// Montserrat Alternates for display headings, Montserrat for section
+// headings and numerals, Red Hat Text for reading, Red Hat Mono for code.
+const montserratAlternates = Montserrat_Alternates({
+  variable: '--font-montserrat-alternates',
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+});
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const montserrat = Montserrat({
+  variable: '--font-montserrat',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const redHatText = Red_Hat_Text({
+  variable: '--font-red-hat-text',
+  subsets: ['latin'],
+});
+
+const redHatMono = Red_Hat_Mono({
+  variable: '--font-red-hat-mono',
   subsets: ['latin'],
 });
 
@@ -49,14 +60,15 @@ export default function RootLayout({
       className={cn(
         'h-full',
         'antialiased',
-        geistSans.variable,
-        geistMono.variable,
-        'font-sans',
-        inter.variable
+        montserratAlternates.variable,
+        montserrat.variable,
+        redHatText.variable,
+        redHatMono.variable,
+        'font-sans'
       )}
     >
       <body className="flex min-h-full flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <QueryProvider>
             <SessionExpiredRedirect />
             <SessionRevalidator />

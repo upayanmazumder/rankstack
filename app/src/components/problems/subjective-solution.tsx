@@ -28,7 +28,7 @@ export function SubjectiveSolution({
         </Label>
         <span
           className={cn(
-            'font-mono text-xs text-muted-foreground tabular-nums',
+            'text-xs text-muted-foreground tabular-nums',
             overLimit && 'font-semibold text-destructive'
           )}
           aria-live="polite"

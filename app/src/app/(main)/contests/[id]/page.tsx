@@ -2,12 +2,13 @@
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, Clock3, Users } from 'lucide-react';
+import { CalendarDays, Clock3, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { isApiError } from '@/api';
 import { EmptyState } from '@/components/common/empty-state';
 import { ContestStatusBadge } from '@/components/contests/contest-status-badge';
+import { RankNumeral } from '@/components/leaderboard/rank-numeral';
 import { ProblemCard } from '@/components/problems/problem-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -75,7 +76,11 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
         <EmptyState
           title="Contest unavailable"
           description="This contest could not be found or loaded."
-          action={<Button render={<Link href="/contests" />}>Browse contests</Button>}
+          action={
+            <Button nativeButton={false} render={<Link href="/contests" />}>
+              Browse contests
+            </Button>
+          }
         />
       </section>
     );
@@ -106,19 +111,17 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
 
   return (
     <section className="mx-auto w-full max-w-6xl flex-1 space-y-7 px-4 py-8 sm:px-6">
-      <Link href="/contests" className="text-sm text-muted-foreground hover:text-foreground">
-        ← All contests
+      <Link
+        href="/contests"
+        className="rounded-sm text-sm text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      >
+        All contests
       </Link>
-      <header className="space-y-5 border-b border-border pb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <ContestStatusBadge status={contest.status} />
-          <span className="text-sm text-muted-foreground">
-            {contest.participants.length} participants
-          </span>
-        </div>
+      <header className="space-y-4">
+        <ContestStatusBadge status={contest.status} />
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl space-y-3">
-            <h1 className="text-3xl font-semibold">{contest.title}</h1>
+            <h1 className="text-4xl leading-tight font-bold">{contest.title}</h1>
             <p className="text-muted-foreground">
               {contest.description || 'A Rankstack competition.'}
             </p>
@@ -153,11 +156,11 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
       </header>
 
       {isUpcoming && (
-        <div className="border-l-2 border-amber-500 bg-amber-500/5 px-4 py-3 text-sm">
+        <div className="border-l-2 border-foreground/40 bg-muted px-4 py-3 text-sm">
           <span className="font-medium">Problems unlock when the contest goes live.</span> The
           schedule begins {formatDateTime(contest.startTime)}.
           {now !== null && (
-            <p role="timer" className="mt-1 font-mono tabular-nums">
+            <p role="timer" className="mt-1 font-semibold tabular-nums">
               Starts in {formatCountdown(startTime - now)}
             </p>
           )}
@@ -208,7 +211,12 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
           ) : problemsQuery.data.length ? (
             <div className="grid gap-4 md:grid-cols-2">
               {problemsQuery.data.map(problem => (
-                <ProblemCard key={problem.id} problem={problem} disabled={problemLinksDisabled} />
+                <ProblemCard
+                  key={problem.id}
+                  problem={problem}
+                  index={contest.problemIds.indexOf(problem.id)}
+                  disabled={problemLinksDisabled}
+                />
               ))}
             </div>
           ) : (
@@ -229,11 +237,8 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
                 <Button
                   variant="outline"
                   size="sm"
-                  render={
-                    <Link href={`/contests/${id}/leaderboard`}>
-                      Full leaderboard <ArrowRight />
-                    </Link>
-                  }
+                  nativeButton={false}
+                  render={<Link href={`/contests/${id}/leaderboard`}>Full leaderboard</Link>}
                 />
               </div>
               {leaderboardQuery.data?.slice(0, 10).length ? (
@@ -241,13 +246,13 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
                   {leaderboardQuery.data.slice(0, 10).map(entry => (
                     <li
                       key={entry.memberId}
-                      className="flex items-center justify-between py-3 text-sm"
+                      className="flex items-center justify-between gap-4 py-2.5"
                     >
-                      <span>
-                        <span className="mr-4 font-mono text-muted-foreground">
-                          {String(entry.rank).padStart(2, '0')}
+                      <span className="flex min-w-0 items-center gap-4">
+                        <RankNumeral rank={entry.rank} className="w-8 text-2xl" />
+                        <span className="truncate font-semibold">
+                          {entry.participantName ?? entry.memberId}
                         </span>
-                        {entry.participantName ?? entry.memberId}
                       </span>
                       <span className="font-semibold tabular-nums">
                         {entry.score.toLocaleString()}

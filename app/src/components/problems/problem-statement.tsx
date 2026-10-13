@@ -37,9 +37,6 @@ export function ProblemStatement({ problem }: { problem: Problem }) {
             </Badge>
           </div>
           <div>
-            <p className="mb-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-              Problem statement
-            </p>
             <CardTitle className="text-2xl leading-tight sm:text-3xl">{problem.title}</CardTitle>
           </div>
         </CardHeader>
@@ -81,7 +78,7 @@ function CodingDetails({ problem }: { problem: Problem }) {
           <CardHeader>
             <CardTitle className="text-base">Input format</CardTitle>
           </CardHeader>
-          <CardContent className="font-mono text-sm leading-6 whitespace-pre-wrap text-foreground/80">
+          <CardContent className="text-sm leading-6 whitespace-pre-wrap text-foreground/80">
             {problem.inputFormat || 'Read input from standard input.'}
           </CardContent>
         </Card>
@@ -89,7 +86,7 @@ function CodingDetails({ problem }: { problem: Problem }) {
           <CardHeader>
             <CardTitle className="text-base">Constraints</CardTitle>
           </CardHeader>
-          <CardContent className="font-mono text-sm leading-6 whitespace-pre-wrap text-foreground/80">
+          <CardContent className="text-sm leading-6 whitespace-pre-wrap text-foreground/80">
             {problem.constraints || 'No additional constraints were provided.'}
           </CardContent>
         </Card>
@@ -103,9 +100,7 @@ function CodingDetails({ problem }: { problem: Problem }) {
           <CardContent className="space-y-4">
             {problem.testCases.map((testCase, index) => (
               <div key={`${testCase.input}-${index}`} className="rounded-lg border bg-muted/20 p-4">
-                <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                  Example {index + 1}
-                </p>
+                <p className="mb-3 text-sm text-muted-foreground">Example {index + 1}</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <CodeBlock label="Input" value={testCase.input} />
                   <CodeBlock label="Expected output" value={testCase.output} />

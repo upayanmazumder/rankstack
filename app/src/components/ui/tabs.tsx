@@ -32,7 +32,7 @@ function TabsList({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot="tabs-list"
       activateOnFocus
       className={cn(
-        'inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground',
+        'inline-flex h-10 items-stretch justify-start gap-1 text-muted-foreground shadow-[inset_0_-1px_0_var(--border)]',
         className
       )}
       {...props}
@@ -50,7 +50,7 @@ function TabsTrigger({ className, type = 'button', ...props }: TabsTriggerProps)
       type={type}
       data-slot="tabs-trigger"
       className={cn(
-        'inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 aria-selected:bg-background aria-selected:text-foreground aria-selected:shadow-sm',
+        'inline-flex items-center justify-center border-b-2 border-transparent px-3 text-sm font-semibold whitespace-nowrap transition-colors hover:text-foreground focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 aria-selected:border-primary aria-selected:text-foreground',
         className
       )}
       {...props}

@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck } from 'lucide-react';
 
+import { FullScreenLoader } from '@/components/common/loaders';
 import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore } from '@/stores';
 
@@ -21,15 +21,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   }, [mounted, router, user?.role]);
 
   if (!mounted || user?.role !== 'admin') {
-    return (
-      <div
-        role="status"
-        className="flex min-h-[50vh] items-center justify-center gap-3 text-sm text-muted-foreground"
-      >
-        <ShieldCheck className="size-5 animate-pulse text-primary" />
-        Verifying administrator access…
-      </div>
-    );
+    return <FullScreenLoader label="Checking administrator access" />;
   }
 
   return children;

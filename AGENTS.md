@@ -132,7 +132,9 @@ def get_user(user_id: str):
 - **TanStack Query Hooks:** Create structured query keys using `createQueryKeys(entity)` from `@/lib/query`. Colocate query hooks in `src/hooks/api/`.
 - **Zustand State:** Define one store per file in `src/stores/`. Wrap stores with `createSelectors` to expose auto-generated `use.fieldName()` hooks.
 - **Form Handling:** Standardize forms with `useZodForm(schema, options)` from `@/hooks/use-zod-form`. Wire submission handlers to toast notifications via `sonner`.
-- **Styling & Theme:** Use Tailwind CSS v4 utility classes. Use `cn()` for class merging. Design tokens are defined as OKLCH CSS variables in `src/app/globals.css`.
+- **Styling & Theme:** Use Tailwind CSS v4 utility classes. Use `cn()` for class merging. Design tokens are defined as OKLCH CSS variables in `src/app/globals.css`. Dark is the default theme. Fonts: Montserrat Alternates (`h1`, `font-display`), Montserrat (`h2`/`h3`, `font-heading`), Red Hat Text (body), Red Hat Mono (code).
+- **React Bits Effects:** Effect components live in `src/components/react-bits/`, added with `pnpm dlx shadcn@latest add @react-bits/<Name>-TS-TW` and renamed to kebab-case. Canvas and WebGL effects cannot read CSS variables: pass colors from `usePalette()` (`src/lib/palette.ts`), and keep those hex values in sync with `globals.css`.
+- **Loading States:** Use `Skeleton` for content placeholders, `PageLoader` for route segments (`loading.tsx`), and `FullScreenLoader` only while the user moves between auth states (sign in, sign out, admin check).
 
 ---
 
