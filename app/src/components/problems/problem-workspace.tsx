@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, ArrowLeft, CheckCircle2, Clock3, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,7 +10,7 @@ import { SubmissionStatusBadge } from '@/components/submissions/submission-statu
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCreateSubmission, useProblem } from '@/hooks/api';
+import { useContest, useCreateSubmission, useProblem } from '@/hooks/api';
 import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore } from '@/stores';
 
@@ -26,6 +27,23 @@ export function ProblemWorkspace({ contestId, problemId }: ProblemWorkspaceProps
   const mounted = useMounted();
   const user = useAuthStore(state => state.user);
   const problemQuery = useProblem(problemId);
+  const contestQuery = useContest(contestId);
+  const [now, setNow] = useState<number | null>(null);
+  const contest = contestQuery.data;
+  const startTime = contest ? new Date(contest.startTime).getTime() : NaN;
+  const endTime = contest ? new Date(contest.endTime).getTime() : NaN;
+
+  useEffect(() => {
+    if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) return;
+    const tick = () => {
+      const currentTime = Date.now();
+      setNow(currentTime);
+      if (currentTime > endTime) window.clearInterval(timer);
+    };
+    const timer = window.setInterval(tick, 1_000);
+    tick();
+    return () => window.clearInterval(timer);
+  }, [startTime, endTime]);
   const createSubmission = useCreateSubmission();
 
   async function submitSolution(answer: SolutionAnswer) {
@@ -80,6 +98,7 @@ export function ProblemWorkspace({ contestId, problemId }: ProblemWorkspaceProps
   }
 
   const problem = problemQuery.data;
+  const isOpen = contest?.status === 'live' && now !== null && now >= startTime && now <= endTime;
   const latestSubmission = createSubmission.data;
 
   return (
@@ -124,7 +143,7 @@ export function ProblemWorkspace({ contestId, problemId }: ProblemWorkspaceProps
             key={problem.id}
             problem={problem}
             isSubmitting={createSubmission.isPending}
-            disabled={!mounted || !user}
+            disabled={!mounted || !user || !isOpen}
             onSubmit={submitSolution}
           />
         </div>
