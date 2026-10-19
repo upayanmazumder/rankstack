@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Review 3 - Contest Platform with Live Leaderboard</title>
+<style>
+  @page { size: A4; margin: 12mm 15mm 10mm 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Calibri, Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 9.3pt;
+    line-height: 1.36;
+    margin: 0;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 1.5px solid #333;
+    padding-bottom: 4px;
+    margin-bottom: 7px;
+  }
+  .header .code { font-size: 9pt; letter-spacing: 0.5px; color: #444; }
+  .header h1 { font-size: 15pt; margin: 2px 0 1px 0; }
+  .header .sub { font-size: 9pt; color: #555; }
+  table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 9pt; }
+  table.meta td { border: 1px solid #999; padding: 2.5px 6px; }
+  table.meta td.label { background: #eee; font-weight: 600; width: 18%; }
+  h2 {
+    font-size: 11pt;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1px;
+  }
+  h3 { font-size: 9.4pt; margin-top: 5px; margin-bottom: 2px; font-weight: 700; color: #222; }
+  p { margin: 2.5px 0; text-align: justify; }
+  ul, ol { margin: 2px 0; padding-left: 16px; }
+  .shot {
+    width: 100%;
+    max-height: 66mm;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid #aaa;
+    display: block;
+    margin: 2px 0 1px 0;
+  }
+  .caption { font-size: 8pt; color: #444; margin-bottom: 5px; }
+  pre {
+    background: #f6f6f6;
+    border: 1px solid #ccc;
+    padding: 3px 6px;
+    margin: 2px 0 4px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  code.inline { background: #eee; padding: 0 2px; }
+  .page-break { page-break-after: always; break-after: page; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="code">BCSE302P – Database Systems Lab – Review 3</div>
+  <h1>Contest Platform with Live Leaderboard</h1>
+  <div class="sub">Final Demonstration, Evaluation &amp; Documentation (MongoDB + Redis)</div>
+</div>
+
+<table class="meta">
+  <tr>
+    <td class="label">Team</td>
+    <td>Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS0378)</td>
+  </tr>
+  <tr>
+    <td class="label">Course</td>
+    <td>BCSE302P – Database Systems Lab</td>
+  </tr>
+  <tr>
+    <td class="label">Component</td>
+    <td>Review 3 – Final Demonstration, Evaluation &amp; Documentation</td>
+  </tr>
+  <tr>
+    <td class="label">Public Website</td>
+    <td><a href="https://rankstack.upayan.dev">rankstack.upayan.dev</a></td>
+  </tr>
+  <tr>
+    <td class="label">Repository</td>
+    <td><a href="https://github.com/upayanmazumder/rankstack">github.com/upayanmazumder/rankstack</a></td>
+  </tr>
+</table>
+
+<h2>1. Complete Working Demonstration &amp; Database Implementation</h2>
+
+<p>Rankstack is a contest platform with live leaderboards, real-time submission evaluation, and team management. MongoDB is the primary database for application records. Redis is used alongside MongoDB for leaderboard sorted sets, login sessions, and submission rate limits. A FastAPI backend serves the REST API, and a Next.js 16 client serves the user interface.</p>
+
+<p>The system runs on five MongoDB collections, each configured with <code>$jsonSchema</code> validation and B-tree indexes. The dataset is populated using <code>scripts/seed.py</code>, which loads 112 sample records across all five collections:</p>
+
+<table class="data">
+  <tr>
+    <th>Collection</th>
+    <th>Record Count</th>
+    <th>Primary Fields</th>
+  </tr>
+  <tr>
+    <td><code>users</code></td>
+    <td>15</td>
+    <td>name, email, passwordHash, role, totalScore, teamIds</td>
+  </tr>
+  <tr>
+    <td><code>teams</code></td>
+    <td>5</td>
+    <td>name, ownerId, memberIds, totalScore</td>
+  </tr>
+  <tr>
+    <td><code>contests</code></td>
+    <td>5</td>
+    <td>title, description, startTime, endTime, status, problemIds, participants</td>
+  </tr>
+  <tr>
+    <td><code>problems</code></td>
+    <td>15</td>
+    <td>contestId, type (mcq/coding/subjective), difficulty, points, attemptCount</td>
+  </tr>
+  <tr>
+    <td><code>submissions</code></td>
+    <td>72</td>
+    <td>contestId, problemId, submittedBy (user/team), status, score, answer</td>
+  </tr>
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>112</strong></td>
+    <td>Exceeds the 100+ sample document requirement</td>
+  </tr>
+</table>
+
+<h2>2. Multi-Document Database Transactions</h2>
+
+<p>A contest platform performs mutations that touch multiple documents simultaneously. If one write succeeds while another fails (due to a network interruption or server restart), the database becomes inconsistent. For example, if a submission is inserted but the problem attempt counter fails to increment, problem statistics become inaccurate. Similarly, if a participant's score updates without updating their submission verdict, the leaderboard diverges from the submission record.</p>
+
+<p>To eliminate these risks, Rankstack wraps all multi-document writes inside <strong>ACID transactions</strong> in <code>api/services.py</code> using PyMongo client sessions. MongoDB supports transactions across multiple collections when running as a replica set (<code>rs0</code>).</p>
+
+<h3>2.1 The Transaction Mechanism (<code>run_in_transaction</code>)</h3>
+<p>Every transaction executes through a centralized runner function that handles session lifecycle and automatic conflict retries:</p>
+
+<pre>def run_in_transaction(db: Database, callback: Callable[[ClientSession], T]) -> T:
+    with db.client.start_session() as session:
+        return session.with_transaction(callback)</pre>
+
+<p>MongoDB's <code>session.with_transaction()</code> implements the official retry loop. If a concurrent write causes a <code>TransientTransactionError</code> or an <code>UnknownTransactionCommitResult</code>, PyMongo automatically re-runs the callback function rather than surfacing an unhandled error to the user.</p>
+
+<h3>2.2 Core Application Transactions</h3>
+<p>Rankstack implements four distinct transactional boundaries across its services:</p>
+
+<ol>
+  <li><strong>Submission Creation (<code>create_submission</code>):</strong>
+    <ul>
+      <li>Step 1: Validates that the contest is currently live, within its scheduled start and end window, and that the user is an enrolled participant.</li>
+      <li>Step 2: Inserts the new submission document into <code>db.submissions</code> with <code>status="pending"</code>.</li>
+      <li>Step 3: Atomically increments the problem's counter: <code>db.problems.update_one({"_id": problem_id}, {"$inc": {"attemptCount": 1}})</code>.</li>
+      <li>Guaranteed Outcome: A submission record cannot exist without its corresponding attempt counter increment.</li>
+    </ul>
+  </li>
+  <li><strong>Submission Scoring &amp; Total Recalculation (<code>update_submission_status</code>):</strong>
+    <ul>
+      <li>Step 1: Reads the existing submission within the session to compute the score difference: <code>delta = new_score - old_score</code>.</li>
+      <li>Step 2: Updates the submission document with the new status (e.g. <code>correct</code>) and awarded score.</li>
+      <li>Step 3: Atomically increments the submitter's score in either the <code>users</code> or <code>teams</code> collection: <code>db[target].update_one({"_id": refId}, {"$inc": {"totalScore": delta}})</code>.</li>
+      <li>Step 4: If <code>delta != 0</code>, increments the contest version counter in <code>dirty_leaderboards</code> to signal that the Redis cache must reflect the change.</li>
+      <li>Guaranteed Outcome: A user's total score always matches the exact sum of points awarded across their submissions.</li>
+    </ul>
+  </li>
+  <li><strong>Team Creation (<code>create_team</code>):</strong>
+    <ul>
+      <li>Step 1: Verifies that all member user IDs exist in the <code>users</code> collection.</li>
+      <li>Step 2: Inserts the new team document into <code>db.teams</code>.</li>
+      <li>Step 3: Updates each member's user document simultaneously using <code>db.users.update_many()</code> with <code>$addToSet: {"teamIds": team_id}</code>.</li>
+      <li>Guaranteed Outcome: A team record cannot exist without mutual back-references on all member profiles.</li>
+    </ul>
+  </li>
+  <li><strong>Team Membership Updates (<code>add_team_member</code> / <code>remove_team_member</code>):</strong>
+    <ul>
+      <li>Atomically adds or removes the user ID from <code>teams.memberIds</code> and updates <code>users.teamIds</code> within the same session. If an invalid member or team is passed, all updates roll back.</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="page-break"></div>
+
+<h2>3. Advanced Queries and Analytics (Five Aggregation Pipelines)</h2>
+
+<p>MongoDB's aggregation framework calculates totals, averages, and groupings across collections without pulling raw documents into application memory. Below is each pipeline explained stage by stage with real query code and execution results:</p>
+
+<h3>Pipeline 1: Contest Leaderboard with Window Ranking (<code>/aggregations/leaderboard/{id}</code>)</h3>
+<p>Groups scored submissions by participant, calculates total points, and sorts competitors descending:</p>
+<pre>pipeline = [
+    {"$match": {"contestId": contest_id, "score": {"$exists": True, "$ne": 0}}},
+    {"$group": {
+        "_id": {"refId": "$submittedBy.refId", "refType": "$submittedBy.refType"},
+        "totalScore": {"$sum": "$score"}
+    }},
+    {"$project": {"_id": 0, "refId": "$_id.refId", "refType": "$_id.refType", "totalScore": 1}},
+    {"$sort": {"totalScore": -1, "refId": -1}},
+    {"$limit": 10}
+]
+# Output:
+{'refId': '6ad65ef678cdc32a6e2e361b', 'refType': 'user', 'totalScore': 60.0, 'submissionCount': 3}
+{'refId': '6ad65ef678cdc32a6e2e3628', 'refType': 'team', 'totalScore': 50.0, 'submissionCount': 3}</pre>
+
+<h3>Pipeline 2: Average Score by Difficulty Tier via <code>$lookup</code> (<code>/aggregations/avg-score-by-difficulty</code>)</h3>
+<p>Computes average score per problem, joins with the <code>problems</code> collection, and averages by difficulty:</p>
+<pre>pipeline = [
+    {"$group": {"_id": "$problemId", "avgScore": {"$avg": "$score"}}},
+    {"$lookup": {"from": "problems", "localField": "_id", "foreignField": "_id", "as": "problem"}},
+    {"$unwind": "$problem"},
+    {"$group": {
+        "_id": "$problem.difficulty",
+        "avgScorePerProblem": {"$avg": "$avgScore"},
+        "problemCount": {"$sum": 1}
+    }},
+    {"$project": {"_id": 0, "difficulty": "$_id", "avgScorePerProblem": 1, "problemCount": 1}}
+]
+# Output:
+{'difficulty': 'easy',   'problemCount': 3, 'avgScorePerProblem': 5.21}
+{'difficulty': 'medium', 'problemCount': 3, 'avgScorePerProblem': 11.67}
+{'difficulty': 'hard',   'problemCount': 3, 'avgScorePerProblem': 18.75}</pre>
+
+<h3>Pipeline 3: Submission Status Breakdown per Contest (<code>/aggregations/submission-status-by-contest</code>)</h3>
+<p>Facets submission verdicts (correct, incorrect, partial, pending) across contests in a two-tier group:</p>
+<pre>pipeline = [
+    {"$group": {"_id": {"contestId": "$contestId", "status": "$status"}, "count": {"$sum": 1}}},
+    {"$group": {"_id": "$_id.contestId", "statusCounts": {"$push": {"status": "$_id.status", "count": "$count"}}}},
+    {"$lookup": {"from": "contests", "localField": "_id", "foreignField": "_id", "as": "contest"}},
+    {"$unwind": "$contest"},
+    {"$project": {"_id": 0, "contestId": "$_id", "title": "$contest.title", "statusCounts": 1}}
+]
+# Output: Contest: 'Streamlined modular infrastructure Contest'
+Status Counts: [{'status': 'correct', 'count': 13}, {'status': 'incorrect', 'count': 6}, {'status': 'partial', 'count': 3}]</pre>
+
+<h3>Pipeline 4: Distinct Problems Solved per User (<code>/aggregations/problems-solved-per-user</code>)</h3>
+<p>Uses <code>$addToSet</code> to isolate unique problem IDs solved correctly, preventing duplicate point counting:</p>
+<pre>pipeline = [
+    {"$match": {"status": "correct", "submittedBy.refType": "user"}},
+    {"$group": {"_id": "$submittedBy.refId", "problemsSolved": {"$addToSet": "$problemId"}}},
+    {"$project": {"_id": 0, "userId": "$_id", "distinctProblemsSolved": {"$size": "$problemsSolved"}}},
+    {"$lookup": {"from": "users", "localField": "userId", "foreignField": "_id", "as": "user"}},
+    {"$unwind": "$user"},
+    {"$project": {"userId": 1, "name": "$user.name", "distinctProblemsSolved": 1}},
+    {"$sort": {"distinctProblemsSolved": -1}}
+]
+# Output:
+{'name': 'Daniel Wagner', 'distinctProblemsSolved': 7} | {'name': 'Connie Lawrence', 'distinctProblemsSolved': 5}</pre>
+
+<h3>Pipeline 5: Team Performance via Correlated Subquery <code>$lookup</code> (<code>/aggregations/team-performance</code>)</h3>
+<p>Performs a correlated subquery <code>$lookup</code> into submissions matching team <code>memberIds</code>:</p>
+<pre>pipeline = [
+    {"$lookup": {
+        "from": "submissions",
+        "let": {"memberIds": "$memberIds"},
+        "pipeline": [{"$match": {"$expr": {"$and": [
+            {"$eq": ["$submittedBy.refType", "user"]},
+            {"$in": ["$submittedBy.refId", "$$memberIds"]}
+        ]}}}],
+        "as": "memberSubmissions"
+    }},
+    {"$addFields": {
+        "totalScore": {"$sum": "$memberSubmissions.score"},
+        "submissionCount": {"$size": "$memberSubmissions"},
+        "memberCount": {"$size": "$memberIds"}
+    }},
+    {"$project": {"name": 1, "totalScore": 1, "submissionCount": 1, "memberCount": 1}}
+]
+# Output: Team: 'Team Darkgreen Husband' | Members: 3 | Total Submissions: 27 | Combined Score: 365.0 pts</pre>
+
+<h2>4. Ephemeral Storage (Redis)</h2>
+
+<p>Redis 7 handles high-frequency reads and transient state alongside MongoDB:</p>
+<ul>
+  <li><strong>Live Leaderboard:</strong> Stored as a sorted set (<code>ZSET</code>). Scores update via <code>ZINCRBY</code> on judged submissions. Reading top participants via <code>ZREVRANGE</code> takes sub-millisecond memory time.</li>
+  <li><strong>Session Management:</strong> Opaque 32-byte tokens are stored with <code>SETEX</code> and automatic 3600-second expiration, avoiding database cleanup jobs.</li>
+  <li><strong>Rate Limiting:</strong> Atomic key increments enforce a cap of 10 submissions per 60-second window.</li>
+  <li><strong>Cache Reconciliation:</strong> If Redis restarts, the API checks MongoDB's <code>dirty_leaderboards</code> version, runs the aggregation pipeline to rebuild the sorted set, and updates the cache.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>5. User Interface and Usability</h2>
+
+<p>The frontend is built with Next.js 16 (App Router), React 19, Tailwind CSS, and TanStack Query. It provides pages for contest listings, lettered problem workspaces, real-time leaderboards, team profiles, and administrative controls. The live deployment is accessible at <strong>rankstack.upayan.dev</strong>.</p>
+
+<img class="shot" src="review3-assets/01-contests.png" alt="Contest catalog" />
+<div class="caption">Figure 1: Contest Catalog (<code>/contests</code>) showing live, upcoming, and ended contests with search and status filters.</div>
+
+<img class="shot" src="review3-assets/02-contest-detail.png" alt="Contest overview" />
+<div class="caption">Figure 2: Contest Details (<code>/contests/[id]</code>) showing contest schedule, rules, and participant count.</div>
+
+<img class="shot" src="review3-assets/03-problems-tab.png" alt="Problems catalog" />
+<div class="caption">Figure 3: Problem Workspace showing lettered problems (MCQ, coding, subjective) and point values.</div>
+
+<div class="page-break"></div>
+
+<img class="shot" src="review3-assets/04-leaderboard.png" alt="Contest leaderboard" />
+<div class="caption">Figure 4: Real-time Leaderboard showing live participant rankings, submission counts, and scores from Redis.</div>
+
+<img class="shot" src="review3-assets/05-teams.png" alt="Team catalog" />
+<div class="caption">Figure 5: Teams Catalog (<code>/teams</code>) showing ranked squads, rosters, and combined team scores.</div>
+
+<img class="shot" src="review3-assets/06-admin.png" alt="Admin dashboard" />
+<div class="caption">Figure 6: Administrator Control Center (<code>/admin</code>) for managing users, problems, and submission evaluations.</div>
+
+
+</body>
+</html>

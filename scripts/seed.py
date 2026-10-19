@@ -1,7 +1,7 @@
 """Wipe application state and reseed the 5 core collections with consistent sample data.
 
-Target distribution (comfortably clears the 50-record minimum):
-  users 15, teams 5, contests 5, problems 15, submissions 40-50+  ->  85-95+ total
+Target distribution (meets the 100-document MongoDB minimum):
+  users 15, teams 5, contests 5, problems 15, submissions 72  ->  112 total
 
 Submissions are only generated for "live"/"ended" contests (an "upcoming"
 contest realistically has zero submissions yet) and use the same
@@ -210,7 +210,7 @@ def seed_submissions(db, redis_client, contests: list[dict]) -> int:
             continue  # upcoming contests have no submissions yet
         scores: dict[str, float] = {}
         for participant in c["participants"]:
-            problems_sample = random.sample(c["problems"], k=min(2, len(c["problems"])))
+            problems_sample = random.sample(c["problems"], k=min(3, len(c["problems"])))
             for problem in problems_sample:
                 answer = make_answer(problem)
                 submission = services.create_seeded_submission(

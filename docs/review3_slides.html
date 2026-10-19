@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Rankstack | Review 3 slides</title><style>
+@page { size:297mm 167mm; margin:0; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial,Helvetica,sans-serif; color:#182427; }
+.slide { position:relative; width:297mm; height:167mm; padding:17mm 20mm 15mm; page-break-after:always; break-after:page; overflow:hidden; }
+.slide:last-child { page-break-after:auto; }
+.kicker { color:#386e56; text-transform:uppercase; letter-spacing:.16em; font-size:12pt; font-weight:700; }
+h1 { font-size:49pt; letter-spacing:-.05em; margin:13mm 0 5mm; line-height:1; }
+h2 { font-size:30pt; letter-spacing:-.035em; margin:2mm 0 9mm; }
+p { font-size:17pt; line-height:1.35; margin:0 0 4mm; }
+.small { font-size:12pt; color:#536466; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:12mm; align-items:center; }
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:7mm; margin:7mm 0; }
+.card { border:1px solid #d5dfdc; background:#edf5ee; border-radius:4mm; padding:6mm; min-height:33mm; }
+.num { color:#386e56; font-weight:700; font-size:31pt; }
+.card p { font-size:13pt; margin:0; }
+img { display:block; width:100%; border:1px solid #d5dfdc; border-radius:3mm; }
+ul { margin:0; padding-left:7mm; font-size:17pt; line-height:1.5; }
+li { margin-bottom:3mm; }
+a { color:#386e56; text-decoration:none; }
+.footer { position:absolute; bottom:8mm; left:20mm; right:20mm; border-top:1px solid #d5dfdc; padding-top:3mm; font-size:10pt; color:#536466; display:flex; justify-content:space-between; }
+</style></head><body>
+<section class="slide"><div class="kicker">BCSE302P · Database Systems Lab · Review 3</div><h1>Rankstack</h1><p>Contest participation, evaluated submissions, and ranked results.</p><p style="margin-top:12mm"><a href="https://rankstack.upayan.dev/">rankstack.upayan.dev</a></p><p class="small">Upayan Mazumder · Aditya Rawat · Shloak Sinha</p><div class="cards" style="margin-top:16mm"><div class="card"><div class="num">5</div><p>MongoDB collections</p></div><div class="card"><div class="num">112</div><p>Fresh local sample documents</p></div><div class="card"><div class="num">5</div><p>Aggregation pipelines</p></div></div><div class="footer"><span>Website and source: github.com/upayanmazumder/rankstack</span><span>1 / 5</span></div></section>
+<section class="slide"><div class="kicker">Architecture</div><h2>Records and live state</h2><div class="grid"><div><ul><li>Next.js provides contest, team, and submission screens.</li><li>FastAPI validates requests and writes related documents in MongoDB transactions.</li><li>Redis stores session keys, rate-limit counters, and leaderboard sorted sets.</li></ul></div><div><div class="card"><p><strong>MongoDB</strong><br>Users · teams · contests · problems · submissions</p></div><div class="card" style="margin-top:6mm"><p><strong>Verified demo</strong><br>CRUD, two indexed queries, transactions, five aggregations, and Redis operations</p></div></div></div><div class="footer"><span>Seed and schema: scripts/seed.py · api/db.py</span><span>2 / 5</span></div></section>
+<section class="slide"><div class="kicker">Working application</div><h2>Contest catalog and standings</h2><div class="grid"><div><img src="review3-assets/contests.png" alt="Local contest catalog"><p class="small">Seeded local contest catalog</p></div><div><img src="review3-assets/leaderboard.png" alt="Local leaderboard"><p class="small">Seeded local final standings</p></div></div><div class="footer"><span>Live website: rankstack.upayan.dev · Populated screenshots: local demo</span><span>3 / 5</span></div></section>
+<section class="slide"><div class="kicker">Advanced queries</div><h2>Five aggregation questions</h2><div class="grid"><ul><li>Who leads a contest by score?</li><li>How do scores differ by problem difficulty?</li><li>Which verdicts appear in each contest?</li></ul><ul><li>How many distinct problems did each user solve?</li><li>How many submissions and members does each team have?</li><li>Indexed lookups use <code>IXSCAN</code> for problems and participant submissions.</li></ul></div><div class="footer"><span>Implementation: api/aggregations/ · Verified by scripts/demo.py</span><span>4 / 5</span></div></section>
+<section class="slide"><div class="kicker">Demonstration</div><h2>Show the system, then the data</h2><div class="grid"><div><p>1. Open the website and sign in to the local seeded demo.</p><p>2. Browse contests, problems, teams, and the leaderboard.</p><p>3. Update a submission verdict as an administrator.</p></div><div><p>4. Run <code>make demo</code> against the seed database.</p><p>5. Explain transactions, indexes, and Redis expiration.</p><p class="small" style="margin-top:9mm">The public contest catalog was empty at screenshot time. The local seed supplies 112 documents for the review.</p></div></div><div class="footer"><span><a href="https://github.com/upayanmazumder/rankstack">github.com/upayanmazumder/rankstack</a></span><span>5 / 5</span></div></section>
+</body></html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Student Demonstration Guide - Contest Platform with Live Leaderboard</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm 10mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Calibri, Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 9.3pt;
+    line-height: 1.36;
+    margin: 0;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 1.5px solid #333;
+    padding-bottom: 4px;
+    margin-bottom: 7px;
+  }
+  .header .code { font-size: 9pt; letter-spacing: 0.5px; color: #444; }
+  .header h1 { font-size: 14.5pt; margin: 2px 0 1px 0; }
+  .header .sub { font-size: 9pt; color: #555; }
+  table.meta { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 9pt; }
+  table.meta td { border: 1px solid #999; padding: 2.5px 6px; }
+  table.meta td.label { background: #eee; font-weight: 600; width: 18%; }
+  h2 {
+    font-size: 11pt;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1px;
+  }
+  p { margin: 2.5px 0; text-align: justify; }
+  ul, ol { margin: 2px 0; padding-left: 16px; }
+  li { margin-bottom: 1.5px; }
+  table.data { width: 100%; border-collapse: collapse; margin: 3px 0 5px 0; font-size: 8.5pt; }
+  table.data th { background: #e8e8e8; color: #000; padding: 3px 5px; text-align: left; border: 1px solid #999; font-weight: 600; }
+  table.data td { border: 1px solid #999; padding: 3px 5px; vertical-align: top; }
+  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 8.2pt; }
+  pre {
+    background: #f6f6f6;
+    border: 1px solid #ccc;
+    padding: 3.5px 6px;
+    margin: 2.5px 0 5px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .page-break { page-break-after: always; break-after: page; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="code">BCSE302P – Database Systems Lab – Review 3 Demonstration &amp; Database Viva Guide</div>
+  <h1>Contest Platform with Live Leaderboard</h1>
+  <div class="sub">Walkthrough Manual, Database Architecture &amp; Database Viva Voce Reference</div>
+</div>
+
+<table class="meta">
+  <tr>
+    <td class="label">Team</td>
+    <td>Upayan Mazumder (24BDS0367), Aditya Rawat (24BCE2992), Shloak Sinha (24BDS0378)</td>
+  </tr>
+  <tr>
+    <td class="label">Course</td>
+    <td>BCSE302P – Database Systems Lab</td>
+  </tr>
+  <tr>
+    <td class="label">Component</td>
+    <td>Review 3 – Operator Manual &amp; Comprehensive Database Viva Defense</td>
+  </tr>
+  <tr>
+    <td class="label">Repository</td>
+    <td><a href="https://github.com/upayanmazumder/rankstack">github.com/upayanmazumder/rankstack</a></td>
+  </tr>
+</table>
+
+<h2>1. System Architecture &amp; Data Flow</h2>
+
+<p>Rankstack separates persistent document storage from ephemeral caching to handle contest workloads:</p>
+<ul>
+  <li><strong>MongoDB Replica Set (<code>rs0</code>):</strong> System of record. Houses five collections with <code>$jsonSchema</code> validation. Runs as a replica set to support multi-document ACID transactions.</li>
+  <li><strong>Redis Ephemeral Store:</strong> In-memory key-value store for live leaderboards (sorted sets), opaque user sessions (with TTL), and submission rate limiters.</li>
+  <li><strong>FastAPI Backend (<code>api/</code>):</strong> Implements REST endpoints, session checks, and multi-document transactions using synchronous PyMongo.</li>
+  <li><strong>Next.js 16 Web Frontend (<code>app/</code>):</strong> Client application using App Router, TanStack Query, and Zustand stores. Proxies session cookies to backend Bearer tokens.</li>
+</ul>
+
+<h3>Submission Data Flow</h3>
+<ol>
+  <li>The participant submits a solution via <code>POST /submissions</code>.</li>
+  <li>The API checks the user rate limit counter in Redis (key: <code>rate_limit:&lt;userId&gt;</code>).</li>
+  <li>The backend executes a MongoDB transaction: inserts the submission document and increments <code>problems.attemptCount</code> atomically.</li>
+  <li>An evaluation update sets submission status and increments score totals on the user or team document.</li>
+  <li>The route updates the Redis leaderboard sorted set using <code>ZINCRBY leaderboard:&lt;contestId&gt;</code>.</li>
+  <li>Clients poll <code>GET /contests/{id}/leaderboard</code> every 30 seconds to refresh the standings.</li>
+</ol>
+
+<h2>2. How to Run the Project</h2>
+
+<p>Open the repository in two terminals. Run these commands from the repository root:</p>
+<pre># Terminal 1: Database &amp; Backend Server
+make up                  # Start MongoDB (rs0) and Redis in Docker
+make init-db             # Create collections, $jsonSchema rules, and indexes
+make seed                # Wipe and seed 112 verified sample records
+make api                 # Start FastAPI at http://localhost:8000
+
+# Terminal 2: Web Client
+cd app &amp;&amp; pnpm dev --port 3000   # Start Next.js client at http://localhost:3000</pre>
+
+<h2>3. Step-by-Step Demonstration Sequence</h2>
+
+<ol>
+  <li><strong>Public Cloud Deployment:</strong> Open <code>rankstack.upayan.dev</code> to show the live web deployment.</li>
+  <li><strong>User Login:</strong> Open <code>http://localhost:3000/login</code>. Sign in as <code>user1@rankstack.io</code> with password <code>Passw0rd!</code>.</li>
+  <li><strong>Contests Catalog:</strong> Browse contests. Show search filtering and status tabs (All, Live, Upcoming, Ended). Open the live contest.</li>
+  <li><strong>Problem Workspace:</strong> Click Problems. Choose a problem, enter or select an answer, and submit. Show the attempt count increment.</li>
+  <li><strong>Live Leaderboard:</strong> Click Leaderboard. Show real-time participant rankings, submission counts, and scores fetched from Redis.</li>
+  <li><strong>Teams Catalog:</strong> Click Teams. Show score-ranked squads. Open a team profile to inspect member cards and combined score.</li>
+  <li><strong>Admin Dashboard:</strong> Navigate to <code>/admin</code>. Show contest and problem management and subjective submission review.</li>
+  <li><strong>Automated Script Verification:</strong> Run <code>make demo</code> in the terminal. This verifies database connectivity, executes full user CRUD operations, demonstrates <code>IXSCAN</code> index scans via <code>explain()</code>, tests an ACID transaction, runs all five aggregation pipelines, and checks Redis TTLs.</li>
+</ol>
+
+<div class="page-break"></div>
+
+<h2>4. Comprehensive Database Viva Voce Questions &amp; Answers</h2>
+
+<p>Examiner questions in Review 3 will focus on database architecture, schema decisions, transaction guarantees, aggregation stages, and cache consistency. Study these technical answers:</p>
+
+<table class="data">
+  <tr>
+    <th style="width:28%;">Examiner Question</th>
+    <th style="width:72%;">Detailed Database Answer</th>
+  </tr>
+  <tr>
+    <td><strong>1. Why use MongoDB instead of relational SQL (MySQL / Postgres)?</strong></td>
+    <td>Contest problems have polymorphous structures: MCQs need arrays of string options and a correct answer; coding challenges store test cases with input/output pairs and constraints; subjective questions require evaluation rubrics and word limits. In a relational database, this requires multiple sparse tables or EAV anti-patterns with complex joins. MongoDB documents store each problem type naturally as a single document with type-specific fields validated by <code>$jsonSchema</code>.</td>
+  </tr>
+  <tr>
+    <td><strong>2. Explain your data model. Did you embed or reference relationships?</strong></td>
+    <td>We used a <strong>hybrid modeling approach</strong> based on data access patterns:
+      <ul>
+        <li><strong>Referencing:</strong> Problems reference <code>contestId</code>. Submissions reference <code>contestId</code>, <code>problemId</code>, and <code>submittedBy.refId</code>. Teams reference user IDs in <code>memberIds</code>. This prevents unbound document growth and avoids duplicating problem statements or participant profiles across submissions.</li>
+        <li><strong>Embedding:</strong> Contest participants are embedded as an array of <code>{ refType, refId }</code> subdocuments inside the contest document. Coding problem test cases and MCQ option lists are embedded inside problem documents because they are always read together with the problem.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>3. How does MongoDB enforce schema validation?</strong></td>
+    <td>Validation is enforced at the database level using MongoDB's <code>$jsonSchema</code> operator inside <code>createCollection</code> (configured in <code>api/db.py</code>). If an insert or update violates field constraints (e.g., missing required fields, invalid problem type string, negative attempt counts), the storage engine rejects the write with a <code>DocumentValidationFailure</code> error. This guarantees data integrity even if an external script writes directly to the database.</td>
+  </tr>
+  <tr>
+    <td><strong>4. Why is a replica set (<code>rs0</code>) required even on a single machine?</strong></td>
+    <td>MongoDB only supports multi-document transactions (via <code>client.start_session()</code> and <code>session.start_transaction()</code>) on a replica set or sharded cluster. In standalone mode, MongoDB does not write to the replication operations log (oplog), which is necessary for multi-document rollback and isolation. Attempting transactions on a standalone instance raises an explicit error: <i>"Transaction numbers are only allowed on a replica set member or mongos"</i>.</td>
+  </tr>
+  <tr>
+    <td><strong>5. Walk me through a multi-document ACID transaction in your code.</strong></td>
+    <td>In <code>api/services.py:create_submission</code>:
+      <ol>
+        <li>Start a client session: <code>with client.start_session() as session:</code></li>
+        <li>Start transaction block: <code>with session.start_transaction():</code></li>
+        <li>Insert the submission document into <code>db.submissions</code> passing <code>session=session</code>.</li>
+        <li>Atomically increment <code>attemptCount</code> in <code>db.problems</code> using <code>$inc: {"attemptCount": 1}</code> passing <code>session=session</code>.</li>
+        <li>If either write fails, the entire block aborts and rolls back, ensuring attempt counts never desynchronize from submission records.</li>
+      </ol>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>6. What indexes did you build, and what query plans do they produce?</strong></td>
+    <td>We configured four custom B-tree indexes:
+      <ul>
+        <li><code>users.email</code> (unique): Prevents duplicate registrations and gives <code>O(log N)</code> login lookup.</li>
+        <li><code>problems.contestId</code>: Index for fetching all problems in a contest.</li>
+        <li><code>submissions (contestId, submittedBy.refId)</code>: Compound index for retrieving a user's contest submission history.</li>
+        <li><code>teams.memberIds</code>: Multikey index for finding which teams a user belongs to.</li>
+      </ul>
+      Running <code>.explain("executionStats")</code> confirms an <strong><code>IXSCAN</code></strong> stage followed by <strong><code>FETCH</code></strong>, completely avoiding collection scans (<strong><code>COLLSCAN</code></strong>).</td>
+  </tr>
+  <tr>
+    <td><strong>7. What is a multikey index and where did you use it?</strong></td>
+    <td>A multikey index indexes array fields by creating separate index keys for every element in the array. We used a multikey index on <code>teams.memberIds</code>, where each team document contains an array of user ObjectIds. This allows MongoDB to query <code>{"memberIds": userId}</code> using an index scan to instantly find all teams a user belongs to.</td>
+  </tr>
+  <tr>
+    <td><strong>8. Explain the pipeline stages in your 5 aggregation queries.</strong></td>
+    <td>Located in <code>api/aggregations/</code>:
+      <ol>
+        <li><strong>Leaderboard:</strong> <code>$match</code> (by contestId) &rarr; <code>$group</code> (by <code>submittedBy.refId</code>, sum points) &rarr; <code>$sort</code> (descending score) &rarr; <code>$setWindowFields</code> (computes <code>$denseRank</code>).</li>
+        <li><strong>Average Score by Difficulty:</strong> <code>$lookup</code> (joins problems on <code>problemId</code>) &rarr; <code>$unwind</code> &rarr; <code>$group</code> (by <code>problems.difficulty</code>, computes <code>$avg</code> score).</li>
+        <li><strong>Submission Status by Contest:</strong> <code>$group</code> (by contestId and status, counts total) &rarr; <code>$group</code> (by contestId, pushes status counts into an array).</li>
+        <li><strong>Distinct Problems Solved:</strong> <code>$match</code> (status="correct") &rarr; <code>$group</code> (by user and problemId) &rarr; <code>$group</code> (by user, counts distinct problemIds).</li>
+        <li><strong>Team Performance:</strong> <code>$lookup</code> (joins submissions matching team <code>memberIds</code>) &rarr; computes team member count, submission count, and total score.</li>
+      </ol>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>9. Why use Redis alongside MongoDB?</strong></td>
+    <td>
+      <ul>
+        <li><strong>Live Leaderboard:</strong> Stored in Redis sorted sets (<code>ZSET</code>). Reading top 100 participants via <code>ZREVRANGE</code> takes sub-millisecond memory time, preventing expensive analytical aggregation queries on every browser refresh.</li>
+        <li><strong>Session Expiration:</strong> Session tokens are stored with a 3600-second TTL. Redis automatically evicts expired sessions without needing scheduled cleanup cron jobs.</li>
+        <li><strong>Rate Limiting:</strong> Atomic increments (<code>INCR</code>) with 60-second expiration enforce a 10-submission limit per window without writing ephemeral counters to disk.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>10. How do you handle cache invalidation and Redis failover?</strong></td>
+    <td>We implement a write-through invalidation pattern tracked in MongoDB via the <code>dirty_leaderboards</code> collection. Every scored submission increments a version counter. If Redis restarts or drops the sorted set, the API detects the missing cache, runs the aggregation pipeline to rebuild the sorted set, and reconciles the version counter.</td>
+  </tr>
+  <tr>
+    <td><strong>11. How do you prevent SQL / NoSQL injection attacks?</strong></td>
+    <td>We avoid raw query string interpolation. All user inputs are parsed and validated through Pydantic schemas. ObjectIds are validated and converted using <code>bson.ObjectId()</code>, which rejects malformed operator injections (such as <code>{"$gt": ""}</code>) and raises a 400 Bad Request error.</td>
+  </tr>
+</table>
+
+<h2>5. Operator Manual &amp; Role Access Rules</h2>
+
+<h3>Participant Workflow</h3>
+<ol>
+  <li>Register an account or sign in at <code>/login</code>.</li>
+  <li>Browse contests. Click <strong>Join contest</strong> before the start deadline.</li>
+  <li>Open the contest during the live schedule and solve problems in the workspace.</li>
+  <li>Review evaluated answers under Submissions and inspect standings on the live leaderboard.</li>
+</ol>
+
+<h3>Administrator Workflow</h3>
+<ol>
+  <li>Sign in with an account having role <code>admin</code> (e.g. <code>user1@rankstack.io</code>).</li>
+  <li>Open <code>/admin</code> to create or edit contest problems and test cases.</li>
+  <li>Review pending subjective submissions and assign scores. Score updates trigger atomic score recalculations and update Redis leaderboards automatically.</li>
+</ol>
+
+<p><strong>Access Rule:</strong> Participant accounts are blocked from accessing <code>/admin</code> routes and redirect to <code>/contests</code> automatically via Next.js proxy middleware.</p>
+
+</body>
+</html>

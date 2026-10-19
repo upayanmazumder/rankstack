@@ -2,24 +2,6 @@
 
 > Coding-agent reference for this repo. Keep it current when adding tools, scripts, or conventions.
 
-<!-- BEGIN:nextjs-agent-rules -->
-
-## Next.js: ALWAYS read docs before coding
-
-Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
-
-```
-node_modules/next/dist/docs/
-  index.md                        ← start here for orientation
-  01-app/
-    01-getting-started/           ← routing, layouts, data fetching, caching
-    02-guides/                    ← auth, forms, streaming, ISR, self-hosting …
-    03-api-reference/             ← file conventions, functions, config options
-  02-pages/                       ← Pages Router (avoid for new code)
-```
-
-<!-- END:nextjs-agent-rules -->
-
 ---
 
 ## Project Overview
