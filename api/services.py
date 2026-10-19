@@ -5,7 +5,7 @@ standalone `mongod` does not support `start_transaction()`.
 """
 
 from collections.abc import Callable
-from datetime import timezone
+from datetime import UTC
 from typing import Any, TypeVar
 
 from bson import ObjectId
@@ -102,9 +102,9 @@ def assert_contest_open_for(
     now = utcnow()
     start, end = contest["startTime"], contest["endTime"]
     if start.tzinfo is None:
-        start = start.replace(tzinfo=timezone.utc)
+        start = start.replace(tzinfo=UTC)
     if end.tzinfo is None:
-        end = end.replace(tzinfo=timezone.utc)
+        end = end.replace(tzinfo=UTC)
     if contest["status"] != "live" or not (start <= now <= end):
         raise HTTPException(status_code=409, detail="Contest is not live")
     is_participant = any(

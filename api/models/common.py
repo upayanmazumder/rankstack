@@ -1,6 +1,6 @@
 """Shared helpers: ObjectId <-> str conversion, timestamps, doc serialization."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from bson import ObjectId
@@ -21,7 +21,7 @@ def oid(value: str) -> ObjectId:
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def serialize_value(v: Any) -> Any:
