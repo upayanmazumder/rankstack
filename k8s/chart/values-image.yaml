@@ -2,4 +2,4 @@
 # It rewrites this file whenever the mutable `edge` tag resolves to a new digest.
 image:
   repository: ghcr.io/upayanmazumder/rankstack/api
-  tag: edge@sha256:69f42ce269233de010d10e64919b92961efadcaebce72b28b217783591f7c134
+  tag: edge@sha256:0f6b5c68d2eb1de24d3f06ca4be16be98343d77e4e7a24d4865143ee4a21c1af
