@@ -45,10 +45,14 @@ async function forwardToBackend(request: NextRequest, context: ProxyRouteContext
       cache: 'no-store',
     });
   } catch {
-    return NextResponse.json({ detail: 'Upstream API unavailable' }, { status: 502 });
+    return NextResponse.json(
+      { detail: 'Upstream API unavailable' },
+      { status: 502, headers: { 'Cache-Control': 'no-store' } }
+    );
   }
 
   const responseHeaders = new Headers();
+  responseHeaders.set('Cache-Control', 'no-store');
   const upstreamContentType = upstream.headers.get('content-type');
   if (upstreamContentType) {
     responseHeaders.set('Content-Type', upstreamContentType);
