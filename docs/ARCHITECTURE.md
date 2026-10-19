@@ -298,6 +298,11 @@ reload. On 401/404 the cookies and client profile are cleared. Transient 5xx
 or network failures preserve the cookie; protected pages show their own loading
 or error state until the backend recovers. Successful authenticated proxy calls
 can also refresh an overdue cookie after verifying the session.
+Session responses and authenticated proxy responses use `Cache-Control: no-store`.
+The proxy also uses `no-store` for errors and other public reads.
+
+Contest pages disable joining after the scheduled end. Problem pages allow
+submissions only during the scheduled window when the contest status is `live`.
 
 ### Frontend Polling and Invocation Budget
 

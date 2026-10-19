@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAddParticipant, useContest, useLeaderboard } from '@/hooks/api';
 import { useProblems } from '@/hooks/api/use-problems';
+import { useMounted } from '@/hooks/use-mounted';
 import { useAuthStore } from '@/stores';
 import { formatDateTime } from '@/utils';
 
@@ -38,28 +39,27 @@ function formatCountdown(milliseconds: number) {
 
 export default function ContestOverviewPage({ params }: ContestOverviewPageProps) {
   const { id } = use(params);
+  const mounted = useMounted();
   const [now, setNow] = useState<number | null>(null);
   const user = useAuthStore(state => state.user);
   const contestQuery = useContest(id);
   const problemsQuery = useProblems(id);
   const leaderboardQuery = useLeaderboard(id, false);
   const join = useAddParticipant(id);
-  const contestStatus = contestQuery.data?.status;
   const startTime = contestQuery.data ? new Date(contestQuery.data.startTime).getTime() : NaN;
-
+  const endTime = contestQuery.data ? new Date(contestQuery.data.endTime).getTime() : NaN;
   useEffect(() => {
-    if (contestStatus !== 'upcoming' || !Number.isFinite(startTime)) {
-      return;
-    }
+    if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) return;
 
-    const timer = window.setInterval(() => {
+    const tick = () => {
       const currentTime = Date.now();
       setNow(currentTime);
-      if (currentTime >= startTime) window.clearInterval(timer);
-    }, 1_000);
-
+      if (currentTime >= endTime) window.clearInterval(timer);
+    };
+    const timer = window.setInterval(tick, 1_000);
+    tick();
     return () => window.clearInterval(timer);
-  }, [contestStatus, startTime]);
+  }, [startTime, endTime]);
 
   if (contestQuery.isPending) {
     return (
@@ -88,6 +88,7 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
 
   const contest = contestQuery.data;
   const isBeforeStart = now === null || now < startTime;
+  const hasEnded = mounted && now !== null && now >= endTime;
   const isUpcoming = contest.status === 'upcoming' && isBeforeStart;
   const joined =
     !!user &&
@@ -142,13 +143,13 @@ export default function ContestOverviewPage({ params }: ContestOverviewPageProps
           </div>
           <Button
             onClick={joinContest}
-            disabled={joined || join.isPending || contest.status === 'ended'}
+            disabled={joined || join.isPending || contest.status === 'ended' || hasEnded}
           >
             {joined
               ? 'Joined'
               : join.isPending
                 ? 'Joining…'
-                : contest.status === 'ended'
+                : contest.status === 'ended' || hasEnded
                   ? 'Contest ended'
                   : 'Join contest'}
           </Button>
