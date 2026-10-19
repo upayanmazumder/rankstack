@@ -10,6 +10,8 @@ import {
 } from '@/lib/session-cookie';
 import type { Session, User } from '@/types';
 
+const noStoreHeaders = { 'Cache-Control': 'no-store' };
+
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') ?? '';
   const origin = request.headers.get('origin');
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
   if (!isJson || (!isSameOrigin && !isSameSiteRequest)) {
     return new NextResponse(JSON.stringify({ detail: 'Forbidden' }), {
       status: 403,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...noStoreHeaders },
     });
   }
 
@@ -40,7 +42,10 @@ export async function POST(request: NextRequest) {
     cache: 'no-store',
   });
   if (!login.ok) {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...noStoreHeaders,
+    };
     const retryAfter = login.headers.get('Retry-After');
     if (retryAfter) {
       headers['Retry-After'] = retryAfter;
@@ -80,18 +85,22 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       { detail: 'Unable to load authenticated user profile' },
-      { status: profileStatus >= 400 ? profileStatus : 502 }
+      { status: profileStatus >= 400 ? profileStatus : 502, headers: noStoreHeaders }
     );
   }
 
-  const response = NextResponse.json({ user });
+  const response = NextResponse.json({ user }, { headers: noStoreHeaders });
   setSessionCookies(response, request, session.sessionId, session.expiresInSeconds);
   return response;
 }
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (!token) return NextResponse.json({ detail: 'Session not found' }, { status: 401 });
+  if (!token)
+    return NextResponse.json(
+      { detail: 'Session not found' },
+      { status: 401, headers: noStoreHeaders }
+    );
 
   let profile: Response;
   try {
@@ -100,23 +109,35 @@ export async function GET(request: NextRequest) {
       headers: { Authorization: `Bearer ${token}` },
     });
   } catch {
-    return NextResponse.json({ detail: 'Session service unavailable' }, { status: 502 });
+    return NextResponse.json(
+      { detail: 'Session service unavailable' },
+      { status: 502, headers: noStoreHeaders }
+    );
   }
 
   if (profile.status === 401 || profile.status === 404) {
-    const response = NextResponse.json({ detail: 'Session expired' }, { status: 401 });
+    const response = NextResponse.json(
+      { detail: 'Session expired' },
+      { status: 401, headers: noStoreHeaders }
+    );
     clearSessionCookies(response);
     return response;
   }
   if (!profile.ok) {
-    return NextResponse.json({ detail: 'Session service unavailable' }, { status: 502 });
+    return NextResponse.json(
+      { detail: 'Session service unavailable' },
+      { status: 502, headers: noStoreHeaders }
+    );
   }
 
   const detail = (await profile.json()) as { user?: User | null };
   if (!detail.user) {
-    return NextResponse.json({ detail: 'Session profile unavailable' }, { status: 502 });
+    return NextResponse.json(
+      { detail: 'Session profile unavailable' },
+      { status: 502, headers: noStoreHeaders }
+    );
   }
-  const response = NextResponse.json({ user: detail.user });
+  const response = NextResponse.json({ user: detail.user }, { headers: noStoreHeaders });
   if (sessionNeedsRefresh(request)) {
     setSessionCookies(response, request, token, sessionTtlSeconds(request));
   }
@@ -138,7 +159,10 @@ export async function DELETE(request: NextRequest) {
       revoked = false;
     }
   }
-  const response = new NextResponse(null, { status: revoked ? 204 : 502 });
+  const response = new NextResponse(null, {
+    status: revoked ? 204 : 502,
+    headers: noStoreHeaders,
+  });
   clearSessionCookies(response);
   return response;
 }
