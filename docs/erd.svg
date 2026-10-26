@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#ffffff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <style>
+      .entity-title { font-size: 12px; font-weight: 700; fill: #ffffff; letter-spacing: 0.5px; }
+      .field-pk { font-size: 10.5px; font-weight: 700; fill: #0f172a; }
+      .field-fk { font-size: 10.5px; font-weight: 600; fill: #334155; }
+      .field-std { font-size: 10.5px; font-weight: 400; fill: #334155; }
+      .field-type { font-size: 9.5px; font-weight: 400; fill: #64748b; font-family: monospace; }
+      .rel-label { font-size: 9px; fill: #334155; font-weight: 600; }
+    </style>
+    <marker id="crow" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 6 L 0 11 M 10 0 L 10 12" fill="none" stroke="#334155" stroke-width="1.5" />
+    </marker>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Figure 4.2: Entity-Relationship Diagram (Monochrome Academic Format)</text>
+  <text x="30" y="46" font-size="10.5" fill="#64748b">Primary entities, attributes, primary/foreign key constraints, and polymorphic problem subtypes</text>
+
+  <!-- USER -->
+  <g transform="translate(30, 65)">
+    <rect width="200" height="185" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="200" height="24" rx="3" fill="#1e293b"/>
+    <rect y="20" width="200" height="4" fill="#1e293b"/>
+    <text x="10" y="16" class="entity-title">USER</text>
+    
+    <text x="10" y="44" class="field-pk">id</text><text x="130" y="44" class="field-type">objectId [PK]</text>
+    <text x="10" y="62" class="field-pk">email</text><text x="130" y="62" class="field-type">string [UK]</text>
+    <text x="10" y="80" class="field-std">name</text><text x="130" y="80" class="field-type">string</text>
+    <text x="10" y="98" class="field-std">passwordHash</text><text x="130" y="98" class="field-type">string</text>
+    <text x="10" y="116" class="field-std">role</text><text x="130" y="116" class="field-type">enum(part/adm)</text>
+    <text x="10" y="134" class="field-std">totalScore</text><text x="130" y="134" class="field-type">double</text>
+    <text x="10" y="152" class="field-fk">teamIds</text><text x="130" y="152" class="field-type">objectId[]</text>
+    <text x="10" y="170" class="field-std">createdAt</text><text x="130" y="170" class="field-type">date</text>
+  </g>
+
+  <!-- TEAM -->
+  <g transform="translate(30, 320)">
+    <rect width="200" height="155" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="200" height="24" rx="3" fill="#1e293b"/>
+    <rect y="20" width="200" height="4" fill="#1e293b"/>
+    <text x="10" y="16" class="entity-title">TEAM</text>
+    
+    <text x="10" y="44" class="field-pk">id</text><text x="130" y="44" class="field-type">objectId [PK]</text>
+    <text x="10" y="62" class="field-pk">name</text><text x="130" y="62" class="field-type">string [UK]</text>
+    <text x="10" y="80" class="field-fk">ownerId</text><text x="130" y="80" class="field-type">objectId [FK]</text>
+    <text x="10" y="98" class="field-fk">memberIds</text><text x="130" y="98" class="field-type">objectId[]</text>
+    <text x="10" y="116" class="field-std">totalScore</text><text x="130" y="116" class="field-type">double</text>
+    <text x="10" y="134" class="field-std">createdAt</text><text x="130" y="134" class="field-type">date</text>
+  </g>
+
+  <!-- CONTEST -->
+  <g transform="translate(380, 65)">
+    <rect width="230" height="205" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="230" height="24" rx="3" fill="#1e293b"/>
+    <rect y="20" width="230" height="4" fill="#1e293b"/>
+    <text x="10" y="16" class="entity-title">CONTEST</text>
+    
+    <text x="10" y="44" class="field-pk">id</text><text x="150" y="44" class="field-type">objectId [PK]</text>
+    <text x="10" y="62" class="field-std">title</text><text x="150" y="62" class="field-type">string</text>
+    <text x="10" y="80" class="field-std">description</text><text x="150" y="80" class="field-type">string</text>
+    <text x="10" y="98" class="field-std">startTime</text><text x="150" y="98" class="field-type">date</text>
+    <text x="10" y="116" class="field-std">endTime</text><text x="150" y="116" class="field-type">date</text>
+    <text x="10" y="134" class="field-std">status</text><text x="150" y="134" class="field-type">enum(up/live/end)</text>
+    <text x="10" y="152" class="field-fk">createdBy</text><text x="150" y="152" class="field-type">objectId [FK]</text>
+    <text x="10" y="170" class="field-fk">problemIds</text><text x="150" y="170" class="field-type">objectId[]</text>
+    <text x="10" y="188" class="field-std">participants</text><text x="150" y="188" class="field-type">subdoc[]</text>
+  </g>
+
+  <!-- PROBLEM -->
+  <g transform="translate(380, 340)">
+    <rect width="230" height="180" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="230" height="24" rx="3" fill="#1e293b"/>
+    <rect y="20" width="230" height="4" fill="#1e293b"/>
+    <text x="10" y="16" class="entity-title">PROBLEM</text>
+    
+    <text x="10" y="44" class="field-pk">id</text><text x="150" y="44" class="field-type">objectId [PK]</text>
+    <text x="10" y="62" class="field-fk">contestId</text><text x="150" y="62" class="field-type">objectId [FK]</text>
+    <text x="10" y="80" class="field-pk">type (discriminator)</text><text x="150" y="80" class="field-type">enum(mcq/cod/sub)</text>
+    <text x="10" y="98" class="field-std">title</text><text x="150" y="98" class="field-type">string</text>
+    <text x="10" y="116" class="field-std">difficulty</text><text x="150" y="116" class="field-type">enum(ez/med/hrd)</text>
+    <text x="10" y="134" class="field-std">points</text><text x="150" y="134" class="field-type">double</text>
+    <text x="10" y="152" class="field-std">attemptCount</text><text x="150" y="152" class="field-type">int (atomic)</text>
+    <text x="10" y="170" class="field-std">createdAt</text><text x="150" y="170" class="field-type">date</text>
+  </g>
+
+  <!-- SUBTYPES (Grayscale) -->
+  <g transform="translate(310, 560)">
+    <rect width="180" height="75" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+    <text x="8" y="16" font-size="10" font-weight="bold" fill="#0f172a">MCQ PROBLEM</text>
+    <text x="8" y="38" class="field-std">options: string[]</text>
+    <text x="8" y="58" class="field-std">correctAnswer: string</text>
+  </g>
+
+  <g transform="translate(505, 560)">
+    <rect width="180" height="85" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+    <text x="8" y="16" font-size="10" font-weight="bold" fill="#0f172a">CODING PROBLEM</text>
+    <text x="8" y="36" class="field-std">inputFormat: string</text>
+    <text x="8" y="54" class="field-std">constraints: string</text>
+    <text x="8" y="72" class="field-std">testCases: json[]</text>
+  </g>
+
+  <g transform="translate(700, 560)">
+    <rect width="180" height="75" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+    <text x="8" y="16" font-size="10" font-weight="bold" fill="#0f172a">SUBJECTIVE PROBLEM</text>
+    <text x="8" y="38" class="field-std">wordLimit: int</text>
+    <text x="8" y="58" class="field-std">evaluationRubric: string</text>
+  </g>
+
+  <!-- SUBMISSION -->
+  <g transform="translate(740, 140)">
+    <rect width="230" height="215" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="230" height="24" rx="3" fill="#1e293b"/>
+    <rect y="20" width="230" height="4" fill="#1e293b"/>
+    <text x="10" y="16" class="entity-title">SUBMISSION</text>
+    
+    <text x="10" y="44" class="field-pk">id</text><text x="150" y="44" class="field-type">objectId [PK]</text>
+    <text x="10" y="62" class="field-fk">contestId</text><text x="150" y="62" class="field-type">objectId [FK]</text>
+    <text x="10" y="80" class="field-fk">problemId</text><text x="150" y="80" class="field-type">objectId [FK]</text>
+    <text x="10" y="98" class="field-fk">submittedBy.refId</text><text x="150" y="98" class="field-type">objectId [POLY]</text>
+    <text x="10" y="116" class="field-std">submittedBy.refType</text><text x="150" y="116" class="field-type">enum(user/team)</text>
+    <text x="10" y="134" class="field-std">answer</text><text x="150" y="134" class="field-type">json / string</text>
+    <text x="10" y="152" class="field-std">status</text><text x="150" y="152" class="field-type">enum(pend/corr/inc)</text>
+    <text x="10" y="170" class="field-std">score</text><text x="150" y="170" class="field-type">double</text>
+    <text x="10" y="188" class="field-std">submittedAt</text><text x="150" y="188" class="field-type">date</text>
+  </g>
+
+  <!-- CONNECTIONS -->
+  <path d="M 130 250 L 130 320" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="135" y="275" width="70" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="140" y="287" class="rel-label">1 owns M</text>
+
+  <path d="M 230 130 L 380 130" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="275" y="122" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="280" y="134" class="rel-label">1 creates M</text>
+
+  <path d="M 495 270 L 495 340" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="500" y="295" width="80" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="505" y="307" class="rel-label">1 contains M</text>
+
+  <path d="M 610 160 L 740 160" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="645" y="152" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="650" y="164" class="rel-label">1 tracks M</text>
+
+  <path d="M 610 370 L 680 370 L 680 290 L 740 290" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="655" y="325" width="80" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="660" y="337" class="rel-label">1 receives M</text>
+
+  <!-- Specialization links -->
+  <path d="M 430 520 L 400 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <path d="M 495 520 L 580 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <path d="M 560 520 L 740 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+</svg>
