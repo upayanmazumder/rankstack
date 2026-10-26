@@ -36,7 +36,11 @@ TEAMS_SCHEMA = {
         "required": ["name", "memberIds", "ownerId", "createdAt"],
         "properties": {
             "name": {"bsonType": "string"},
-            "memberIds": {"bsonType": "array", "items": {"bsonType": "objectId"}},
+            "memberIds": {
+                "bsonType": "array",
+                "maxItems": 5,
+                "items": {"bsonType": "objectId"},
+            },
             "ownerId": {"bsonType": "objectId"},
             "totalScore": {"bsonType": ["int", "double"]},
             "createdAt": {"bsonType": "date"},
@@ -91,7 +95,7 @@ PROBLEMS_SCHEMA = {
             "difficulty": {"enum": ["easy", "medium", "hard"]},
             "points": {"bsonType": ["int", "double"]},
             "attemptCount": {"bsonType": ["int", "double"]},
-            "createdAt": {"bsonType": "date"},
+            "solveCount": {"bsonType": ["int", "double"]},
         },
         "oneOf": [
             {
@@ -233,6 +237,7 @@ def ensure_indexes(db: Database) -> None:
     )
     db["submissions"].create_index([("problemId", ASCENDING)], name="by_problem")
     db["teams"].create_index([("memberIds", ASCENDING)], name="by_member")
+    db["teams"].create_index([("name", ASCENDING)], unique=True, name="uniq_team_name")
     db["contests"].create_index([("status", ASCENDING)], name="by_status")
 
 
