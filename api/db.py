@@ -238,6 +238,9 @@ def ensure_indexes(db: Database) -> None:
     db["teams"].create_index([("memberIds", ASCENDING)], name="by_member")
     db["teams"].create_index([("name", ASCENDING)], unique=True, name="uniq_team_name")
     db["submissions"].create_index([("status", ASCENDING)], name="by_submission_status")
+    db["submissions"].create_index(
+        [("submittedBy.refId", ASCENDING)], name="by_submitter_ref_id"
+    )
     db["contests"].create_index([("status", ASCENDING)], name="by_status")
 
 
