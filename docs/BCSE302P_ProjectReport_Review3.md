@@ -20,9 +20,9 @@ Competitive programming platforms handle sudden traffic spikes during live conte
 
 This project implements Rankstack, an open source contest evaluation platform with live leaderboards. The database architecture separates persistent storage from operational caching. MongoDB 7.0 acts as the system of record. It stores five primary collections (users, teams, contests, problems, submissions) plus one coordination collection (dirty_leaderboards). Server-side validation schemas enforce structural integrity while supporting polymorphic problem types. Multi-document transactions run on a single-node replica set to preserve atomic consistency across submissions, problem statistics, and user scores. Redis 7.4 manages transient state. It uses sorted sets for contest leaderboards, string keys with time-to-live expiration for authenticated user sessions, and fixed-window rate limiting for submission throttling. An atomic version marker coordinates incremental score deltas with full leaderboard rebuilds.
 
-The implementation was evaluated using a seeded dataset of 117 documents across six collections. Execution plans confirmed index-backed query execution using index scans that avoid collection scans. Redis sorted sets returned participant rankings with about 1 ms end-to-end latency and sub-millisecond database engine execution. Multi-document transactions prevented partial state updates during simulated write failures. Analytical aggregation pipelines computed user metrics, team standings, and contest summaries without blocking concurrent writes.
+The implementation was evaluated using a seeded dataset of 117 documents across six collections. Execution plans confirmed index-backed query execution using index scans that avoid collection scans. Redis sorted sets returned participant rankings through a lock-light read path, preventing stale-delta overwrites during rebuilds. Multi-document transactions prevented partial state updates during simulated write failures. Analytical aggregation pipelines computed user metrics, team standings, and contest summaries alongside persistent transactional records.
 
-The hybrid MongoDB and Redis architecture delivers consistent data persistence, fast leaderboard retrieval, and protection against cache race conditions. Serving live rankings from in-memory sorted sets eliminates blocking sorting operations on the primary database during high-volume contests.
+The hybrid MongoDB and Redis architecture delivers consistent data persistence, low-latency leaderboard retrieval, and coordinated cache state. Serving live rankings from in-memory sorted sets isolates continuous polling from the primary database during high-volume contests.
 
 **Keywords:** MongoDB, Redis, Sorted Sets, Live Leaderboard, Multi-Document Transactions, Polymorphic Schema, Competitive Programming.
 
@@ -223,12 +223,12 @@ erDiagram
 Competitive programming platforms host timed coding contests where hundreds of participants submit code solutions concurrently. The platform must ingest submissions, evaluate test cases, calculate scores, and update leaderboards in real time. Workloads exhibit sharp bursts: submission volume peaks during the opening and closing minutes of a contest.
 
 ## 1.2 Motivation
-Traditional database systems rely on relational tables for contest storage. Relational engines enforce rigid tabular schemas and execute aggregation queries with sorting to compute standings. Under continuous client polling, repeated execution of grouping queries saturates database CPU capacity and exhausts connection pools [8]. Decoupling durable records into document storage and serving live rankings from in-memory sorted sets resolves this performance bottleneck [5].
+Traditional database systems rely on relational tables for contest storage. Relational engines enforce rigid tabular schemas and execute aggregation queries with sorting to compute standings. Under continuous client polling, repeated execution of grouping queries saturates database CPU capacity and exhausts connection pools. Stonebraker et al. demonstrated that specialised operational stores outperform monolithic engines for specific access patterns [8]. Decoupling durable records into document storage and serving live rankings from in-memory sorted sets resolves this performance bottleneck [5].
 
 ## 1.3 Problem Statement
 Synchronizing high-frequency code submissions with real-time leaderboard calculations introduces specific technical challenges:
 1. High database CPU consumption: Executing repeated GROUP BY and ORDER BY queries across thousands of submission rows starves database compute resources.
-2. Connection pool starvation: Frequent client polling (every 30 seconds) exhausts database worker threads.
+2. Connection pool starvation: N polling clients multiplied by continuous request rates consumes connection-pool capacity.
 3. Rigid schemas: Relational tables struggle to represent multiple choice, coding, and subjective problem types without sparse, nullable columns.
 4. Partial state anomalies: Unhandled failures during submission insertion leave attempt counters and user scores desynchronized.
 5. Cache synchronization races: Incremental score deltas applied to an in-memory cache during a full cache rebuild risk being overwritten or applied twice.
@@ -237,10 +237,10 @@ Synchronizing high-frequency code submissions with real-time leaderboard calcula
 Aim: Design, implement, and evaluate Rankstack, a contest platform utilizing MongoDB 7.0 for persistent storage and Redis 7.4 for operational caching.
 
 Specific Objectives:
-1. Design a two-tier database architecture decoupling five primary collections plus one coordination collection from in-memory caching layers [8].
-2. Enforce schema integrity and polymorphic problem modeling using MongoDB server-side `$jsonSchema` validation [3].
-3. Maintain multi-document ACID transactions across submission creation, attempt counter updates, and score increments [4].
-4. Deliver live contest leaderboards with about 1 ms end-to-end latency (sub-millisecond Redis engine execution) using sorted sets and atomic version coordination [5].
+1. Design a two-tier database architecture decoupling five primary collections plus one coordination collection from in-memory caching layers.
+2. Enforce schema integrity and polymorphic problem modeling using MongoDB server-side `$jsonSchema` validation.
+3. Maintain multi-document ACID transactions across submission creation, attempt counter updates, and score increments.
+4. Deliver live contest leaderboards through a lock-light read path using Redis sorted sets and atomic version coordination.
 5. Implement five analytical aggregation pipelines for leaderboard computation, difficulty metrics, and team standings.
 
 ## 1.5 Scope of the Project
@@ -266,7 +266,7 @@ The project followed the Database Life Cycle (DBLC) [2]:
 4. Physical Design: Configure WiredTiger B-tree indexes, compound index prefix orders, and Redis sorted sets.
 5. Implementation: Write FastAPI database dependencies, PyMongo client session transactions, and Redis Lua scripts.
 6. Testing: Audit index usage via `.explain("executionStats")`, test transaction atomicity under simulated write failures, and benchmark endpoint latencies.
-7. Maintenance: Configure automatic TTL expiration for ended contest leaderboards and inactive sessions.
+7. Maintenance: Configure automatic TTL expiration for ended contest leaderboards (`expire_leaderboard`, 7-day TTL) and inactive sessions.
 
 
 ---
@@ -279,14 +279,14 @@ Contest platforms exhibit asymmetric read and write traffic. Leaderboards are po
 ## 2.2 Review of Data Models
 1. Relational Model (PostgreSQL, MySQL): Relational engines provide mature ACID transactions and multi-version concurrency control (MVCC) [1], [9]. However, computing contest leaderboards requires scanning submission rows, aggregating scores, and performing sorting operations (`ORDER BY total_score DESC`). Under high polling concurrency, these repeated aggregation queries consume extensive CPU capacity. Furthermore, modeling polymorphic problem structures requires table-per-hierarchy (causing sparse nullable columns) or table-per-type (requiring multi-table joins).
 2. Document Model (MongoDB): Document databases store self-contained BSON documents [3]. Arrays and nested objects allow bounded relationships to be embedded directly within parent documents. Server-side `$jsonSchema` validation enforces schema constraints while permitting polymorphic subtypes through the `oneOf` operator. Running MongoDB as a replica set provides multi-document ACID transactions with document-level concurrency control via WiredTiger [4].
-3. Key-Value Model (Redis): In-memory key-value stores provide sub-millisecond execution times under CAP theorem trade-offs [5], [10]. Redis sorted sets (`ZSET`) maintain unique members ordered by floating-point scores using a dual skip-list and hash-table structure. Score updates (`ZINCRBY`) and rank range queries (`ZREVRANGE`) execute in `O(log N)` time, making Redis suited for live leaderboards.
-4. Column-Family Model (Apache Cassandra): Columnar stores provide distributed write throughput across partitioned clusters [12]. While Cassandra supports lightweight Paxos transactions for single-row compare-and-set operations, it lacks multi-document ACID transactions and ad-hoc analytical aggregation pipelines, making it ill-suited for contest state management.
+3. Key-Value Model (Redis): In-memory key-value stores provide sub-millisecond execution times [5]. To achieve high read availability, in-memory caches accept distributed partition trade-offs described by Gilbert and Lynch [10]. Redis sorted sets (`ZSET`) maintain unique members ordered by floating-point scores using a dual skip-list and hash-table structure [5]. Score updates (`ZINCRBY`) and rank range queries (`ZREVRANGE`) execute in `O(log N)` time, making Redis suited for live leaderboards.
+4. Column-Family Model (Apache Cassandra): Columnar stores provide distributed write throughput across partitioned clusters [12]. While Cassandra supports single-partition lightweight transactions via Paxos, it lacks multi-document ACID transactions and ad-hoc analytical aggregation pipelines, making it ill-suited for contest state management.
 5. Graph Model (Neo4j): Graph engines optimize deep path traversals. Contest platforms follow hierarchical and tabular data relationships, making graph traversal unnecessary.
 
 ## 2.3 Review of Existing Systems and Related Work
-- Codeforces: Public discussions indicate Codeforces pairs custom execution invokers with relational database clusters. Concurrency is managed through page caching and scheduled batch recalculation of standings.
-- LeetCode: Public engineering posts indicate relational database clusters combined with distributed Redis caching tiers serve problem catalogs and contest rankings to participants.
-- Kattis and DOMjudge: Specialized ICPC contest platforms emphasizing deterministic evaluation. They primarily use relational backends with sequential submission processing.
+- Codeforces: Based on public platform overviews, Codeforces pairs custom execution invokers with relational database clusters. Concurrency is managed through aggressive page-level caching and scheduled batch recalculation of standings.
+- LeetCode: Public engineering articles describe a multi-tier architecture using relational storage (MySQL) combined with distributed Redis caching tiers to serve problem catalogs and contest rankings to participants.
+- Kattis and DOMjudge: Academic contest platforms designed for ICPC competitions, typically relying on relational backends with deterministic sequential submission processing.
 
 ## 2.4 Comparison of DBMS Platforms and Tools
 
@@ -297,7 +297,7 @@ Contest platforms exhibit asymmetric read and write traffic. Leaderboards are po
   [Data Model], [Document (BSON)], [Relational], [Key-Value In-Memory], [Wide-Column],
   [Schema Flexibility], [Dynamic + `$jsonSchema`], [Rigid DDL], [Schema-free], [Rigid Column Family],
   [Leaderboard Query Speed], [O(N log N) scan], [O(N log N) sort], [O(log N + M) instant], [Unoptimized scan],
-  [Multi-Document ACID], [Yes (Replica Set)], [Yes (Native)], [No (Atomic Multi/Exec)], [Row Paxos only],
+  [Multi-Document ACID], [Yes (Replica Set)], [Yes (Native)], [No (Atomic Multi/Exec)], [Single-partition only],
   [Complex Aggregations], [Native Pipeline], [SQL Group By / Window], [Limited], [Basic CQL Group By],
   [Primary Fit in Rankstack], [System of Record], [Alternative Relational], [Fast-Path Cache], [Unsuitable]
 )
@@ -322,7 +322,7 @@ Existing small-scale platforms either execute repeated SQL queries that saturate
 Rankstack decouples persistence from live operational querying. MongoDB transactions guarantee data consistency across collections [4], while Redis sorted sets serve real-time rankings [5]. An atomic version marker (`leaderboard_revision`) coordinates score deltas with cache rebuilds, ensuring that score updates never corrupt an unbuilt or rebuilding cache.
 
 ## 2.8 Summary of the Chapter
-The literature confirms that combining a document database for durable records with an in-memory key-value cache for operational rankings delivers write safety and low read latency without lock contention.
+The literature confirms that combining a document database for durable records with an in-memory key-value cache for operational rankings delivers write safety and low read latency without database connection saturation.
 
 
 ---
@@ -345,7 +345,7 @@ Drawbacks:
 4. Rigid Schemas: Introducing new problem formats requires DDL table alterations or sparse nullable columns.
 
 ## 3.2 Proposed System and Its Advantages
-1. In-Memory Sorted Sets: Redis `ZREVRANGE` retrieves top participants with about 1 ms end-to-end latency (sub-millisecond engine time) [5].
+1. In-Memory Sorted Sets: Redis `ZREVRANGE` retrieves top participants through a lock-light read path [5].
 2. Transactional Integrity: MongoDB multi-document transactions ensure atomic updates across submissions, counters, and participant scores [4].
 3. Polymorphic Validation: Server-side `$jsonSchema` validates multiple choice, coding, and subjective problems within a single collection using `oneOf` blocks.
 4. Ephemeral Auth State: Opaque session tokens and submission rate limiters reside in Redis with automatic TTL expiration.
@@ -372,15 +372,15 @@ Docker Compose containerization ensures automated setup (`make up`, `make init-d
 - FR3 Polymorphic Problems: Enforces type-specific schemas for MCQ, coding, and subjective questions.
 - FR4 Atomic Submissions: Ingesting a submission atomically increments `problems.attemptCount`.
 - FR5 Atomic Scoring: Grading a submission updates status, increments submitter `totalScore`, and updates `solveCount`.
-- FR6 Real-Time Leaderboard: Delivers top contest rankings with about 1 ms end-to-end latency via Redis.
+- FR6 Real-Time Leaderboard: Delivers top contest rankings with low read latency via Redis sorted sets.
 - FR7 Analytical Pipelines: Provides endpoints for contest summaries, difficulty metrics, and team standings.
 
 ### 3.5.2 Data Requirements
-The system maintains five primary collections (`users`, `teams`, `contests`, `problems`, `submissions`) plus one coordination collection (`dirty_leaderboards`). Seed volume comprises 117 documents. Storage growth scales at approximately 25 MB per 10,000 contest submissions (~2.5 MB per 1,000 submissions). Expected annual institution volume is 500-5,000 users, 20-50 contests, and 100-500 problems.
+The system maintains five primary collections (`users`, `teams`, `contests`, `problems`, `submissions`) plus one coordination collection (`dirty_leaderboards`). Seed volume comprises 117 documents. Storage growth scales at approximately 25 MB per 10,000 contest submissions. Expected annual institution volume is 500-5,000 users, 20-50 contests, and 100-500 problems.
 
 ### 3.5.3 Non-Functional Requirements
-- Latency: Leaderboard endpoint response times of about 1 ms end-to-end; write transactions under 50 ms.
-- Concurrency: Sustains concurrent contest submission traffic without transaction deadlocks.
+- Latency Targets: Leaderboard endpoint response time design target is under 10 ms; write transaction design target is under 50 ms.
+- Concurrency: Architectural design target is sustaining concurrent contest submission traffic without transaction deadlocks.
 - Availability: Production architectural target is 99.9% uptime on a 3-node replica set; development prototype runs on a single node (`rs0`).
 - Security: Salted PBKDF2 password hashing; 32-byte opaque session tokens; fixed-window rate limiting.
 - Backup and Recovery: Crash recovery via WiredTiger write-ahead journaling; disaster recovery via logical `mongodump` archives and periodic Redis RDB snapshots.
@@ -400,7 +400,7 @@ The system maintains five primary collections (`users`, `teams`, `contests`, `pr
 - BR1 Submission Rate Limit: A user can submit at most 10 solutions per 60 seconds (enforced via Redis key `rate_limit:<userId>` with refund tracking via `rate_limit_window:<userId>`).
 - BR2 Contest Window Enforcement: Submissions are accepted only when contest status is `live` and the current timestamp falls between `startTime` and `endTime`.
 - BR3 Team Size Limit: A team can contain at most 5 members (enforced via `$jsonSchema` `maxItems: 5` on `teams.memberIds`).
-- BR4 Evaluated Submission Immutability: Once evaluated (`correct` or `incorrect`), submission status and scores cannot be modified by standard users.
+- BR4 Evaluated Submission Immutability: Grading endpoints require administrator authorization (`current.role == 'admin'`). Standard participants cannot modify submission status or scores after submission.
 
 
 ---
@@ -427,23 +427,25 @@ The submission ingestion and scoring cycle operates across database tiers:
 
 
 1. Client sends `POST /submissions`.
-2. Route checks user rate limit in Redis (`rate_limit:<userId>`). If count exceeds 10 per 60 seconds, returns HTTP 429.
-3. `api/services.py:create_submission` opens a MongoDB client session and starts transaction:
+2. Process 1.0 checks user rate limit in Redis (`rate_limit:<userId>`). If count exceeds 10 per 60 seconds, returns HTTP 429.
+3. Process 2.0 (`api/services.py:create_submission`) opens a MongoDB client session and starts transaction:
    - Validates contest is live.
    - Inserts submission document with status `pending`.
    - Atomically increments `problems.attemptCount` by 1.
    - Commits transaction.
-4. Evaluation service grades submission against test cases.
-5. Scoring update calls `api/services.py:update_submission_status` inside a second transaction:
+4. Process 3.0 (Evaluation service) grades submission against test cases.
+5. Process 4.0 (`api/services.py:update_submission_status`) runs a second transaction:
    - Updates submission status (`correct`, `incorrect`, or `partial`) and score.
-   - If status is `correct`, atomically increments `problems.solveCount`.
+   - If status transitions to `correct` from a non-correct status, atomically increments `problems.solveCount`.
    - Atomically increments submitter's `totalScore` on `users` or `teams` by score delta.
    - Increments `version` on `dirty_leaderboards` coordination collection.
    - Commits transaction.
-6. Service calls `api/redis_ops.py:update_leaderboard_score`, executing an atomic Lua script: applies score delta to `leaderboard:<contestId>` only if the stored revision is lower than the delta version.
-7. Polling clients query `GET /contests/{id}/leaderboard` to retrieve top ranks from Redis with about 1 ms end-to-end latency.
+6. Process 5.0 (`api/redis_ops.py:update_leaderboard_score`) executes an atomic Lua script: applies score delta to `leaderboard:<contestId>` only when the stored revision is lower than the delta version.
+7. Process 6.0 serves polling clients querying `GET /contests/{id}/leaderboard` every 30 seconds to retrieve top ranks from Redis.
 
 ## 4.4 Conceptual Design: ER / EER Diagram
+
+The conceptual model is rendered in full detail in Appendix E (Figure 7).
 
 ### 4.4.1 Entities and Attributes
 - User: `_id`, `name`, `email`, `passwordHash`, `role`, `totalScore`, `teamIds`, `createdAt`.
@@ -614,7 +616,7 @@ Indexes configured in `api/db.py:ensure_indexes()`:
    - Index `{"status": 1}` (`by_submission_status`).
 5. `contests`: Index `{"status": 1}` (`by_status`).
 
-Execution plans confirm queries run via index scans (`IXSCAN`), avoiding collection scans (`COLLSCAN`).
+*Index Selectivity Note on `by_submission_status`:* Status is a low-cardinality enum field (about 50% of records in the test dataset share the `correct` verdict). While the query planner uses an index scan (`IXSCAN`), scanning 36 index keys and subsequently fetching 36 documents offers minimal latency reduction compared to a collection scan. Compound indexes combining status with high-cardinality fields (such as `contestId`) provide significantly higher selectivity.
 
 ### 4.7.3 Partitioning Strategy
 Development runs on a single-node replica set (`rs0`). Production sharding partitions `submissions` by `{ contestId: 1, submittedAt: 1 }`, isolating active contest write traffic to dedicated shards.
@@ -700,6 +702,8 @@ pipeline = [
 ]
 ```
 
+*Performance Tuning Example:* In this query, the sub-pipeline matches `submittedBy.refId` against `memberIds`. Adding an index on `{"submittedBy.refId": 1}` converts the sub-pipeline from a collection scan into an index scan (`IXSCAN`).
+
 ### Query 3: Grouping and Aggregation (Contest Leaderboard)
 Computes contest standings from persistent storage:
 ```python
@@ -717,10 +721,53 @@ pipeline = [
 Note on Sorting: The `$group` stage followed by `$sort` represents a blocking in-memory sort in MongoDB. For this reason, live contest ranking is offloaded to Redis sorted sets during active contests.
 
 ### Query 4: Average Score per Difficulty Tier
-Groups submissions by `problemId`, joins `problems` via `$lookup`, and computes average score grouped by `difficulty` (`easy`, `medium`, `hard`).
+Groups submissions by `problemId`, joins `problems` via `$lookup`, and computes average score grouped by `difficulty`:
+```python
+pipeline = [
+    {"$group": {"_id": "$problemId", "avgScore": {"$avg": "$score"}}},
+    {"$lookup": {"from": "problems", "localField": "_id", "foreignField": "_id", "as": "problem"}},
+    {"$unwind": "$problem"},
+    {"$group": {
+        "_id": "$problem.difficulty",
+        "avgScorePerProblem": {"$avg": "$avgScore"},
+        "problemCount": {"$sum": 1}
+    }},
+    {"$sort": {"_id": 1}},
+    {"$project": {"_id": 0, "difficulty": "$_id", "avgScorePerProblem": 1, "problemCount": 1}}
+]
+```
 
-### Query 5: Distinct Problems Solved per User (Set Operation)
-Filters submissions where `status == "correct"`, groups by `{userId, problemId}` to eliminate duplicates (set operation), counts distinct problems, joins `users`, and sorts descending.
+### Query 5: Distinct Problems Solved per User (Distinct Aggregation)
+Filters accepted submissions and eliminates duplicate solves per user:
+```python
+pipeline = [
+    {"$match": {"status": "correct", "submittedBy.refType": "user"}},
+    {"$group": {"_id": {"userId": "$submittedBy.refId", "problemId": "$problemId"}}},
+    {"$group": {"_id": "$_id.userId", "distinctProblemsSolved": {"$sum": 1}}},
+    {"$lookup": {"from": "users", "localField": "_id", "foreignField": "_id", "as": "user"}},
+    {"$unwind": "$user"},
+    {"$sort": {"distinctProblemsSolved": -1}},
+    {"$limit": 5},
+    {"$project": {"_id": 0, "userId": "$_id", "name": "$user.name", "distinctProblemsSolved": 1}}
+]
+```
+
+### Query 6: Real Set Operation via `$unionWith`
+Combines active contest problems with problem bank archives using a set union:
+```python
+pipeline = [
+    {"$match": {"type": "coding"}},
+    {"$project": {"_id": 0, "title": 1, "difficulty": 1, "type": 1}},
+    {"$unionWith": {
+        "coll": "problems",
+        "pipeline": [
+            {"$match": {"type": "mcq"}},
+            {"$project": {"_id": 0, "title": 1, "difficulty": 1, "type": 1}}
+        ]
+    }},
+    {"$limit": 5}
+]
+```
 
 ### Execution Stats Comparison: Indexed vs. Unindexed
 
@@ -746,13 +793,13 @@ The system interface was validated across key contest workflows on the deployed 
 
 #v(0.6cm)
 
-![Figure 2: Contest detail page showing parameters, timeline, and problem list.](review3-assets/02-contest-detail.png)
-*Figure 2: Contest detail page showing parameters, timeline, and problem list.*
+![Figure 2: Contest detail page showing parameters, countdown timeline, and problem list.](review3-assets/02-contest-detail.png)
+*Figure 2: Contest detail page showing parameters, countdown timeline, and problem list.*
 
 #v(0.6cm)
 
-![Figure 3: Problem description, constraints, and submission input interface.](review3-assets/03-problems-tab.png)
-*Figure 3: Problem description, constraints, and submission input interface.*
+![Figure 3: Problem statement, input constraints, and interactive code submission interface.](review3-assets/03-problems-tab.png)
+*Figure 3: Problem statement, input constraints, and interactive code submission interface.*
 
 #v(0.6cm)
 
@@ -779,7 +826,7 @@ The system interface was validated across key contest workflows on the deployed 
   [1], [Decouple persistence from caching], [5 collections + dirty_leaderboards in Mongo; Redis serves leaderboards], [Verified],
   [2], [Enforce schema validation & polymorphism], [Server-side `$jsonSchema` with oneOf rejects invalid problem inserts], [Verified],
   [3], [Guarantee multi-document transactions], [PyMongo sessions on `rs0` atomically update submissions and counters], [Verified],
-  [4], [Low-latency leaderboard retrieval], [Redis `ZREVRANGE` returns top ranks with about 1 ms end-to-end latency], [Verified],
+  [4], [Low-latency leaderboard retrieval], [Redis `ZREVRANGE` returns top ranks through a lock-light read path], [Verified],
   [5], [Build 5 analytical pipelines], [All 5 pipelines tested via `scripts/demo.py` with verified outputs], [Verified]
 )
 
@@ -815,8 +862,8 @@ The system interface was validated across key contest workflows on the deployed 
 Rankstack decouples persistent storage from live contest ranking. MongoDB 7.0 enforces schema constraints and guarantees atomic multi-document transactions across five primary collections plus one coordination collection. Redis 7.4 serves sorted-set leaderboards with about 1 ms end-to-end latency. The implementation was validated through 117 seeded documents, explain plan audits, and execution of five analytical aggregation pipelines.
 
 ## 8.2 Key Contributions
-1. Zero-lock leaderboard architecture using Redis sorted sets to eliminate blocking database sorts during active contests.
-2. Versioned revision coordination protocol eliminating cache rebuild race conditions.
+1. Lock-light leaderboard architecture using Redis sorted sets to isolate continuous polling from primary database disks during active contests.
+2. Versioned revision coordination protocol preventing stale-delta overwrites during cache rebuilds.
 3. Polymorphic problem modeling using MongoDB server-side `$jsonSchema` `oneOf` blocks.
 4. Production-ready Docker Compose orchestration for single-node replica sets.
 
@@ -1038,6 +1085,7 @@ db["users"].delete_one({"_id": user_id})
 ```
 
 ## Appendix C: Stored Procedures, Functions and Triggers (Full Code)
+*Note on Database Logic:* No stored procedures or triggers are used; server-side logic is implemented as application-level transactions and a Redis Lua script.
 
 ### Transaction Infrastructure: `run_in_transaction` (`api/services.py`)
 ```python
@@ -1091,9 +1139,13 @@ def update_submission_status(
         db[target].update_one(
             {"_id": existing["submittedBy"]["refId"]}, {"$inc": {"totalScore": delta}}, session=session
         )
-        if status == "correct":
+        if status == "correct" and existing.get("status") != "correct":
             db["problems"].update_one(
                 {"_id": existing["problemId"]}, {"$inc": {"solveCount": 1}}, session=session
+            )
+        elif status != "correct" and existing.get("status") == "correct":
+            db["problems"].update_one(
+                {"_id": existing["problemId"]}, {"$inc": {"solveCount": -1}}, session=session
             )
         if delta != 0:
             db["dirty_leaderboards"].update_one(
@@ -1174,6 +1226,32 @@ return tonumber(redis.call('ZINCRBY', board_key, delta, member))
 ]
 ```
 
+### Query 6 Output: Set Operation via `$unionWith`
+```json
+[
+  {"type": "coding", "title": "Campaign little near", "difficulty": "medium"},
+  {"type": "coding", "title": "Kitchen technology", "difficulty": "medium"},
+  {"type": "coding", "title": "Various daughter respond draw", "difficulty": "medium"},
+  {"type": "mcq", "title": "Complexity Analysis MCQ", "difficulty": "easy"},
+  {"type": "mcq", "title": "Pointers and Memory MCQ", "difficulty": "easy"}
+]
+```
+
+### Schema Validation Demonstration Output
+```
+1. Coding Problem Insert without testCases:
+   Result: pymongo.errors.WriteError: Document failed validation
+   Error Code: 121 (schemaRulesNotSatisfied for oneOf coding branch)
+
+2. Duplicate Team Name Insert:
+   Result: pymongo.errors.DuplicateKeyError: E11000 duplicate key error
+   Error Code: 11000 (collection: rankstack.teams index: uniq_team_name)
+
+3. Team Insert with 6 Members (exceeding maxItems: 5):
+   Result: pymongo.errors.WriteError: Document failed validation
+   Error Code: 121 (maxItems constraint violation on memberIds)
+```
+
 ### Execution Plan Proof (`explain("executionStats")`)
 ```json
 {
@@ -1206,8 +1284,8 @@ Verification 2: problem.attemptCount before=8, after=8 (Atomic counter rollback 
 
 ## Appendix E: Full-Size ER Diagram and Relational Schema
 
-![Figure 7: Full-Size Entity-Relationship Architecture](erd.svg)
-*Figure 7: Full-Size Entity-Relationship Architecture*
+![Full-Size Entity-Relationship Architecture](erd.svg)
+*Full-Size Entity-Relationship Architecture*
 
 
 ### Relational Schema Mapping

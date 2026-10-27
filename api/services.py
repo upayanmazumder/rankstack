@@ -236,6 +236,18 @@ def update_submission_status(
             {"$inc": {"totalScore": delta}},
             session=session,
         )
+        if status == "correct" and existing.get("status") != "correct":
+            db["problems"].update_one(
+                {"_id": existing["problemId"]},
+                {"$inc": {"solveCount": 1}},
+                session=session,
+            )
+        elif status != "correct" and existing.get("status") == "correct":
+            db["problems"].update_one(
+                {"_id": existing["problemId"]},
+                {"$inc": {"solveCount": -1}},
+                session=session,
+            )
         if delta != 0:
             # Upsert, not a plain update: without a pre-existing marker the
             # contest's very first grade must still mint a revision so
