@@ -92,8 +92,7 @@ PROBLEMS_SCHEMA = {
             "type": {"enum": ["mcq", "coding", "subjective"]},
             "title": {"bsonType": "string"},
             "description": {"bsonType": "string"},
-            "difficulty": {"enum": ["easy", "medium", "hard"]},
-            "points": {"bsonType": ["int", "double"]},
+            "points": {"bsonType": ["int", "double"], "minimum": 0},
             "attemptCount": {"bsonType": ["int", "double"]},
             "solveCount": {"bsonType": ["int", "double"]},
         },
@@ -154,7 +153,7 @@ SUBMISSIONS_SCHEMA = {
             "submittedBy": SUBMITTED_BY_SCHEMA,
             "answer": {},
             "status": {"enum": ["pending", "correct", "incorrect", "partial"]},
-            "score": {"bsonType": ["int", "double"]},
+            "score": {"bsonType": ["int", "double"], "minimum": 0},
             "submittedAt": {"bsonType": "date"},
         },
     }
@@ -238,6 +237,7 @@ def ensure_indexes(db: Database) -> None:
     db["submissions"].create_index([("problemId", ASCENDING)], name="by_problem")
     db["teams"].create_index([("memberIds", ASCENDING)], name="by_member")
     db["teams"].create_index([("name", ASCENDING)], unique=True, name="uniq_team_name")
+    db["submissions"].create_index([("status", ASCENDING)], name="by_submission_status")
     db["contests"].create_index([("status", ASCENDING)], name="by_status")
 
 

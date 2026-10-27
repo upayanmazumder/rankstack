@@ -3,13 +3,10 @@
     <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#1e293b" />
     </marker>
-    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b" />
-    </marker>
   </defs>
 
   <!-- Title -->
-  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Figure 4.1: Rankstack System Architecture</text>
+  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Rankstack System Architecture</text>
   <text x="30" y="48" font-size="10.5" fill="#64748b">Decoupled presentation, REST API service, operational in-memory cache, and persistent document store</text>
 
   <!-- CLIENT TIER -->
@@ -33,13 +30,12 @@
     <rect y="18" width="820" height="4" fill="#1e293b"/>
     <text x="12" y="15" font-size="11" font-weight="bold" fill="#ffffff">APPLICATION TIER: FastAPI Server (Python 3.14, Thread Pool Worker Execution)</text>
     
-    <!-- Sub modules inside API -->
     <g transform="translate(20, 35)">
       <rect width="235" height="95" rx="3" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
       <text x="10" y="20" font-size="10.5" font-weight="bold" fill="#0f172a">Auth &amp; Rate Limiting</text>
       <text x="10" y="40" font-size="9.5" fill="#475569">- PBKDF2 Password Hashing</text>
       <text x="10" y="58" font-size="9.5" fill="#475569">- 32-Byte Opaque Bearer Tokens</text>
-      <text x="10" y="76" font-size="9.5" fill="#475569">- Sliding-Window Rate Limiter</text>
+      <text x="10" y="76" font-size="9.5" fill="#475569">- Fixed-Window Rate Limiter (10/60s)</text>
     </g>
 
     <g transform="translate(285, 35)">
@@ -81,22 +77,24 @@
     <text x="12" y="84" font-size="9.5" font-weight="bold" fill="#0f172a">session:&lt;token&gt;</text>
     <text x="150" y="84" font-size="9.5" fill="#475569">- Opaque auth session (TTL: 24h)</text>
     <text x="12" y="104" font-size="9.5" font-weight="bold" fill="#0f172a">rate_limit:&lt;user&gt;</text>
-    <text x="150" y="104" font-size="9.5" fill="#475569">- Submission throttle counter (TTL: 5s)</text>
+    <text x="150" y="104" font-size="9.5" fill="#475569">- Fixed-window counter (TTL: 60s, max 10)</text>
   </g>
 
   <!-- DATA TIER: MONGODB -->
   <g transform="translate(460, 380)">
-    <rect width="400" height="115" rx="4" fill="#f8fafc" stroke="#334155" stroke-width="1.2"/>
+    <rect width="400" height="125" rx="4" fill="#f8fafc" stroke="#334155" stroke-width="1.2"/>
     <rect width="400" height="22" rx="4" fill="#334155"/>
     <rect y="18" width="400" height="4" fill="#334155"/>
     <text x="12" y="15" font-size="11" font-weight="bold" fill="#ffffff">MONGODB 7.0: Replica Set rs0 (System of Record)</text>
     <text x="12" y="44" font-size="9.5" font-weight="bold" fill="#0f172a">users, teams</text>
-    <text x="120" y="44" font-size="9.5" fill="#475569">- Accounts, credentials, team rosters</text>
-    <text x="12" y="64" font-size="9.5" font-weight="bold" fill="#0f172a">contests</text>
-    <text x="120" y="64" font-size="9.5" fill="#475569">- Timelines, embedded participant references</text>
-    <text x="12" y="84" font-size="9.5" font-weight="bold" fill="#0f172a">problems</text>
-    <text x="120" y="84" font-size="9.5" fill="#475569">- $jsonSchema with oneOf (MCQ, Coding, Subj)</text>
-    <text x="12" y="104" font-size="9.5" font-weight="bold" fill="#0f172a">submissions</text>
-    <text x="120" y="104" font-size="9.5" fill="#475569">- Multi-document ACID records and score deltas</text>
+    <text x="135" y="44" font-size="9.5" fill="#475569">- Accounts, credentials, team rosters</text>
+    <text x="12" y="62" font-size="9.5" font-weight="bold" fill="#0f172a">contests</text>
+    <text x="135" y="62" font-size="9.5" fill="#475569">- Timelines, embedded participant references</text>
+    <text x="12" y="80" font-size="9.5" font-weight="bold" fill="#0f172a">problems</text>
+    <text x="135" y="80" font-size="9.5" fill="#475569">- $jsonSchema with oneOf (MCQ, Coding, Subj)</text>
+    <text x="12" y="98" font-size="9.5" font-weight="bold" fill="#0f172a">submissions</text>
+    <text x="135" y="98" font-size="9.5" fill="#475569">- Multi-document ACID records and score deltas</text>
+    <text x="12" y="116" font-size="9.5" font-weight="bold" fill="#0f172a">dirty_leaderboards</text>
+    <text x="135" y="116" font-size="9.5" fill="#475569">- Monotonic version coordination markers</text>
   </g>
 </svg>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate monochromatic / grayscale SVGs for ERD and Architecture."""
+"""Generate updated grayscale SVGs for ERD and Architecture."""
 
 def generate_arch_svg():
     width = 900
@@ -10,13 +10,10 @@ def generate_arch_svg():
     <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 8 5 L 0 9 z" fill="#1e293b" />
     </marker>
-    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b" />
-    </marker>
   </defs>
 
   <!-- Title -->
-  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Figure 4.1: Rankstack System Architecture</text>
+  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Rankstack System Architecture</text>
   <text x="30" y="48" font-size="10.5" fill="#64748b">Decoupled presentation, REST API service, operational in-memory cache, and persistent document store</text>
 
   <!-- CLIENT TIER -->
@@ -40,13 +37,12 @@ def generate_arch_svg():
     <rect y="18" width="820" height="4" fill="#1e293b"/>
     <text x="12" y="15" font-size="11" font-weight="bold" fill="#ffffff">APPLICATION TIER: FastAPI Server (Python 3.14, Thread Pool Worker Execution)</text>
     
-    <!-- Sub modules inside API -->
     <g transform="translate(20, 35)">
       <rect width="235" height="95" rx="3" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
       <text x="10" y="20" font-size="10.5" font-weight="bold" fill="#0f172a">Auth &amp; Rate Limiting</text>
       <text x="10" y="40" font-size="9.5" fill="#475569">- PBKDF2 Password Hashing</text>
       <text x="10" y="58" font-size="9.5" fill="#475569">- 32-Byte Opaque Bearer Tokens</text>
-      <text x="10" y="76" font-size="9.5" fill="#475569">- Sliding-Window Rate Limiter</text>
+      <text x="10" y="76" font-size="9.5" fill="#475569">- Fixed-Window Rate Limiter (10/60s)</text>
     </g>
 
     <g transform="translate(285, 35)">
@@ -88,30 +84,32 @@ def generate_arch_svg():
     <text x="12" y="84" font-size="9.5" font-weight="bold" fill="#0f172a">session:&lt;token&gt;</text>
     <text x="150" y="84" font-size="9.5" fill="#475569">- Opaque auth session (TTL: 24h)</text>
     <text x="12" y="104" font-size="9.5" font-weight="bold" fill="#0f172a">rate_limit:&lt;user&gt;</text>
-    <text x="150" y="104" font-size="9.5" fill="#475569">- Submission throttle counter (TTL: 5s)</text>
+    <text x="150" y="104" font-size="9.5" fill="#475569">- Fixed-window counter (TTL: 60s, max 10)</text>
   </g>
 
   <!-- DATA TIER: MONGODB -->
   <g transform="translate(460, 380)">
-    <rect width="400" height="115" rx="4" fill="#f8fafc" stroke="#334155" stroke-width="1.2"/>
+    <rect width="400" height="125" rx="4" fill="#f8fafc" stroke="#334155" stroke-width="1.2"/>
     <rect width="400" height="22" rx="4" fill="#334155"/>
     <rect y="18" width="400" height="4" fill="#334155"/>
     <text x="12" y="15" font-size="11" font-weight="bold" fill="#ffffff">MONGODB 7.0: Replica Set rs0 (System of Record)</text>
     <text x="12" y="44" font-size="9.5" font-weight="bold" fill="#0f172a">users, teams</text>
-    <text x="120" y="44" font-size="9.5" fill="#475569">- Accounts, credentials, team rosters</text>
-    <text x="12" y="64" font-size="9.5" font-weight="bold" fill="#0f172a">contests</text>
-    <text x="120" y="64" font-size="9.5" fill="#475569">- Timelines, embedded participant references</text>
-    <text x="12" y="84" font-size="9.5" font-weight="bold" fill="#0f172a">problems</text>
-    <text x="120" y="84" font-size="9.5" fill="#475569">- $jsonSchema with oneOf (MCQ, Coding, Subj)</text>
-    <text x="12" y="104" font-size="9.5" font-weight="bold" fill="#0f172a">submissions</text>
-    <text x="120" y="104" font-size="9.5" fill="#475569">- Multi-document ACID records and score deltas</text>
+    <text x="135" y="44" font-size="9.5" fill="#475569">- Accounts, credentials, team rosters</text>
+    <text x="12" y="62" font-size="9.5" font-weight="bold" fill="#0f172a">contests</text>
+    <text x="135" y="62" font-size="9.5" fill="#475569">- Timelines, embedded participant references</text>
+    <text x="12" y="80" font-size="9.5" font-weight="bold" fill="#0f172a">problems</text>
+    <text x="135" y="80" font-size="9.5" fill="#475569">- $jsonSchema with oneOf (MCQ, Coding, Subj)</text>
+    <text x="12" y="98" font-size="9.5" font-weight="bold" fill="#0f172a">submissions</text>
+    <text x="135" y="98" font-size="9.5" fill="#475569">- Multi-document ACID records and score deltas</text>
+    <text x="12" y="116" font-size="9.5" font-weight="bold" fill="#0f172a">dirty_leaderboards</text>
+    <text x="135" y="116" font-size="9.5" fill="#475569">- Monotonic version coordination markers</text>
   </g>
 </svg>
 """
 
 def generate_erd_bw_svg():
-    width = 1000
-    height = 680
+    width = 1050
+    height = 720
     
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%" style="background:#ffffff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
   <defs>
@@ -129,8 +127,8 @@ def generate_erd_bw_svg():
   </defs>
 
   <!-- Title Header -->
-  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Figure 4.2: Entity-Relationship Diagram (Monochrome Academic Format)</text>
-  <text x="30" y="46" font-size="10.5" fill="#64748b">Primary entities, attributes, primary/foreign key constraints, and polymorphic problem subtypes</text>
+  <text x="30" y="30" font-size="14" font-weight="bold" fill="#0f172a">Rankstack Entity-Relationship Architecture</text>
+  <text x="30" y="46" font-size="10.5" fill="#64748b">Primary collections, coordination collection, constraints, and polymorphic problem subtypes</text>
 
   <!-- USER -->
   <g transform="translate(30, 65)">
@@ -159,14 +157,14 @@ def generate_erd_bw_svg():
     <text x="10" y="44" class="field-pk">id</text><text x="130" y="44" class="field-type">objectId [PK]</text>
     <text x="10" y="62" class="field-pk">name</text><text x="130" y="62" class="field-type">string [UK]</text>
     <text x="10" y="80" class="field-fk">ownerId</text><text x="130" y="80" class="field-type">objectId [FK]</text>
-    <text x="10" y="98" class="field-fk">memberIds</text><text x="130" y="98" class="field-type">objectId[]</text>
+    <text x="10" y="98" class="field-fk">memberIds</text><text x="130" y="98" class="field-type">objectId[1..5]</text>
     <text x="10" y="116" class="field-std">totalScore</text><text x="130" y="116" class="field-type">double</text>
     <text x="10" y="134" class="field-std">createdAt</text><text x="130" y="134" class="field-type">date</text>
   </g>
 
   <!-- CONTEST -->
   <g transform="translate(380, 65)">
-    <rect width="230" height="205" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+    <rect width="230" height="215" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
     <rect width="230" height="24" rx="3" fill="#1e293b"/>
     <rect y="20" width="230" height="4" fill="#1e293b"/>
     <text x="10" y="16" class="entity-title">CONTEST</text>
@@ -180,11 +178,12 @@ def generate_erd_bw_svg():
     <text x="10" y="152" class="field-fk">createdBy</text><text x="150" y="152" class="field-type">objectId [FK]</text>
     <text x="10" y="170" class="field-fk">problemIds</text><text x="150" y="170" class="field-type">objectId[]</text>
     <text x="10" y="188" class="field-std">participants</text><text x="150" y="188" class="field-type">subdoc[]</text>
+    <text x="10" y="204" class="field-std">createdAt</text><text x="150" y="204" class="field-type">date</text>
   </g>
 
   <!-- PROBLEM -->
-  <g transform="translate(380, 340)">
-    <rect width="230" height="180" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
+  <g transform="translate(380, 330)">
+    <rect width="230" height="195" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
     <rect width="230" height="24" rx="3" fill="#1e293b"/>
     <rect y="20" width="230" height="4" fill="#1e293b"/>
     <text x="10" y="16" class="entity-title">PROBLEM</text>
@@ -193,10 +192,11 @@ def generate_erd_bw_svg():
     <text x="10" y="62" class="field-fk">contestId</text><text x="150" y="62" class="field-type">objectId [FK]</text>
     <text x="10" y="80" class="field-pk">type (discriminator)</text><text x="150" y="80" class="field-type">enum(mcq/cod/sub)</text>
     <text x="10" y="98" class="field-std">title</text><text x="150" y="98" class="field-type">string</text>
-    <text x="10" y="116" class="field-std">difficulty</text><text x="150" y="116" class="field-type">enum(ez/med/hrd)</text>
-    <text x="10" y="134" class="field-std">points</text><text x="150" y="134" class="field-type">double</text>
-    <text x="10" y="152" class="field-std">attemptCount</text><text x="150" y="152" class="field-type">int (atomic)</text>
-    <text x="10" y="170" class="field-std">createdAt</text><text x="150" y="170" class="field-type">date</text>
+    <text x="10" y="116" class="field-std">description</text><text x="150" y="116" class="field-type">string</text>
+    <text x="10" y="134" class="field-std">difficulty</text><text x="150" y="134" class="field-type">enum(ez/med/hrd)</text>
+    <text x="10" y="152" class="field-std">points</text><text x="150" y="152" class="field-type">double</text>
+    <text x="10" y="170" class="field-std">attemptCount</text><text x="150" y="170" class="field-type">int (atomic)</text>
+    <text x="10" y="186" class="field-std">solveCount</text><text x="150" y="186" class="field-type">int (atomic)</text>
   </g>
 
   <!-- SUBTYPES (Grayscale) -->
@@ -223,7 +223,7 @@ def generate_erd_bw_svg():
   </g>
 
   <!-- SUBMISSION -->
-  <g transform="translate(740, 140)">
+  <g transform="translate(740, 110)">
     <rect width="230" height="215" rx="3" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
     <rect width="230" height="24" rx="3" fill="#1e293b"/>
     <rect y="20" width="230" height="4" fill="#1e293b"/>
@@ -240,31 +240,52 @@ def generate_erd_bw_svg():
     <text x="10" y="188" class="field-std">submittedAt</text><text x="150" y="188" class="field-type">date</text>
   </g>
 
+  <!-- DIRTY_LEADERBOARDS -->
+  <g transform="translate(740, 360)">
+    <rect width="230" height="110" rx="3" fill="#f8fafc" stroke="#334155" stroke-width="1.2"/>
+    <rect width="230" height="24" rx="3" fill="#334155"/>
+    <rect y="20" width="230" height="4" fill="#334155"/>
+    <text x="10" y="16" class="entity-title">DIRTY_LEADERBOARD</text>
+    
+    <text x="10" y="44" class="field-pk">_id (contestId)</text><text x="150" y="44" class="field-type">objectId [PK, FK]</text>
+    <text x="10" y="62" class="field-std">dirty</text><text x="150" y="62" class="field-type">bool</text>
+    <text x="10" y="80" class="field-std">version</text><text x="150" y="80" class="field-type">int [monotone]</text>
+    <text x="10" y="98" class="field-std">reconciledVersion</text><text x="150" y="98" class="field-type">int / null</text>
+  </g>
+
   <!-- CONNECTIONS -->
   <path d="M 130 250 L 130 320" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
   <rect x="135" y="275" width="70" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
   <text x="140" y="287" class="rel-label">1 owns M</text>
 
-  <path d="M 230 130 L 380 130" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
-  <rect x="275" y="122" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
-  <text x="280" y="134" class="rel-label">1 creates M</text>
+  <path d="M 230 110 L 380 110" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="275" y="102" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="280" y="114" class="rel-label">1 creates M</text>
 
-  <path d="M 495 270 L 495 340" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <path d="M 230 150 L 380 150" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#crow)"/>
+  <rect x="275" y="142" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="280" y="154" class="rel-label">joins M</text>
+
+  <path d="M 495 280 L 495 330" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
   <rect x="500" y="295" width="80" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
   <text x="505" y="307" class="rel-label">1 contains M</text>
 
-  <path d="M 610 160 L 740 160" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
-  <rect x="645" y="152" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
-  <text x="650" y="164" class="rel-label">1 tracks M</text>
+  <path d="M 610 140 L 740 140" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="645" y="132" width="75" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="650" y="144" class="rel-label">1 tracks M</text>
 
-  <path d="M 610 370 L 680 370 L 680 290 L 740 290" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
-  <rect x="655" y="325" width="80" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
-  <text x="660" y="337" class="rel-label">1 receives M</text>
+  <path d="M 610 370 L 680 370 L 680 260 L 740 260" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#crow)"/>
+  <rect x="655" y="310" width="80" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="660" y="322" class="rel-label">1 receives M</text>
+
+  <path d="M 610 180 L 680 180 L 680 410 L 740 410" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4 2" marker-end="url(#crow)"/>
+  <rect x="650" y="280" width="85" height="16" fill="#ffffff" stroke="#cbd5e1" rx="2"/>
+  <text x="655" y="292" class="rel-label">1 coordinates</text>
 
   <!-- Specialization links -->
-  <path d="M 430 520 L 400 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
-  <path d="M 495 520 L 580 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
-  <path d="M 560 520 L 740 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <path d="M 430 525 L 400 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <path d="M 495 525 L 580 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <path d="M 560 525 L 740 560" fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
 
 </svg>
 """
@@ -275,4 +296,4 @@ with open("docs/arch.svg", "w", encoding="utf-8") as f:
 with open("docs/erd.svg", "w", encoding="utf-8") as f:
     f.write(generate_erd_bw_svg())
 
-print("Wrote docs/arch.svg and docs/erd.svg in clean grayscale")
+print("Regenerated docs/arch.svg and docs/erd.svg successfully")
