@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Generate updated grayscale SVGs for ERD and Architecture."""
 
+
 def generate_arch_svg():
     width = 900
     height = 520
-    
+
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%" style="background:#ffffff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -107,10 +108,11 @@ def generate_arch_svg():
 </svg>
 """
 
+
 def generate_erd_bw_svg():
     width = 1050
     height = 720
-    
+
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="100%" height="100%" style="background:#ffffff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
   <defs>
     <style>
@@ -289,6 +291,7 @@ def generate_erd_bw_svg():
 
 </svg>
 """
+
 
 with open("docs/arch.svg", "w", encoding="utf-8") as f:
     f.write(generate_arch_svg())

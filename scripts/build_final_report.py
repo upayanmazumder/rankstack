@@ -1149,6 +1149,7 @@ make demo
 This script verifies MongoDB connection integrity, user CRUD operations, indexed query execution plans (`IXSCAN`), multi-document transaction rollbacks, all five analytical aggregation pipelines, and Redis sorted set operations.
 """
 
+
 def generate_typst():
     content = f"""// BCSE302P Review 3 Project Report - Final Faculty Reviewed Edition
 #set document(title: "Contest Platform with Live Leaderboard", author: "Upayan Mazumder, Aditya Rawat, Shloak Sinha")
@@ -1311,8 +1312,9 @@ def generate_typst():
 """
     return content
 
+
 def generate_markdown():
-    mermaid_arch = '''```mermaid
+    mermaid_arch = """```mermaid
 graph TD
     Client[Next.js 16 Web Client<br/>React 19, TypeScript, Tailwind CSS]
     
@@ -1337,9 +1339,9 @@ graph TD
     TxService -->|Conditional Lua Delta Updates| Redis
     AggPipelines -->|Analytical Aggregations| Mongo
     Client -.->|Poll Leaderboard / GET| Redis
-```'''
+```"""
 
-    mermaid_dfd = '''```mermaid
+    mermaid_dfd = """```mermaid
 flowchart TD
     Client[Contestant Web Client]
     P1[1.0 Check Rate Limit]
@@ -1363,9 +1365,9 @@ flowchart TD
     P5 -->|ZINCRBY if stored rev < delta version| D1
     Client -->|GET /contests/id/leaderboard 30s poll| P6
     P6 <-->|ZREVRANGE <1ms| D1
-```'''
+```"""
 
-    mermaid_erd = '''```mermaid
+    mermaid_erd = """```mermaid
 erDiagram
     USER ||--o{ TEAM : owns
     USER ||--o{ TEAM_MEMBER : "belongs to"
@@ -1476,7 +1478,7 @@ erDiagram
         int version "NOT NULL"
         int reconciled_version
     }
-```'''
+```"""
 
     return f"""# Database Project Report
 
@@ -1570,13 +1572,19 @@ erDiagram
 {convert_typst_to_md(APPENDICES)}
 """
 
+
 def convert_typst_to_md(text):
     out = text
     out = re.sub(r"^=== (.*)$", r"### \1", out, flags=re.MULTILINE)
     out = re.sub(r"^== (.*)$", r"## \1", out, flags=re.MULTILINE)
     out = re.sub(r"^= (.*)$", r"# \1", out, flags=re.MULTILINE)
-    out = re.sub(r'#figure\(\s*image\("([^"]+)",[^\)]*\),\s*caption:\s*\[([^\]]+)\]\s*\)', r'![\2](\1)\n*\2*\n', out)
+    out = re.sub(
+        r'#figure\(\s*image\("([^"]+)",[^\)]*\),\s*caption:\s*\[([^\]]+)\]\s*\)',
+        r"![\2](\1)\n*\2*\n",
+        out,
+    )
     return out
+
 
 def verify_constraints(content):
     print("Verifying constraints...")
@@ -1588,7 +1596,25 @@ def verify_constraints(content):
         raise ValueError("Em-dash found")
     content = content.replace("–", "-")
 
-    forbidden = ["delve", "tapestry", "vibrant", "pivotal", "crucial", "testament", "landscape", "interplay", "intricate", "bolster", "showcase", "enduring", "revolutionary", "seamless", "at its core", "what really matters", "not only"]
+    forbidden = [
+        "delve",
+        "tapestry",
+        "vibrant",
+        "pivotal",
+        "crucial",
+        "testament",
+        "landscape",
+        "interplay",
+        "intricate",
+        "bolster",
+        "showcase",
+        "enduring",
+        "revolutionary",
+        "seamless",
+        "at its core",
+        "what really matters",
+        "not only",
+    ]
     for w in forbidden:
         matches = re.findall(rf"\b{w}\b", content, re.IGNORECASE)
         if matches:
@@ -1596,6 +1622,7 @@ def verify_constraints(content):
 
     print("Constraints verified.")
     return content
+
 
 def main():
     typst_raw = generate_typst()
@@ -1611,15 +1638,20 @@ def main():
 
     pdf_path = DOCS / "BCSE302P_ProjectReport_Review3.pdf"
     cmd = ["/home/upayan/.local/bin/typst", "compile", str(typ_path), str(pdf_path)]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(cmd, check=False, capture_output=True, text=True)
     if res.returncode != 0:
         print("Typst compile error:\n", res.stderr)
         return
 
-    out = subprocess.run(["pdfinfo", str(pdf_path)], capture_output=True, text=True).stdout
+    out = subprocess.run(
+        ["pdfinfo", str(pdf_path)], check=False, capture_output=True, text=True
+    ).stdout
     for line in out.splitlines():
         if "Pages:" in line:
-            print(f"Successfully generated {pdf_path}: {line.strip()} ({os.path.getsize(pdf_path)} bytes)")
+            print(
+                f"Successfully generated {pdf_path}: {line.strip()} ({os.path.getsize(pdf_path)} bytes)"
+            )
+
 
 if __name__ == "__main__":
     main()

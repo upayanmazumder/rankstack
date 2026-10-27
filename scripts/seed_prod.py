@@ -12,31 +12,38 @@ Generates:
   - Synchronized Redis sorted-set leaderboards
 """
 
-from datetime import UTC, datetime, timedelta
 import random
-from bson import ObjectId
-from api.db import get_db, get_redis_client, init_db
+from datetime import timedelta
+
+from api import redis_ops
+from api.db import get_redis_client, init_db
 from api.models.common import utcnow
 from api.security import hash_password
-from api import redis_ops, services
+
 
 def seed_production():
     db = init_db()
     redis_client = get_redis_client()
 
-    print("Ensuring existing admin/personal user 'rankstack@upayan.dev' has password 'password'...")
+    print(
+        "Ensuring existing admin/personal user 'rankstack@upayan.dev' has password 'password'..."
+    )
     user_rankstack = db.users.find_one({"email": "rankstack@upayan.dev"})
     if user_rankstack:
         db.users.update_one(
             {"_id": user_rankstack["_id"]},
-            {"$set": {
-                "passwordHash": hash_password("password"),
-                "role": "admin",
-                "name": "Upayan Mazumder"
-            }}
+            {
+                "$set": {
+                    "passwordHash": hash_password("password"),
+                    "role": "admin",
+                    "name": "Upayan Mazumder",
+                }
+            },
         )
         primary_user_id = user_rankstack["_id"]
-        print(f"  Updated 'rankstack@upayan.dev' (id: {primary_user_id}) to admin role with password 'password'.")
+        print(
+            f"  Updated 'rankstack@upayan.dev' (id: {primary_user_id}) to admin role with password 'password'."
+        )
     else:
         doc = {
             "name": "Upayan Mazumder",
@@ -58,7 +65,7 @@ def seed_production():
     db.problems.delete_many({})
     db.submissions.delete_many({})
     db.dirty_leaderboards.delete_many({})
-    
+
     for pattern in ("leaderboard:*", "leaderboard_revision:*"):
         for key in redis_client.keys(pattern):
             redis_client.delete(key)
@@ -79,7 +86,14 @@ def seed_production():
         {"name": "Rhea Chakraborty", "email": "rhea.c@vitstudent.ac.in"},
     ]
 
-    all_users = [{"_id": primary_user_id, "name": "Upayan Mazumder", "email": "rankstack@upayan.dev", "role": "admin"}]
+    all_users = [
+        {
+            "_id": primary_user_id,
+            "name": "Upayan Mazumder",
+            "email": "rankstack@upayan.dev",
+            "role": "admin",
+        }
+    ]
     for p in natural_participants:
         u_doc = {
             "name": p["name"],
@@ -97,10 +111,19 @@ def seed_production():
 
     # 2. Realistic Competitive Teams
     teams_spec = [
-        {"name": "Null Pointers", "members": [all_users[1], all_users[2], all_users[3]]},
-        {"name": "Binary Mavericks", "members": [all_users[4], all_users[5], all_users[6]]},
+        {
+            "name": "Null Pointers",
+            "members": [all_users[1], all_users[2], all_users[3]],
+        },
+        {
+            "name": "Binary Mavericks",
+            "members": [all_users[4], all_users[5], all_users[6]],
+        },
         {"name": "Algorithmics", "members": [all_users[7], all_users[8], all_users[9]]},
-        {"name": "Stack Overflowed", "members": [all_users[10], all_users[11], all_users[12]]},
+        {
+            "name": "Stack Overflowed",
+            "members": [all_users[10], all_users[11], all_users[12]],
+        },
     ]
 
     all_teams = []
@@ -188,7 +211,12 @@ def seed_production():
             "description": "Which anomaly is prevented under Snapshot Isolation that is permitted under Read Committed?",
             "difficulty": "medium",
             "points": 20,
-            "options": ["Dirty Reads only", "Non-Repeatable Reads and Dirty Reads", "Phantom Reads only", "Dirty Writes only"],
+            "options": [
+                "Dirty Reads only",
+                "Non-Repeatable Reads and Dirty Reads",
+                "Phantom Reads only",
+                "Dirty Writes only",
+            ],
             "correctAnswer": "Non-Repeatable Reads and Dirty Reads",
         },
         # Coding
@@ -202,8 +230,8 @@ def seed_production():
             "constraints": "1 <= nums.length <= 2 * 10^4, -1000 <= nums[i] <= 1000",
             "testCases": [
                 {"input": "[1,1,1]\n2", "output": "2"},
-                {"input": "[1,2,3]\n3", "output": "2"}
-            ]
+                {"input": "[1,2,3]\n3", "output": "2"},
+            ],
         },
         {
             "type": "coding",
@@ -215,8 +243,8 @@ def seed_production():
             "constraints": "2 <= numbers.length <= 3 * 10^4",
             "testCases": [
                 {"input": "2 7 11 15\n9", "output": "1 2"},
-                {"input": "2 3 4\n6", "output": "1 3"}
-            ]
+                {"input": "2 3 4\n6", "output": "1 3"},
+            ],
         },
         # Subjective
         {
@@ -226,8 +254,8 @@ def seed_production():
             "difficulty": "hard",
             "points": 40,
             "wordLimit": 400,
-            "evaluationRubric": "Full marks for identifying replica failover consistency risks and dirty marker reconciliation mechanisms."
-        }
+            "evaluationRubric": "Full marks for identifying replica failover consistency risks and dirty marker reconciliation mechanisms.",
+        },
     ]
 
     all_contests = []
@@ -284,8 +312,12 @@ def seed_production():
         # Iterate participants
         for part in c["participants"]:
             # Make 1 to 3 attempts
-            for prob in c["problems"][:random.randint(1, 3)]:
-                ans = prob.get("correctAnswer", "O(log N)") if prob["type"] == "mcq" else "def solve(): return True"
+            for prob in c["problems"][: random.randint(1, 3)]:
+                ans = (
+                    prob.get("correctAnswer", "O(log N)")
+                    if prob["type"] == "mcq"
+                    else "def solve(): return True"
+                )
                 sub_doc = {
                     "contestId": c["_id"],
                     "problemId": prob["_id"],
@@ -293,10 +325,13 @@ def seed_production():
                     "answer": ans,
                     "status": "pending",
                     "score": 0,
-                    "submittedAt": c["startTime"] + timedelta(hours=random.randint(1, 6)),
+                    "submittedAt": c["startTime"]
+                    + timedelta(hours=random.randint(1, 6)),
                 }
                 sub_id = db.submissions.insert_one(sub_doc).inserted_id
-                db.problems.update_one({"_id": prob["_id"]}, {"$inc": {"attemptCount": 1}})
+                db.problems.update_one(
+                    {"_id": prob["_id"]}, {"$inc": {"attemptCount": 1}}
+                )
 
                 # Outcome
                 verdict = random.choice(["correct", "correct", "partial", "incorrect"])
@@ -310,12 +345,18 @@ def seed_production():
                     awarded = prob["points"] / 2
 
                 if verdict != "pending":
-                    db.submissions.update_one({"_id": sub_id}, {"$set": {"status": verdict, "score": awarded}})
+                    db.submissions.update_one(
+                        {"_id": sub_id}, {"$set": {"status": verdict, "score": awarded}}
+                    )
                     target = "users" if part["refType"] == "user" else "teams"
-                    db[target].update_one({"_id": part["refId"]}, {"$inc": {"totalScore": awarded}})
-                    
+                    db[target].update_one(
+                        {"_id": part["refId"]}, {"$inc": {"totalScore": awarded}}
+                    )
+
                     pid_str = str(part["refId"])
-                    scores_by_participant[pid_str] = scores_by_participant.get(pid_str, 0) + awarded
+                    scores_by_participant[pid_str] = (
+                        scores_by_participant.get(pid_str, 0) + awarded
+                    )
 
                 total_submissions += 1
 
@@ -325,7 +366,7 @@ def seed_production():
             db.dirty_leaderboards.update_one(
                 {"_id": c["_id"]},
                 {"$set": {"version": 1, "reconciledVersion": 1}},
-                upsert=True
+                upsert=True,
             )
 
     print(f"Generated {total_submissions} submissions and updated Redis leaderboards.")
@@ -341,6 +382,7 @@ def seed_production():
     for k, v in final_counts.items():
         print(f"  {k}: {v}")
     print(f"TOTAL: {sum(final_counts.values())}")
+
 
 if __name__ == "__main__":
     seed_production()
